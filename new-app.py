@@ -41,8 +41,7 @@ CORS(app, resources={
 }, supports_credentials=True)
 
 # Initialize OpenAI client
-client = OpenAI(api_key="")  # Replace with your valid OpenAI API key
-
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))  # Use environment variables instead
 # Create necessary folders for PDF processing
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(CURRENT_DIR, 'Uploads')  # Kept as 'Uploads' to match your setup

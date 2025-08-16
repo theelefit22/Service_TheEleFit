@@ -43,9 +43,7 @@ CORS(app, resources={
 #load_dotenv()
 
 # OpenAI API Configuration
-API_KEY = "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"
-print(f"Using API key: {API_KEY[:20]}...")
-
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))  # Use environment variables instead
 # Create necessary folders for grocery backend
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(CURRENT_DIR, 'Uploads')
