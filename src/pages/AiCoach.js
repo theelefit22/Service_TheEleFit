@@ -1886,7 +1886,7 @@ const AIFitnessCoach = () => {
                     <div
                       className="accordion-header"
                       data-meal={`day${dayPlan.dayNumber}`}
-                      onClick={() => toggleAccordion('meal', `day${dayPlan.dayNumber}`)}
+                      onClick={() => toggleAccordion(`day${dayPlan.dayNumber}`, 'meal')}
                     >
                       <div className="day-header-content">
                         <i className="fas fa-calendar-day accordion-icon"></i>
@@ -1920,7 +1920,7 @@ const AIFitnessCoach = () => {
                             <div 
                               className="nested-accordion-header"
                               data-meal-type={meal.type.toLowerCase()}
-                              onClick={() => toggleAccordion('meal-sub', `${dayPlan.dayNumber}-${meal.type}`)}
+                              onClick={() => toggleAccordion(`${dayPlan.dayNumber}-${meal.type}`, 'meal-sub')}
                             >
                               <div className="meal-header-content">
                                 <i className={`fas ${getMealIcon(meal.type)} nested-accordion-icon`}></i>
@@ -1972,7 +1972,7 @@ const AIFitnessCoach = () => {
                     <div
                       className="accordion-header"
                       data-day={`day${section.dayNumber}`}
-                      onClick={() => toggleAccordion('workout', `day${section.dayNumber}`)}
+                      onClick={() => toggleAccordion(`day${section.dayNumber}`, 'workout')}
                     >
                       <div className="day-header-content">
                         <i className={`fas ${getWorkoutIcon(section.workoutType)} accordion-icon`}></i>
