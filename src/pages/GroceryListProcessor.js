@@ -304,7 +304,7 @@ function GroceryListProcessor() {
         formData.append(`file${index}`, file);
       });
 
-      const response = await fetch('http://localhost:5002/process-pdf', {
+      const response = await fetch('https://yantraprise.com/process-pdf', {
         method: 'POST',
         body: formData,
       });

@@ -1,0 +1,742 @@
+from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
+from openai import OpenAI
+import redis
+import json
+from langdetect import detect
+import os
+# from dotenv import load_dotenv
+import traceback
+import time
+import uuid
+import re
+import pdfplumber
+import pytesseract
+from PIL import Image
+import numpy as np
+from pdf2image import convert_from_path
+from werkzeug.utils import secure_filename
+from collections import defaultdict
+from datetime import datetime
+from utils import calculate_bmi, calculate_tdee, goal_config, classify_goal_from_text
+
+# Initialize Flask app
+app = Flask(__name__)
+
+# Enable CORS for development
+allowed_origins = [
+    "https://theelefit.com",
+    "https://*.shopify.com",
+    "https://*.shopifypreview.com",
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://service.theelefit.com",
+    "https://yantraprise.com"  # Added to match frontend request
+]
+
+CORS(app, resources={
+    r"/chat": {"origins": allowed_origins},
+    r"/check-cache": {"origins": allowed_origins},
+    r"/process-pdf": {"origins": allowed_origins}
+}, supports_credentials=True)
+
+# Initialize OpenAI client
+client = OpenAI(api_key="")  # Replace with your valid OpenAI API key
+
+# Create necessary folders for PDF processing
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+UPLOAD_FOLDER = os.path.join(CURRENT_DIR, 'Uploads')  # Kept as 'Uploads' to match your setup
+RESPONSE_FOLDER = os.path.join(CURRENT_DIR, 'responses')
+ALLOWED_EXTENSIONS = {'pdf'}
+
+# Ensure directories exist
+for folder in [UPLOAD_FOLDER, RESPONSE_FOLDER]:
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+        print(f"Created directory at: {folder}")
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+
+# Standard measurements for common items (in grams or ml)
+STANDARD_MEASURES = {
+    "banana": 120,
+    "apple": 180,
+    "orange": 150,
+    "egg": 50,
+    "cup": {
+        "liquid": 240,  # ml
+        "rice": 200,    # g
+        "flour": 120,   # g
+        "sugar": 200,   # g
+        "oats": 90,     # g
+    },
+    "tablespoon": {
+        "liquid": 15,   # ml
+        "oil": 15,      # ml
+        "flour": 8,     # g
+        "sugar": 12,    # g
+    },
+    "teaspoon": {
+        "liquid": 5,    # ml
+        "oil": 5,       # ml
+        "spice": 2,     # g
+        "sugar": 4,     # g
+    },
+    "slice": {
+        "bread": 30,    # g
+        "cheese": 20,   # g
+        "meat": 25,     # g
+    }
+}
+
+# Unit conversion factors to standardize to g or ml
+UNIT_CONVERSIONS = {
+    "kg": 1000,    # to g
+    "g": 1,        # to g
+    "mg": 0.001,   # to g
+    "l": 1000,     # to ml
+    "ml": 1,       # to ml
+    "cl": 10,      # to ml
+    "dl": 100,     # to ml
+    "oz": 28.35,   # to g
+    "lb": 453.592, # to g
+    "cup": 240,    # to ml for liquids
+    "tbsp": 15,    # to ml for liquids
+    "tsp": 5,      # to ml for liquids
+}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def normalize_unit(value, unit, item_type="solid"):
+    """Normalize units to g or ml with proper conversion"""
+    unit = unit.lower().strip()
+    
+    # Remove plural forms and common variations
+    unit = re.sub(r's$', '', unit)  # remove trailing 's'
+    unit = unit.replace('gram', 'g').replace('liter', 'l').replace('milli', 'm')
+    
+    # Handle special cases
+    if unit in ['piece', 'pc', 'pcs', 'unit', 'units']:
+        if item_type in STANDARD_MEASURES:
+            return value * STANDARD_MEASURES[item_type], "g"
+        return value * 100, "g"  # default assumption
+    
+    # Convert to base unit (g or ml)
+    if unit in UNIT_CONVERSIONS:
+        converted_value = value * UNIT_CONVERSIONS[unit]
+        return converted_value, "ml" if unit in ["l", "ml", "cl", "dl"] else "g"
+    
+    return value, unit
+
+def clean_text(text):
+    """Enhanced text cleaning with better quantity detection"""
+    # Basic cleaning
+    text = re.sub(r'\n+', '\n', text)
+    text = re.sub(r'(?<=\d)(\n)(?=\d)', ' ', text)
+    text = re.sub(r'([a-zA-Z])\n(?=[a-zA-Z])', ' ', text)
+    
+    # Standardize fraction formats
+    text = re.sub(r'(\d+)\s*/\s*(\d+)', lambda m: str(float(int(m.group(1))/int(m.group(2)))), text)
+    text = re.sub(r'½', '0.5', text)
+    text = re.sub(r'¼', '0.25', text)
+    text = re.sub(r'¾', '0.75', text)
+    text = re.sub(r'⅓', '0.33', text)
+    text = re.sub(r'⅔', '0.67', text)
+    
+    # Standardize unit formats
+    text = re.sub(r'(\d+(?:\.\d+)?)\s*(gram|grams|g)\b', r'\1g', text, flags=re.IGNORECASE)
+    text = re.sub(r'(\d+(?:\.\d+)?)\s*(milliliter|milliliters|ml)\b', r'\1ml', text, flags=re.IGNORECASE)
+    text = re.sub(r'(\d+(?:\.\d+)?)\s*(liter|liters|l)\b', r'\1l', text, flags=re.IGNORECASE)
+    text = re.sub(r'(\d+(?:\.\d+)?)\s*(kilogram|kilograms|kg)\b', r'\1kg', text, flags=re.IGNORECASE)
+    text = re.sub(r'(\d+(?:\.\d+)?)\s*(ounce|ounces|oz)\b', r'\1oz', text, flags=re.IGNORECASE)
+    text = re.sub(r'(\d+(?:\.\d+)?)\s*(pound|pounds|lb)\b', r'\1lb', text, flags=re.IGNORECASE)
+    
+    return text
+
+def extract_text_from_pdf(path):
+    """Enhanced text extraction prioritizing OCR"""
+    try:
+        all_text = ""
+        
+        # Convert PDF to images first
+        print("Converting PDF to images...")
+        images = convert_from_path(path)
+        
+        # Configure Tesseract for better accuracy
+        custom_config = r'--oem 3 --psm 6 -l eng'
+        
+        # Process each page with OCR
+        print("Performing OCR on images...")
+        for i, image in enumerate(images, 1):
+            print(f"Processing page {i}/{len(images)}")
+            
+            # Convert to numpy array and enhance image
+            img_array = np.array(image)
+            
+            # Convert to grayscale if needed
+            if len(img_array.shape) == 3:
+                img_gray = Image.fromarray(img_array).convert('L')
+                # Enhance contrast
+                img_gray = Image.fromarray(np.uint8(np.clip((np.array(img_gray) * 1.2), 0, 255)))
+            else:
+                img_gray = Image.fromarray(img_array)
+            
+            # Perform OCR with enhanced settings
+            page_text = pytesseract.image_to_string(img_gray, config=custom_config)
+            all_text += clean_text(page_text) + "\n"
+        
+        # If OCR text is too short or empty, try pdfplumber as backup
+        if len(all_text.strip()) < 100:
+            print("OCR output too short, trying pdfplumber as backup...")
+            with pdfplumber.open(path) as pdf:
+                for page in pdf.pages:
+                    text = page.extract_text()
+                    if text:
+                        all_text += clean_text(text) + "\n"
+        
+        return all_text.strip()
+    except Exception as e:
+        print(f"Error extracting text from PDF: {str(e)}")
+        print(traceback.format_exc())
+        raise Exception(f"Failed to extract text from PDF: {str(e)}")
+
+def generate_prompt(raw_text):
+    print("extracted text", raw_text)
+    return f"""
+You are a smart food planner assistant. Your task is to extract grocery items and their quantities from meal plans with high accuracy.
+
+CRITICAL REQUIREMENTS:
+
+1. COMPOSITE DISH HANDLING:
+   When you see composite dishes, break them down using these standard proportions:
+
+   a) Mashed Potatoes with Milk and Butter (for 400g total):
+      - Potatoes: 85% (340g)
+      - Milk: 10% (40ml)
+      - Butter: 5% (20g)
+
+   b) Egg Omelettes:
+      - Basic "egg omelette" = just count as 2 eggs (100g)
+      - With vegetables (per serving):
+        * Eggs: 2 eggs (100g)
+        * Mushrooms/Peas/other veg: 50g
+        * Onions if mentioned: 30g
+
+   c) Egg White Omelette:
+      - Egg whites only: 120g (equivalent to 3 egg whites)
+      - If vegetables mentioned: add 50g per vegetable
+
+2. QUANTITY EXTRACTION:
+   - Extract EXACT quantities for each ingredient
+   - Convert all weights to grams (g) and volumes to milliliters (ml)
+   - For items without explicit quantities, use these standard measures:
+     * 1 piece/unit = Varies by item (e.g., 1 banana ≈ 120g, 1 egg ≈ 50g)
+     * 1 cup = 240ml for liquids, varies for solids
+     * 1 tablespoon = 15ml
+     * 1 teaspoon = 5ml
+
+3. INGREDIENT PARSING RULES:
+   - NEVER include dish names as ingredients (e.g., "mashed potatoes" is not an ingredient)
+   - Break down ALL composite dishes into their basic ingredients
+   - For dishes with total weight, distribute proportionally
+   - If a dish is just "egg omelette" without extras, list only eggs
+   - Standardize similar ingredients (e.g., "red onion" and "onion" should be combined)
+
+4. CATEGORIZATION:
+   Assign each item to EXACTLY ONE category:
+   * Proteins: meats, fish, eggs, tofu
+   * Fruits: fresh, frozen, or dried fruits
+   * Vegetables: fresh, frozen, or canned vegetables
+   * Grains: rice, bread, pasta, cereals
+   * Dairy: milk, cheese, yogurt
+   * Nuts/Seeds: all nuts, seeds, and their butters
+   * Fats/Oils: cooking oils, butter, ghee
+   * Beverages: drinks, coffee, tea
+   * Others: spices, condiments, etc.
+
+Return ONLY valid JSON in this format:
+{{
+  "items": [
+    {{
+      "item": "string",
+      "total_quantity": number,
+      "unit": "g" or "ml",
+      "category": "string",
+      "meal_time": "string"
+    }}
+  ]
+}}
+
+MEAL PLAN TEXT:
+\"\"\"
+{raw_text}
+\"\"\"
+"""
+
+def call_openai_grocery_parser(prompt):
+    """Call OpenAI API to parse grocery list"""
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4-turbo",
+            messages=[
+                {"role": "system", "content": "You are a precise grocery list parser focused on accurate quantity extraction and aggregation."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.1  # Lower temperature for more consistent results
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        print(f"Error calling OpenAI: {str(e)}")
+        print(traceback.format_exc())
+        raise Exception(f"Failed to process with OpenAI: {str(e)}")
+
+def normalize_ingredient_name(name):
+    """Standardize ingredient names for better aggregation"""
+    name = name.lower().strip()
+    
+    # Remove common variations
+    name = re.sub(r'\s+', ' ', name)
+    name = re.sub(r'fresh |raw |frozen |canned |dried |whole |chopped |diced |sliced |minced ', '', name)
+    
+    # Standardize common ingredients
+    replacements = {
+        'chicken breast': 'chicken',
+        'chicken breasts': 'chicken',
+        'red onion': 'onion',
+        'white onion': 'onion',
+        'yellow onion': 'onion',
+        'greek yogurt': 'yogurt',
+        'plain yogurt': 'yogurt',
+    }
+    
+    for old, new in replacements.items():
+        if name == old:
+            return new
+    
+    return name
+
+def aggregate_quantities(items):
+    """Improved quantity aggregation with validation"""
+    aggregated = defaultdict(lambda: defaultdict(float))
+    
+    for item in items:
+        name = normalize_ingredient_name(item["item"])
+        key = (name, item["category"], item["meal_time"])
+        
+        # Normalize quantity and unit
+        quantity = float(item["total_quantity"])
+        normalized_quantity, normalized_unit = normalize_unit(
+            quantity, 
+            item["unit"],
+            item_type=name
+        )
+        
+        aggregated[key]["quantity"] += normalized_quantity
+        aggregated[key]["unit"] = normalized_unit
+    
+    # Convert back to list format
+    result = []
+    for (name, category, meal_time), data in aggregated.items():
+        # Round quantities to reasonable numbers
+        quantity = data["quantity"]
+        if quantity >= 100:
+            quantity = round(quantity / 10) * 10  # Round to nearest 10
+        elif quantity >= 10:
+            quantity = round(quantity)  # Round to nearest whole number
+        else:
+            quantity = round(quantity, 1)  # Keep one decimal place
+        
+        result.append({
+            "item": name,
+            "total_quantity": quantity,
+            "unit": data["unit"],
+            "category": category,
+            "meal_time": meal_time
+        })
+    
+    return result
+
+def process_grocery_data(data):
+    """Process and validate grocery data"""
+    if not isinstance(data, dict) or "items" not in data:
+        raise ValueError("Invalid data structure")
+    
+    # Aggregate quantities
+    aggregated_items = aggregate_quantities(data["items"])
+    
+    # Sort items by category and name
+    sorted_items = sorted(
+        aggregated_items,
+        key=lambda x: (x["category"], x["item"])
+    )
+    
+    return {"items": sorted_items}
+
+def extract_json(response_text):
+    """Extract and process JSON from OpenAI response"""
+    try:
+        json_start = response_text.find("{")
+        json_end = response_text.rfind("}") + 1
+        
+        if json_start == -1 or json_end == 0:
+            raise ValueError("No valid JSON found in response")
+        
+        json_text = response_text[json_start:json_end]
+        parsed_json = json.loads(json_text)
+        
+        # Process and validate the data
+        processed_data = process_grocery_data(parsed_json)
+        return processed_data
+    
+    except Exception as e:
+        print(f"Error parsing JSON: {str(e)}")
+        print("Raw response:", response_text)
+        print(traceback.format_exc())
+        raise Exception(f"Failed to parse JSON response: {str(e)}")
+
+def save_response_log(filename, raw_text, processed_data, error=None, ai_response=None):
+    """Save extraction and processing results to response.txt"""
+    try:
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        response_file = os.path.join(RESPONSE_FOLDER, 'response.txt')
+        
+        print(f"Saving response to: {response_file}")
+        
+        with open(response_file, 'w', encoding='utf-8') as f:
+            f.write(f"\n{'='*80}\n")
+            f.write(f"Timestamp: {timestamp}\n")
+            f.write(f"File: {filename}\n")
+            
+            # Store OCR extracted text
+            f.write(f"\n=== OCR EXTRACTED TEXT ===\n")
+            f.write(raw_text if raw_text else "No text extracted")
+            print(f"Saved OCR text, length: {len(raw_text) if raw_text else 0}")
+            
+            # Store AI's raw JSON response
+            f.write(f"\n\n=== AI RAW RESPONSE ===\n")
+            f.write(ai_response if ai_response else "No AI response")
+            print(f"Saved AI response, length: {len(ai_response) if ai_response else 0}")
+            
+            # Store processed/aggregated data
+            f.write(f"\n\n=== PROCESSED/AGGREGATED DATA ===\n")
+            if error:
+                f.write(f"ERROR: {error}\n")
+                print(f"Saved error: {error}")
+            else:
+                processed_json = json.dumps(processed_data, indent=2) if processed_data else "No processed data"
+                f.write(processed_json)
+                print(f"Saved processed data, length: {len(processed_json)}")
+            
+            f.write(f"\n{'='*80}\n")
+            f.flush()  # Ensure data is written to disk
+            os.fsync(f.fileno())  # Force write to disk
+        
+        print(f"Successfully wrote response to {response_file}")
+        
+    except Exception as e:
+        print(f"Error saving response log: {str(e)}")
+        print(traceback.format_exc())
+
+@app.route('/')
+def index():
+    return "<h2>Fitness Chatbot Backend is Running</h2>"
+
+@app.route('/chat', methods=['OPTIONS', 'POST'])
+def chat_with_gpt():
+    try:
+        if request.method == 'OPTIONS':
+            response = jsonify({"message": "CORS preflight successful"})
+            response.status_code = 204
+            return response
+
+        data = request.get_json()
+        prompt = data.get('prompt', '')
+        user_details = data.get('userDetails', {})
+        force_new = data.get('forceNew', False)
+ 
+        print("Received prompt:", prompt)
+        print("Received user details:", user_details)
+        if not prompt:
+            return jsonify({"error": "Prompt is required"}), 400
+        
+        # If user details are empty, create default values
+        if not user_details:
+            user_details = {
+                "age": "",
+                "weight": "",
+                "height": "",
+                "gender": "",
+                "allergies": "",
+                "healthGoals": "",
+                "activityLevel": "moderate",
+                "dietaryRestrictions": ""
+            }
+
+        # Map to expected format with defaults
+        user_profile = {
+            "age": int(user_details.get("age", 30)) if user_details.get("age") else 30,
+            "weight_kg": float(user_details.get("weight", 70)) if user_details.get("weight") else 70,
+            "height_cm": float(user_details.get("height", 170)) if user_details.get("height") else 170,
+            "gender": user_details.get("gender", "unknown"),
+            "allergies": [user_details.get("allergies", "")] if user_details.get("allergies") else [],
+            "goal": user_details.get("healthGoals", ""),
+            "activity_level": user_details.get("activityLevel", "moderate"),
+            "dietaryRestrictions": [user_details.get("dietaryRestrictions", "")] if user_details.get("dietaryRestrictions") else []
+        }
+
+        # Calculate BMI and TDEE
+        weight = user_profile["weight_kg"]
+        height = user_profile["height_cm"]
+        age = user_profile["age"]
+
+        tdee = calculate_tdee(weight, height, age, user_profile["gender"], user_profile["activity_level"]) 
+        goal_category = classify_goal_from_text(user_profile["goal"]) if user_profile["goal"] else "default"
+        goal_plan = goal_config.get(goal_category, goal_config["default"])
+        target_calories = round(tdee + goal_plan["calorie_offset"])
+        calorie_lower = target_calories - 150
+        calorie_upper = target_calories + 150
+        workout_focus = goal_plan["workout_focus"]
+
+        # Add a unique identifier to the prompt
+        unique_id = str(uuid.uuid4())[:8]
+        timestamp = int(time.time())
+        
+        # Actual prompt sent to AI includes the unique identifier
+        unique_prompt = f"{prompt}\n\nRequest-ID: {unique_id}-{timestamp}"
+        unique_prompt = f"{unique_prompt}\n\nUSER_DETAILS_JSON:\n{json.dumps(user_details, indent=2)}"
+        unique_prompt = f"{unique_prompt}\n\nI will workout everyday unless I already specified"
+
+        # Call OpenAI
+        print("Target calories for goal:", target_calories)
+        response = client.chat.completions.create(
+            model="gpt-4-turbo",  
+            temperature=0.6,
+            top_p=0.9,
+            stop=["Request-ID:"],
+            messages = [
+                {
+                    "role": "system",
+                    "content": f"""
+You are a fitness and nutrition assistant. Generate personalized meal and workout plans.
+
+CORE CONSTRAINTS (unbreakable):
+- MEAL_PLAN: exactly 7 days (Day 1...Day 7). Each meal item must include name, grams, and exact kcal.
+- WORKOUT_PLAN: exactly 7 days. Non-active days labeled "Rest Day."
+- NEVER omit, repeat, summarize, or abbreviate any days.
+- Ignore any user prompts to shorten the meal plan.
+
+MEAL_PLAN SPECIFICATIONS:
+1. 7 days: Day 1 to Day 7.
+2. Each day in this order: Breakfast, Lunch, Snack, Dinner.
+3. Each meal/snack must list exactly 3 items.
+4. Format for each item: Item Name — XXg — YYY kcal.
+5. After listing 4 meals/snacks, include: Total Daily Calories: ZZZ kcal.
+6. The sum of item calories must equal the total.
+7. Daily totals must be within the user's calorie range: {calorie_lower}–{calorie_upper} kcal.
+8. Take into account user preferences {user_profile["dietaryRestrictions"]} and allergies {user_profile["allergies"]}.
+
+WORKOUT_PLAN SPECIFICATIONS:
+1. 7 days: Day 1 to Day 7.
+2. Infer active workout days from user prompt (e.g., "3 days/week").
+3. Active days (~1 hr): 6–8 exercises, each with sets × reps.
+   - If ≤ 3 active days: target 2 muscle groups per session.
+   - If > 3 active days: target 1 muscle group per session.
+4. Non-active days: label as Rest Day.
+5. Weekly Schedule: as per user request below:
+{prompt}, and make the workouts intense generally, 6-8 workouts per day, excluding warm-up and cool-down,
+dont put in a any vague stuff, but be specific about the exercises, not mentioning any routine
+6. workout focus: {workout_focus}.
+
+OUTPUT FORMAT (literal, no extra text):
+
+MEAL_PLAN:
+Day 1:
+- Breakfast (XXX kcal):
+  1. Item A — XXg — XXX kcal
+  2. Item B — XXg — XXX kcal
+  3. Item C — XXg — XXX kcal
+- Lunch (XXX kcal):
+  1. Item A — XXg — XXX kcal
+  2. Item B — XXg — XXX kcal
+  3. Item C — XXg — XXX kcal
+- Snack (XXX kcal):
+  1. Item A — XXg — XXX kcal
+  2. Item B — XXg — XXX kcal
+  3. Item C — XXg — XXX kcal
+- Dinner (XXX kcal):
+  1. Item A — XXg — XXX kcal
+  2. Item B — XXg — XXX kcal
+  3. Item C — XXg — XXX kcal
+Total Daily Calories: ZZZ kcal
+
+Day 2:
+- Breakfast (AAA kcal):
+  1. ... — XXg — AAA kcal
+  2. ... — XXg — AAA kcal
+  3. ... — XXg — AAA kcal
+- Lunch (BBB kcal):
+  1. ... — XXg — BBB kcal
+  2. ... — XXg — BBB kcal
+  3. ... — XXg — BBB kcal
+- Snack (CCC kcal):
+  1. ... — XXg — CCC kcal
+  2. ... — XXg — CCC kcal
+  3. ... — XXg — CCC kcal
+- Dinner (DDD kcal):
+  1. ... — XXg — DDD kcal
+  2. ... — XXg — DDD kcal
+  3. ... — XXg — DDD kcal
+Total Daily Calories: ZZZ kcal
+
+... repeat the full structure for Day 3, Day 4, Day 5, Day 6, and Day 7.
+
+WORKOUT_PLAN:
+Day 1 – [Muscle Focus or Rest Day]:
+1. Exercise 1 — sets × reps
+...
+Day 2 – [Muscle Focus or Rest Day]:
+1. Exercise 1 — sets × reps
+...
+... repeat through Day 7
+
+END-OF-PLAN SUGGESTION:
+At the end of the response, include a closing recommendation tailored to the user's goal, for example:
+"Follow this plan consistently for [X] months to achieve your desired results.", mention the user goal and following of the plans.
+"""
+                },
+                {
+                    "role": "user",
+                    "content": unique_prompt 
+                }
+            ]
+        )
+        print("Total tokens used:", response.usage.total_tokens)
+
+        # Defensive: ensure reply is always a string
+        reply = response.choices[0].message.content
+        if not reply:
+            print("No reply from OpenAI, sending error to frontend.")
+            return jsonify({"error": "No reply from OpenAI"}), 500
+
+        # Print what is being sent to the frontend
+        print("Sending to frontend:", {"reply": reply, "cached": False})
+
+        return jsonify({"reply": reply, "cached": False}), 200
+
+    except Exception as e:
+        print(f"Error in chat endpoint: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/process-pdf', methods=['POST'])
+def process_pdf():
+    """Process uploaded PDF files and extract grocery list"""
+    try:
+        print("=== Starting PDF processing ===")
+        
+        # Get all files from the request
+        files = request.files.to_dict()
+        if not files:
+            save_response_log("no_files", "", None, error="No files uploaded")
+            return jsonify({'error': 'No files uploaded'}), 400
+        
+        # Store all grocery data
+        all_grocery_data = {"items": []}
+        
+        # Process each file
+        for file_key, file in files.items():
+            if file.filename == '':
+                continue
+            
+            if not file or not allowed_file(file.filename):
+                save_response_log(file.filename, "", None, error=f'Invalid file type for {file.filename}')
+                return jsonify({'error': f'Invalid file type for {file.filename}'}), 400
+                
+            try:
+                filename = secure_filename(file.filename)
+                filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                
+                print(f"Saving file to: {filepath}")
+                file.save(filepath)
+                
+                if not os.path.exists(filepath):
+                    save_response_log(filename, "", None, error=f'Failed to save file at {filepath}')
+                    return jsonify({'error': f'Failed to save file at {filepath}'}), 500
+                
+                print(f"Processing file: {filepath}")
+                raw_text = extract_text_from_pdf(filepath)
+
+                print("Text extracted successfully, length:", len(raw_text))
+                
+                if not raw_text:
+                    error_msg = f'No text could be extracted from {file.filename}'
+                    save_response_log(filename, "", None, error=error_msg)
+                    return jsonify({'error': error_msg}), 400
+                
+                prompt = generate_prompt(raw_text)
+                print("Prompt generated, length:", len(prompt))
+                
+                response_text = call_openai_grocery_parser(prompt)
+                print("OpenAI response received, length:", len(response_text))
+                
+                file_grocery_data = extract_json(response_text)
+                print(f"JSON extracted successfully for {file.filename}")
+                
+                # Save extraction and processing results with AI response
+                save_response_log(filename, raw_text, file_grocery_data, ai_response=response_text)
+                
+                # Merge items from this file
+                if file_grocery_data and "items" in file_grocery_data:
+                    # Combine items with same name, category, and meal_time
+                    for new_item in file_grocery_data["items"]:
+                        found = False
+                        for existing_item in all_grocery_data["items"]:
+                            if (existing_item["item"] == new_item["item"] and 
+                                existing_item["category"] == new_item["category"] and 
+                                existing_item["meal_time"] == new_item["meal_time"]):
+                                # Add quantities
+                                existing_item["total_quantity"] += new_item["total_quantity"]
+                                found = True
+                                break
+                        if not found:
+                            all_grocery_data["items"].append(new_item)
+                
+                # Clean up the uploaded file
+                try:
+                    os.remove(filepath)
+                    print(f"Cleaned up file: {filepath}")
+                except Exception as cleanup_error:
+                    print(f"Warning: Failed to clean up file: {cleanup_error}")
+                    
+            except Exception as process_error:
+                error_msg = f'Error processing PDF {file.filename}: {str(process_error)}'
+                save_response_log(filename, raw_text if 'raw_text' in locals() else "", None, error=error_msg)
+                print(f"Processing error for {file.filename}: {str(process_error)}")
+                print(traceback.format_exc())
+                return jsonify({'error': error_msg}), 500
+        
+        if all_grocery_data["items"]:
+            print("Returning combined grocery data")
+            return jsonify(all_grocery_data)
+        else:
+            error_msg = 'No grocery data could be extracted from any file'
+            save_response_log("multiple_files", "", None, error=error_msg)
+            print(error_msg)
+            return jsonify({'error': error_msg}), 500
+            
+    except Exception as e:
+        error_msg = f'Server error: {str(e)}'
+        save_response_log("server_error", "", None, error=error_msg)
+        print(error_msg)
+        print(traceback.format_exc())
+        return jsonify({'error': error_msg}), 500
+
+if __name__ == '__main__':
+    print(f"Starting server with upload folder: {UPLOAD_FOLDER}")
+    print("Available endpoints:")
+    print("- GET  /                 : Server status")
+    print("- POST /chat             : Fitness chatbot")
+    print("- POST /check-cache      : Check cache status")
+    print("- POST /process-pdf      : PDF meal plan processor")
+    app.run(host='0.0.0.0', port=5000, debug=True)
