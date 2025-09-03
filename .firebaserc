@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "getfit-with-elefit"
+  },
+  "targets": {
+    "getfit-with-elefit": {
+      "hosting": {
+        "getfit-with-elefit": [
+          "getfit-with-elefit"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

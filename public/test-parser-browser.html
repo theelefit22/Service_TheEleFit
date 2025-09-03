@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Parser Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .test-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .test-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        .test-button:hover {
+            background: #45a049;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+        }
+        .result-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            border-left: 4px solid #4CAF50;
+        }
+        .result-item.failed {
+            border-left-color: #f44336;
+        }
+        .field {
+            display: inline-block;
+            margin-right: 15px;
+            padding: 3px 8px;
+            background: #e3f2fd;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+        .field.missing {
+            background: #ffebee;
+        }
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .summary.poor {
+            background: #ffebee;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Prompt Parser Comprehensive Test</h1>
+    
+    <div class="test-container">
+        <h2>Manual Test</h2>
+        <input type="text" id="manual-input" class="test-input" 
+               placeholder="Enter a prompt to test (e.g., 'I'm 28M, 5'9&quot;, 165 lbs, want to bulk')" />
+        <button onclick="testManualInput()" class="test-button">Test Input</button>
+        <div id="manual-results"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Automated Test Suite</h2>
+        <button onclick="runAllTests()" class="test-button">Run All Tests</button>
+        <button onclick="runEdgeCases()" class="test-button">Run Edge Cases Only</button>
+        <div id="test-results"></div>
+    </div>
+
+    <script type="module">
+        import { parsePrompt } from '../src/utils/promptParser.js';
+        
+        window.parsePrompt = parsePrompt;
+
+        const testCases = [
+            // First set of test cases
+            { input: "I am a 25-year-old male and I want to lose weight.", expected: { age: 25, gender: 'male', goal: 'weight_loss' } },
+            { input: "I am 30 years old, female, trying to gain muscle.", expected: { age: 30, gender: 'female', goal: 'muscle_gain' } },
+            { input: "Male, 40 years, 170 cm, 70 kg, goal: fat loss.", expected: { age: 40, gender: 'male', height: 170, weight: 70, goal: 'weight_loss' } },
+            { input: "28-year-old female, 160 cm, 55 kg, goal is to tone body.", expected: { age: 28, gender: 'female', height: 160, weight: 55, goal: 'toning' } },
+            { input: "I am 22, male, 65 kg, 175 cm, want to bulk up.", expected: { age: 22, gender: 'male', height: 175, weight: 65, goal: 'muscle_gain' } },
+            { input: "34-year-old woman, 68 kg, 165 cm, wants to slim down.", expected: { age: 34, gender: 'female', height: 165, weight: 68, goal: 'weight_loss' } },
+            { input: "Male, 50 yrs, 182 cm, 80 kg, fitness goal: maintain weight.", expected: { age: 50, gender: 'male', height: 182, weight: 80, goal: 'weight_maintenance' } },
+            { input: "I’m a 19-year-old girl, 48 kg, 158 cm, want to gain weight.", expected: { age: 19, gender: 'female', height: 158, weight: 48, goal: 'weight_gain' } },
+            { input: "42, male, 90 kg, 180 cm, aim: build endurance.", expected: { age: 42, gender: 'male', height: 180, weight: 90, goal: 'endurance' } },
+            { input: "25 y/o female, 60 kg, 162 cm, goal is fat loss.", expected: { age: 25, gender: 'female', height: 162, weight: 60, goal: 'weight_loss' } },
+            { input: "Male, 29, 176 cm, 72 kg, wants to get stronger.", expected: { age: 29, gender: 'male', height: 176, weight: 72, goal: 'strength' } },
+            { input: "I’m a 31-year-old woman, 70 kg, 165 cm, want to tone.", expected: { age: 31, gender: 'female', height: 165, weight: 70, goal: 'toning' } },
+            { input: "37-year-old man, 78 kg, 182 cm, goal: fat loss.", expected: { age: 37, gender: 'male', height: 182, weight: 78, goal: 'weight_loss' } },
+            { input: "I am 26 years old, female, 52 kg, 160 cm, want to bulk.", expected: { age: 26, gender: 'female', height: 160, weight: 52, goal: 'muscle_gain' } },
+            { input: "Male, 21, 60 kg, 170 cm, goal: muscle gain.", expected: { age: 21, gender: 'male', height: 170, weight: 60, goal: 'muscle_gain' } },
+            { input: "Female, 45 years, 165 cm, 70 kg, wants to reduce belly fat.", expected: { age: 45, gender: 'female', height: 165, weight: 70, goal: 'weight_loss' } },
+            { input: "33-year-old male, 185 cm, 90 kg, goal: body recomposition.", expected: { age: 33, gender: 'male', height: 185, weight: 90, goal: 'body_recomposition' } },
+            { input: "Woman, 29, 55 kg, 162 cm, goal is weight gain.", expected: { age: 29, gender: 'female', height: 162, weight: 55, goal: 'weight_gain' } },
+            { input: "38 y/o male, 80 kg, 175 cm, wants to cut fat.", expected: { age: 38, gender: 'male', height: 175, weight: 80, goal: 'weight_loss' } },
+            { input: "27-year-old female, 160 cm, 58 kg, maintain fitness.", expected: { age: 27, gender: 'female', height: 160, weight: 58, goal: 'weight_maintenance' } },
+            { input: "I am a 24-year-old male, 72 kg, 178 cm, looking to lose fat.", expected: { age: 24, gender: 'male', height: 178, weight: 72, goal: 'weight_loss' } },
+            { input: "I am a 36-year-old male, weighing 56 kg at 172 cm, and I want to gain weight while doing light jogging 3 times a week.", expected: { age: 36, gender: 'male', height: 172, weight: 56, goal: 'weight_gain' } },
+            { input: "I’m a 29-year-old female, height 165 cm, weight 60 kg, goal is fat loss, currently doing yoga daily.", expected: { age: 29, gender: 'female', height: 165, weight: 60, goal: 'weight_loss' } },
+            { input: "Male, 42 years old, 182 cm, 90 kg, looking to cut fat while doing weight training 4 days a week.", expected: { age: 42, gender: 'male', height: 182, weight: 90, goal: 'weight_loss' } },
+            { input: "I am a 25-year-old woman, 160 cm, 52 kg, want to gain muscle, currently doing Zumba classes.", expected: { age: 25, gender: 'female', height: 160, weight: 52, goal: 'muscle_gain' } },
+            { input: "34-year-old man, 175 cm, 80 kg, aim: strength gain, activity: gym 5 times a week.", expected: { age: 34, gender: 'male', height: 175, weight: 80, goal: 'strength' } },
+            { input: "Female, 27, 162 cm, 58 kg, goal: fat reduction, activity: walking daily.", expected: { age: 27, gender: 'female', height: 162, weight: 58, goal: 'weight_loss' } },
+            { input: "I’m a 31-year-old male, 180 cm, 78 kg, looking to bulk up, doing push-ups and cardio.", expected: { age: 31, gender: 'male', height: 180, weight: 78, goal: 'muscle_gain' } },
+            { input: "Woman, 45, 165 cm, 70 kg, aim: maintain weight, activity: Pilates twice a week.", expected: { age: 45, gender: 'female', height: 165, weight: 70, goal: 'weight_maintenance' } },
+            { input: "I am a 23-year-old man, 172 cm, 68 kg, want to increase muscle, currently running daily.", expected: { age: 23, gender: 'male', height: 172, weight: 68, goal: 'muscle_gain' } },
+            { input: "Female, 38 years, 160 cm, 65 kg, goal: slim down, doing yoga thrice a week.", expected: { age: 38, gender: 'female', height: 160, weight: 65, goal: 'weight_loss' } },
+            { input: "Male, 29, 182 cm, 85 kg, fitness goal: cut fat, activity: gym 3 days weekly.", expected: { age: 29, gender: 'male', height: 182, weight: 85, goal: 'weight_loss' } },
+            { input: "I am a 33-year-old female, 162 cm, 60 kg, want to tone muscles, currently swimming twice a week.", expected: { age: 33, gender: 'female', height: 162, weight: 60, goal: 'toning' } },
+            { input: "40-year-old man, 185 cm, 92 kg, goal: lose belly fat, doing weightlifting 4 times weekly.", expected: { age: 40, gender: 'male', height: 185, weight: 92, goal: 'weight_loss' } },
+            { input: "Woman, 26, 160 cm, 52 kg, goal: gain lean muscle, activity: jogging daily.", expected: { age: 26, gender: 'female', height: 160, weight: 52, goal: 'muscle_gain' } },
+            { input: "I’m a 37-year-old male, 178 cm, 85 kg, want to slim down, activity: office job + light gym.", expected: { age: 37, gender: 'male', height: 178, weight: 85, goal: 'weight_loss' } },
+            { input: "Female, 30, 165 cm, 59 kg, aim: build strength, currently doing home workouts.", expected: { age: 30, gender: 'female', height: 165, weight: 59, goal: 'strength' } },
+            { input: "I am 22 years old, male, 174 cm, 68 kg, looking to bulk, activity: football training.", expected: { age: 22, gender: 'male', height: 174, weight: 68, goal: 'muscle_gain' } },
+            { input: "28-year-old female, 160 cm, 55 kg, want to gain weight, currently walking daily.", expected: { age: 28, gender: 'female', height: 160, weight: 55, goal: 'weight_gain' } },
+            { input: "Male, 35, 180 cm, 88 kg, goal: fat reduction, activity: desk job, little exercise.", expected: { age: 35, gender: 'male', height: 180, weight: 88, goal: 'weight_loss' } },
+            { input: "I’m a 41-year-old woman, 162 cm, 68 kg, want to tone, doing yoga on weekends.", expected: { age: 41, gender: 'female', height: 162, weight: 68, goal: 'toning' } },
+            { input: "32-year-old male, 176 cm, 75 kg, fitness goal: gain muscle, doing gym workouts.", expected: { age: 32, gender: 'male', height: 176, weight: 75, goal: 'muscle_gain' } },
+            { input: "Female, 27, 160 cm, 53 kg, goal: increase weight, activity: cycling daily.", expected: { age: 27, gender: 'female', height: 160, weight: 53, goal: 'weight_gain' } },
+            { input: "I am 48, male, 182 cm, 95 kg, aim: fat loss, doing brisk walking in mornings.", expected: { age: 48, gender: 'male', height: 182, weight: 95, goal: 'weight_loss' } },
+            { input: "Woman, 25 years, 165 cm, 56 kg, goal: muscle tone, currently jogging.", expected: { age: 25, gender: 'female', height: 165, weight: 56, goal: 'toning' } },
+            { input: "36-year-old male, 180 cm, 82 kg, wants to bulk, activity: gym + cardio.", expected: { age: 36, gender: 'male', height: 180, weight: 82, goal: 'muscle_gain' } },
+            { input: "Female, 29, 160 cm, 58 kg, wants to slim, activity: aerobics class.", expected: { age: 29, gender: 'female', height: 160, weight: 58, goal: 'weight_loss' } },
+            { input: "I’m a 22-year-old man, 175 cm, 70 kg, want to build muscle, activity: cricket.", expected: { age: 22, gender: 'male', height: 175, weight: 70, goal: 'muscle_gain' } },
+            { input: "39-year-old woman, 162 cm, 65 kg, aim: fat reduction, doing dance workouts.", expected: { age: 39, gender: 'female', height: 162, weight: 65, goal: 'weight_loss' } },
+            { input: "Male, 28, 182 cm, 85 kg, goal: maintain fitness, currently swimming.", expected: { age: 28, gender: 'male', height: 182, weight: 85, goal: 'weight_maintenance' } },
+            { input: "I am 30 years old, female, 160 cm, 57 kg, want to gain lean muscle, activity: home workouts.", expected: { age: 30, gender: 'female', height: 160, weight: 57, goal: 'muscle_gain' } },
+            { input: "44-year-old man, 180 cm, 88 kg, goal: fat reduction, currently cycling on weekends.", expected: { age: 44, gender: 'male', height: 180, weight: 88, goal: 'weight_loss' } },
+            { input: "Woman, 21, 162 cm, 52 kg, goal: gain weight, activity: light exercise.", expected: { age: 21, gender: 'female', height: 162, weight: 52, goal: 'weight_gain' } },
+            { input: "I’m a 26-year-old male, 174 cm, 72 kg, looking to bulk, activity: football + gym.", expected: { age: 26, gender: 'male', height: 174, weight: 72, goal: 'muscle_gain' } },
+            { input: "Female, 34 years, 160 cm, 63 kg, goal: slim down, doing treadmill workout.", expected: { age: 34, gender: 'female', height: 160, weight: 63, goal: 'weight_loss' } },
+            { input: "Male, 40, 178 cm, 85 kg, goal: lose fat, activity: boxing classes.", expected: { age: 40, gender: 'male', height: 178, weight: 85, goal: 'weight_loss' } },
+            { input: "I am 29, female, 165 cm, 59 kg, want to gain strength, activity: yoga.", expected: { age: 29, gender: 'female', height: 165, weight: 59, goal: 'strength' } },
+            { input: "35-year-old male, 180 cm, 80 kg, goal: bulk, doing weightlifting.", expected: { age: 35, gender: 'male', height: 180, weight: 80, goal: 'muscle_gain' } },
+            { input: "Female, 23, 160 cm, 54 kg, aim: weight gain, activity: jogging.", expected: { age: 23, gender: 'female', height: 160, weight: 54, goal: 'weight_gain' } },
+            { input: "I am a 50-year-old man, 182 cm, 92 kg, goal: lose weight, activity: cycling daily.", expected: { age: 50, gender: 'male', height: 182, weight: 92, goal: 'weight_loss' } },
+            { input: "Woman, 28, 164 cm, 58 kg, goal: maintain fitness, currently running and yoga.", expected: { age: 28, gender: 'female', height: 164, weight: 58, goal: 'weight_maintenance' } },
+            { input: "I’m a 36-year-old female, 68 kg, 162 cm, want to build muscle.", expected: { age: 36, gender: 'female', height: 162, weight: 68, goal: 'muscle_gain' } },
+            { input: "Male, 41 years old, 175 cm, 82 kg, fitness goal: lose belly fat.", expected: { age: 41, gender: 'male', height: 175, weight: 82, goal: 'weight_loss' } },
+            { input: "32-year-old female, 160 cm, 54 kg, wants to gain lean muscle.", expected: { age: 32, gender: 'female', height: 160, weight: 54, goal: 'muscle_gain' } },
+            { input: "I am 27 years old, male, 74 kg, 180 cm, goal: strength training.", expected: { age: 27, gender: 'male', height: 180, weight: 74, goal: 'strength' } },
+            { input: "Female, 22, 52 kg, 165 cm, want to increase weight.", expected: { age: 22, gender: 'female', height: 165, weight: 52, goal: 'weight_gain' } },
+            { input: "35-year-old man, 178 cm, 85 kg, goal is fat reduction.", expected: { age: 35, gender: 'male', height: 178, weight: 85, goal: 'weight_loss' } },
+            { input: "I am a 39-year-old female, 162 cm, 70 kg, want to slim down.", expected: { age: 39, gender: 'female', height: 162, weight: 70, goal: 'weight_loss' } },
+            { input: "Male, 20 years old, 65 kg, 173 cm, aim: bulk and gain muscle.", expected: { age: 20, gender: 'male', height: 173, weight: 65, goal: 'muscle_gain' } },
+            { input: "Female, 29, 57 kg, 160 cm, looking for weight maintenance.", expected: { age: 29, gender: 'female', height: 160, weight: 57, goal: 'weight_maintenance' } },
+            { input: "I am a 44-year-old man, 88 kg, 180 cm, want to lose fat.", expected: { age: 44, gender: 'male', height: 180, weight: 88, goal: 'weight_loss' } },
+            { input: "Woman, 25, 55 kg, 165 cm, goal: muscle gain.", expected: { age: 25, gender: 'female', height: 165, weight: 55, goal: 'muscle_gain' } },
+            { input: "40-year-old male, 92 kg, 182 cm, wants to improve stamina.", expected: { age: 40, gender: 'male', height: 182, weight: 92, goal: 'endurance' } },
+            { input: "I’m a 33-year-old female, 62 kg, 160 cm, want to tone body.", expected: { age: 33, gender: 'female', height: 160, weight: 62, goal: 'toning' } },
+            { input: "Male, 21, 175 cm, 68 kg, goal: bulk up.", expected: { age: 21, gender: 'male', height: 175, weight: 68, goal: 'muscle_gain' } },
+            { input: "Female, 30 years, 60 kg, 165 cm, wants to slim.", expected: { age: 30, gender: 'female', height: 165, weight: 60, goal: 'weight_loss' } },
+            { input: "28-year-old male, 77 kg, 178 cm, fitness goal: strength.", expected: { age: 28, gender: 'male', height: 178, weight: 77, goal: 'strength' } },
+            { input: "I am 35 years old, woman, 66 kg, 162 cm, goal: fat loss.", expected: { age: 35, gender: 'female', height: 162, weight: 66, goal: 'weight_loss' } },
+            { input: "26-year-old man, 172 cm, 70 kg, looking to cut.", expected: { age: 26, gender: 'male', height: 172, weight: 70, goal: 'weight_loss' } },
+            { input: "Female, 23, 160 cm, 50 kg, want to gain weight.", expected: { age: 23, gender: 'female', height: 160, weight: 50, goal: 'weight_gain' } },
+            { input: "I’m a 47-year-old male, 95 kg, 182 cm, want to lose fat.", expected: { age: 47, gender: 'male', height: 182, weight: 95, goal: 'weight_loss' } },
+            { input: "Woman, 31, 165 cm, 63 kg, wants to tone muscles.", expected: { age: 31, gender: 'female', height: 165, weight: 63, goal: 'toning' } },
+            { input: "22-year-old man, 70 kg, 176 cm, goal is muscle building.", expected: { age: 22, gender: 'male', height: 176, weight: 70, goal: 'muscle_gain' } },
+            { input: "Female, 40, 68 kg, 162 cm, aim: fat reduction.", expected: { age: 40, gender: 'female', height: 162, weight: 68, goal: 'weight_loss' } },
+            { input: "Male, 29, 178 cm, 75 kg, wants to bulk up.", expected: { age: 29, gender: 'male', height: 178, weight: 75, goal: 'muscle_gain' } },
+            { input: "I am a 37-year-old female, 70 kg, 165 cm, goal: fitness.", expected: { age: 37, gender: 'female', height: 165, weight: 70, goal: 'weight_maintenance' } },
+            { input: "Man, 34 years, 185 cm, 92 kg, goal: lose fat.", expected: { age: 34, gender: 'male', height: 185, weight: 92, goal: 'weight_loss' } },
+            { input: "Female, 26 years old, 162 cm, 54 kg, wants to gain muscle.", expected: { age: 26, gender: 'female', height: 162, weight: 54, goal: 'muscle_gain' } },
+            { input: "I’m a 21-year-old male, 174 cm, 68 kg, want to bulk.", expected: { age: 21, gender: 'male', height: 174, weight: 68, goal: 'muscle_gain' } },
+            { input: "38-year-old female, 160 cm, 65 kg, looking to slim down.", expected: { age: 38, gender: 'female', height: 160, weight: 65, goal: 'weight_loss' } },
+            { input: "Male, 27, 72 kg, 176 cm, wants to gain strength.", expected: { age: 27, gender: 'male', height: 176, weight: 72, goal: 'strength' } },
+            { input: "Woman, 33 years, 166 cm, 62 kg, goal is fat loss.", expected: { age: 33, gender: 'female', height: 166, weight: 62, goal: 'weight_loss' } },
+            { input: "45-year-old man, 88 kg, 178 cm, goal: slim down.", expected: { age: 45, gender: 'male', height: 178, weight: 88, goal: 'weight_loss' } },
+            { input: "I am 24, female, 55 kg, 160 cm, aim: muscle gain.", expected: { age: 24, gender: 'female', height: 160, weight: 55, goal: 'muscle_gain' } },
+            { input: "Male, 30 years, 80 kg, 182 cm, goal: cutting fat.", expected: { age: 30, gender: 'male', height: 182, weight: 80, goal: 'weight_loss' } },
+            { input: "Female, 25, 58 kg, 164 cm, goal is toning.", expected: { age: 25, gender: 'female', height: 164, weight: 58, goal: 'toning' } },
+            { input: "Man, 28, 74 kg, 170 cm, wants to build muscle.", expected: { age: 28, gender: 'male', height: 170, weight: 74, goal: 'muscle_gain' } },
+            { input: "I am a 39-year-old woman, 162 cm, 64 kg, want to lose fat.", expected: { age: 39, gender: 'female', height: 162, weight: 64, goal: 'weight_loss' } },
+            { input: "Male, 36 years, 177 cm, 85 kg, looking to reduce belly fat.", expected: { age: 36, gender: 'male', height: 177, weight: 85, goal: 'weight_loss' } },
+            { input: "Female, 22, 50 kg, 158 cm, want to gain weight.", expected: { age: 22, gender: 'female', height: 158, weight: 50, goal: 'weight_gain' } },
+            // Second set of test cases
+            { input: "I’m a 28-year-old male, 5’9”, 165 lbs, want to bulk.", expected: { age: 28, gender: 'male', height: 175, weight: 75, goal: 'muscle_gain' } },
+            { input: "Female, 32, 5.4 ft, 120 lbs, aim: slim down.", expected: { age: 32, gender: 'female', height: 165, weight: 54, goal: 'weight_loss' } },
+            { input: "25 y/o man, 5.11 ft, 150 lbs, fitness goal: gain muscle.", expected: { age: 25, gender: 'male', height: 180, weight: 68, goal: 'muscle_gain' } },
+            { input: "Woman, 30, 5’5”, 130 lbs, goal: tone body.", expected: { age: 30, gender: 'female', height: 165, weight: 59, goal: 'toning' } },
+            { input: "40 yo male, 6 ft, 180 lbs, looking to lose fat.", expected: { age: 40, gender: 'male', height: 183, weight: 82, goal: 'weight_loss' } },
+            { input: "I’m 22-year-old female, 5’3”, 110 lbs, want to gain weight.", expected: { age: 22, gender: 'female', height: 160, weight: 50, goal: 'weight_gain' } },
+            { input: "Male, 35, height 5.10 ft, weight 175 lbs, goal: strength training.", expected: { age: 35, gender: 'male', height: 178, weight: 79, goal: 'strength' } },
+            { input: "Female, 27, 5’6”, 140 lbs, wants to reduce belly fat.", expected: { age: 27, gender: 'female', height: 168, weight: 64, goal: 'weight_loss' } },
+            { input: "21-year-old man, 5.8 ft, 160 lbs, want to bulk up.", expected: { age: 21, gender: 'male', height: 177, weight: 73, goal: 'muscle_gain' } },
+            { input: "Woman, 38, 5’2”, 115 lbs, fitness goal: lean muscle.", expected: { age: 38, gender: 'female', height: 157, weight: 52, goal: 'muscle_gain' } },
+            { input: "I’m 29, male, 180 cm, 170 lbs, want to gain strength.", expected: { age: 29, gender: 'male', height: 180, weight: 77, goal: 'strength' } },
+            { input: "Female, 24, 160 cm, 120 lbs, goal: fat loss.", expected: { age: 24, gender: 'female', height: 160, weight: 54, goal: 'weight_loss' } },
+            { input: "Male, 42, 182 cm, 200 lbs, aim: lose belly fat.", expected: { age: 42, gender: 'male', height: 182, weight: 91, goal: 'weight_loss' } },
+            { input: "31-year-old woman, 5.6 ft, 130 lbs, want to tone.", expected: { age: 31, gender: 'female', height: 171, weight: 59, goal: 'toning' } },
+            { input: "Man, 36, 175 cm, 80 kg, goal: build muscle.", expected: { age: 36, gender: 'male', height: 175, weight: 80, goal: 'muscle_gain' } },
+            { input: "Female, 28, 5.5 ft, 58 kg, aim: gain weight.", expected: { age: 28, gender: 'female', height: 165, weight: 58, goal: 'weight_gain' } },
+            { input: "Male, 25, 6 ft, 190 lbs, goal: bulk.", expected: { age: 25, gender: 'male', height: 183, weight: 86, goal: 'muscle_gain' } },
+            { input: "Woman, 33, 165 cm, 62 kg, fitness goal: slim down.", expected: { age: 33, gender: 'female', height: 165, weight: 62, goal: 'weight_loss' } },
+            { input: "Male, 30, 5’9”, 175 lbs, want to lose fat.", expected: { age: 30, gender: 'male', height: 175, weight: 79, goal: 'weight_loss' } },
+            { input: "Female, 40, 5.4 ft, 130 lbs, goal: maintain weight.", expected: { age: 40, gender: 'female', height: 165, weight: 59, goal: 'weight_maintenance' } },
+            { input: "28M, 5’10”, 170 lbs, want to build muscle.", expected: { age: 28, gender: 'male', height: 178, weight: 77, goal: 'muscle_gain' } },
+            { input: "F25, 5.5 ft, 120 lbs, goal: lose fat.", expected: { age: 25, gender: 'female', height: 165, weight: 54, goal: 'weight_loss' } },
+            { input: "36yo male, 6 ft, 180 lbs, fitness goal: bulk.", expected: { age: 36, gender: 'male', height: 183, weight: 82, goal: 'muscle_gain' } },
+            { input: "22F, 5’3”, 110 lbs, want to gain weight.", expected: { age: 22, gender: 'female', height: 160, weight: 50, goal: 'weight_gain' } },
+            { input: "45M, 5.11 ft, 190 lbs, aim: fat loss.", expected: { age: 45, gender: 'male', height: 180, weight: 86, goal: 'weight_loss' } },
+            { input: "30F, 5’6”, 130 lbs, want to tone body.", expected: { age: 30, gender: 'female', height: 168, weight: 59, goal: 'toning' } },
+            { input: "27M, 175 cm, 78 kg, goal: muscle gain.", expected: { age: 27, gender: 'male', height: 175, weight: 78, goal: 'muscle_gain' } },
+            { input: "31F, 160 cm, 55 kg, aim: slim down.", expected: { age: 31, gender: 'female', height: 160, weight: 55, goal: 'weight_loss' } },
+            { input: "39M, 182 cm, 85 kg, goal: strength training.", expected: { age: 39, gender: 'male', height: 182, weight: 85, goal: 'strength' } },
+            { input: "24F, 5.4 ft, 115 lbs, goal: weight gain.", expected: { age: 24, gender: 'female', height: 165, weight: 52, goal: 'weight_gain' } },
+            { input: "Hey, I’m 28yo male, 5’9”, 160 lbs, trying to bulk up.", expected: { age: 28, gender: 'male', height: 175, weight: 73, goal: 'muscle_gain' } },
+            { input: "I’m a 30-year-old woman, 5.5 ft, 130 lbs, hoping to lose fat.", expected: { age: 30, gender: 'female', height: 165, weight: 59, goal: 'weight_loss' } },
+            { input: "35M, 6 ft, 180 lbs, want to tone a bit.", expected: { age: 35, gender: 'male', height: 183, weight: 82, goal: 'toning' } },
+            { input: "26F, 5’4”, 125 lbs, want to gain some muscle.", expected: { age: 26, gender: 'female', height: 165, weight: 57, goal: 'muscle_gain' } },
+            { input: "Male, 32, 175 cm, 75 kg, aiming for strength.", expected: { age: 32, gender: 'male', height: 175, weight: 75, goal: 'strength' } },
+            { input: "Female, 29, 5’6”, 135 lbs, fitness goal: slim waist.", expected: { age: 29, gender: 'female', height: 168, weight: 61, goal: 'weight_loss' } },
+            { input: "41M, 6’1”, 200 lbs, want to drop belly fat.", expected: { age: 41, gender: 'male', height: 185, weight: 91, goal: 'weight_loss' } },
+            { input: "22F, 5’2”, 110 lbs, goal: build lean muscle.", expected: { age: 22, gender: 'female', height: 157, weight: 50, goal: 'muscle_gain' } },
+            { input: "Hey, I’m 37M, 180 cm, 85 kg, aim: bulk up.", expected: { age: 37, gender: 'male', height: 180, weight: 85, goal: 'muscle_gain' } },
+            { input: "28F, 5.3 ft, 115 lbs, want to tone.", expected: { age: 28, gender: 'female', height: 160, weight: 52, goal: 'toning' } },
+            { input: "Male, 30, 5’10”, 170 lbs, goal: muscle gain, activity: gym 4x/week.", expected: { age: 30, gender: 'male', height: 178, weight: 77, goal: 'muscle_gain' } },
+            { input: "Female, 25, 5’5”, 120 lbs, want to slim, activity: yoga.", expected: { age: 25, gender: 'female', height: 165, weight: 54, goal: 'weight_loss' } },
+            { input: "40M, 6 ft, 180 lbs, fitness goal: fat loss, activity: running.", expected: { age: 40, gender: 'male', height: 183, weight: 82, goal: 'weight_loss' } },
+            { input: "Woman, 28, 5’6”, 130 lbs, aim: bulk, activity: cycling.", expected: { age: 28, gender: 'female', height: 168, weight: 59, goal: 'muscle_gain' } },
+            { input: "33M, 175 cm, 78 kg, want to build muscle, activity: weightlifting.", expected: { age: 33, gender: 'male', height: 175, weight: 78, goal: 'muscle_gain' } },
+            { input: "22F, 5’3”, 110 lbs, goal: gain weight, activity: swimming.", expected: { age: 22, gender: 'female', height: 160, weight: 50, goal: 'weight_gain' } },
+            { input: "Male, 36, 180 cm, 85 kg, want to lose fat, activity: boxing.", expected: { age: 36, gender: 'male', height: 180, weight: 85, goal: 'weight_loss' } },
+            { input: "Female, 31, 160 cm, 55 kg, fitness goal: tone, activity: pilates.", expected: { age: 31, gender: 'female', height: 160, weight: 55, goal: 'toning' } },
+            { input: "25M, 5’9”, 165 lbs, goal: bulk, activity: football.", expected: { age: 25, gender: 'male', height: 175, weight: 75, goal: 'muscle_gain' } },
+            { input: "Woman, 30, 5’4”, 120 lbs, aim: fat loss, activity: aerobics.", expected: { age: 30, gender: 'female', height: 165, weight: 54, goal: 'weight_loss' } },
+            { input: "I’m 29M, 5.8, 160, want muscle.", expected: { age: 29, gender: 'male', height: 177, weight: 73, goal: 'muscle_gain' } },
+            { input: "F30, 5.5’, 125lbs, slim down.", expected: { age: 30, gender: 'female', height: 165, weight: 57, goal: 'weight_loss' } },
+            { input: "Male 36, 180cm, 80, bulk.", expected: { age: 36, gender: 'male', height: 180, weight: 80, goal: 'muscle_gain' } },
+            { input: "Woman 25, 5’4”, 55kg, tone.", expected: { age: 25, gender: 'female', height: 165, weight: 55, goal: 'toning' } },
+            { input: "28M, 5.9ft, 165lb, strength.", expected: { age: 28, gender: 'male', height: 180, weight: 75, goal: 'strength' } },
+            { input: "32F, 5.6, 130, lose fat.", expected: { age: 32, gender: 'female', height: 171, weight: 59, goal: 'weight_loss' } },
+            { input: "M40, 6ft, 180, bulk up.", expected: { age: 40, gender: 'male', height: 183, weight: 82, goal: 'muscle_gain' } },
+            { input: "F22, 5.3’, 110lbs, gain weight.", expected: { age: 22, gender: 'female', height: 160, weight: 50, goal: 'weight_gain' } },
+            { input: "Male, 35, 175 cm, 77kg, muscle gain.", expected: { age: 35, gender: 'male', height: 175, weight: 77, goal: 'muscle_gain' } },
+            { input: "Female, 28, 5’5”, 130 lb, slim waist.", expected: { age: 28, gender: 'female', height: 165, weight: 59, goal: 'weight_loss' } },
+            { input: "I am 36M, 5’10”, 170 lbs, fitness goal: lean muscle.", expected: { age: 36, gender: 'male', height: 178, weight: 77, goal: 'muscle_gain' } },
+            { input: "Female, 29, 5’6”, 130 lbs, aim: endurance.", expected: { age: 29, gender: 'female', height: 168, weight: 59, goal: 'endurance' } },
+            { input: "Male, 31, 6 ft, 180 lbs, goal: cut fat.", expected: { age: 31, gender: 'male', height: 183, weight: 82, goal: 'weight_loss' } },
+            { input: "Woman 25, 5’5”, 120 lbs, objective: bulk.", expected: { age: 25, gender: 'female', height: 165, weight: 54, goal: 'muscle_gain' } },
+            { input: "40M, 5’11”, 190 lbs, target: slim down.", expected: { age: 40, gender: 'male', height: 180, weight: 86, goal: 'weight_loss' } },
+            { input: "22F, 5’3”, 110 lbs, purpose: muscle gain.", expected: { age: 22, gender: 'female', height: 160, weight: 50, goal: 'muscle_gain' } },
+            { input: "Male, 33, 178 cm, 80 kg, intention: weight maintenance.", expected: { age: 33, gender: 'male', height: 178, weight: 80, goal: 'weight_maintenance' } },
+            { input: "Female, 30, 5’4”, 125 lbs, aim: tone muscles.", expected: { age: 30, gender: 'female', height: 165, weight: 57, goal: 'toning' } },
+            { input: "28M, 5’9”, 170 lbs, desire: gain strength.", expected: { age: 28, gender: 'male', height: 175, weight: 77, goal: 'strength' } },
+            { input: "Woman, 26, 5’5”, 115 lbs, goal: fat reduction.", expected: { age: 26, gender: 'female', height: 165, weight: 52, goal: 'weight_loss' } },
+            { input: "Hey, 28M here, 5’10”, 170 lbs, looking to bulk.", expected: { age: 28, gender: 'male', height: 178, weight: 77, goal: 'muscle_gain' } },
+            { input: "25F, 5’4”, 120 lbs, want to slim.", expected: { age: 25, gender: 'female', height: 165, weight: 54, goal: 'weight_loss' } },
+            { input: "Yo, 36M, 6 ft, 180 lbs, fitness goal: gain muscle.", expected: { age: 36, gender: 'male', height: 183, weight: 82, goal: 'muscle_gain' } },
+            { input: "22F, 5’3”, 110 lbs, wanna tone.", expected: { age: 22, gender: 'female', height: 160, weight: 50, goal: 'toning' } },
+            { input: "M28, 5’9”, 165 lbs, aim: strength.", expected: { age: 28, gender: 'male', height: 175, weight: 75, goal: 'strength' } },
+            { input: "F30, 5’5”, 125 lbs, goal: fat loss.", expected: { age: 30, gender: 'female', height: 165, weight: 57, goal: 'weight_loss' } },
+            { input: "32M, 180 cm, 80 kg, bulk time.", expected: { age: 32, gender: 'male', height: 180, weight: 80, goal: 'muscle_gain' } },
+            { input: "29F, 5’6”, 130 lbs, slimming goal.", expected: { age: 29, gender: 'female', height: 168, weight: 59, goal: 'weight_loss' } },
+            { input: "Male, 35, 5’11”, 185 lbs, get ripped.", expected: { age: 35, gender: 'male', height: 180, weight: 84, goal: 'weight_loss' } },
+            { input: "Female, 24, 5’4”, 115 lbs, gain lean mass.", expected: { age: 24, gender: 'female', height: 165, weight: 52, goal: 'muscle_gain' } },
+            { input: "50M, 6’2”, 210 lbs, aim: lose fat.", expected: { age: 50, gender: 'male', height: 188, weight: 95, goal: 'weight_loss' } },
+            { input: "19F, 5’0”, 95 lbs, want to bulk.", expected: { age: 19, gender: 'female', height: 152, weight: 43, goal: 'muscle_gain' } },
+            { input: "Male, 27, 5.8 ft, 165 lbs, goal: muscle.", expected: { age: 27, gender: 'male', height: 177, weight: 75, goal: 'muscle_gain' } },
+            { input: "Female, 31, 5.55 ft, 135 lbs, tone.", expected: { age: 31, gender: 'female', height: 169, weight: 61, goal: 'toning' } },
+            { input: "40M, 6.1 ft, 195 lbs, cut fat.", expected: { age: 40, gender: 'male', height: 185, weight: 88, goal: 'weight_loss' } },
+            { input: "Woman 23, 5.25 ft, 105 lbs, build muscle.", expected: { age: 23, gender: 'female', height: 160, weight: 48, goal: 'muscle_gain' } },
+            { input: "Male, 36, 5.9 ft, 175 lbs, fat loss.", expected: { age: 36, gender: 'male', height: 180, weight: 79, goal: 'weight_loss' } },
+            { input: "Female, 28, 5.6’, 130 lbs, bulk.", expected: { age: 28, gender: 'female', height: 171, weight: 59, goal: 'muscle_gain' } },
+            { input: "33M, 5.95 ft, 180 lbs, strength training.", expected: { age: 33, gender: 'male', height: 181, weight: 82, goal: 'strength' } },
+            { input: "26F, 5.4 ft, 120 lbs, lean muscle.", expected: { age: 26, gender: 'female', height: 165, weight: 54, goal: 'muscle_gain' } },
+            { input: "28M, goal: bulk.", expected: { age: 28, gender: 'male', goal: 'muscle_gain' } },
+            { input: "F25, weight: 120 lbs, want muscle.", expected: { age: 25, gender: 'female', weight: 54, goal: 'muscle_gain' } },
+            { input: "Male 36, height: 6 ft, aim: fat loss.", expected: { age: 36, gender: 'male', height: 183, goal: 'weight_loss' } },
+            { input: "Woman 22, 5’3”, goal: gain weight.", expected: { age: 22, gender: 'female', height: 160, goal: 'weight_gain' } },
+            { input: "30M, 180 lbs, want strength.", expected: { age: 30, gender: 'male', weight: 82, goal: 'strength' } },
+            { input: "29F, 5’5”, goal: slim.", expected: { age: 29, gender: 'female', height: 165, goal: 'weight_loss' } },
+            { input: "35M, 175 cm, aim: bulk.", expected: { age: 35, gender: 'male', height: 175, goal: 'muscle_gain' } },
+            { input: "24F, 115 lbs, goal: tone.", expected: { age: 24, gender: 'female', weight: 52, goal: 'toning' } },
+            { input: "M40, 6 ft, 190 lbs, lose fat.", expected: { age: 40, gender: 'male', height: 183, weight: 86, goal: 'weight_loss' } },
+            { input: "F28, 5’4”, 130 lbs, build muscle.", expected: { age: 28, gender: 'female', height: 165, weight: 59, goal: 'muscle_gain' } },
+            // Third set of test cases
+            { input: "I’m a 26-year-old male, 5’10”, 165 lbs, and I want to gain muscle while running three times a week.", expected: { age: 26, gender: 'male', height: 178, weight: 75, goal: 'muscle_gain' } },
+            { input: "As a 30-year-old woman, 5’5”, 130 lbs, my goal is to slim down and do yoga regularly.", expected: { age: 30, gender: 'female', height: 165, weight: 59, goal: 'weight_loss' } },
+            { input: "I’m 35, male, 6 ft, 180 lbs, and I’d like to build strength through weightlifting.", expected: { age: 35, gender: 'male', height: 183, weight: 82, goal: 'strength' } },
+            { input: "I’m a 22-year-old female, 5’3”, 115 lbs, aiming to gain lean muscle mass while swimming.", expected: { age: 22, gender: 'female', height: 160, weight: 52, goal: 'muscle_gain' } },
+            { input: "At 28, male, 5’9”, 170 lbs, I want to bulk up and increase stamina.", expected: { age: 28, gender: 'male', height: 175, weight: 77, goal: 'muscle_gain' } },
+            { input: "I’m a 40-year-old woman, 5’4”, 140 lbs, looking to lose fat with daily walking.", expected: { age: 40, gender: 'female', height: 165, weight: 64, goal: 'weight_loss' } },
+            { input: "I’m a 32-year-old male, 175 cm, 78 kg, and I want to improve endurance with cycling.", expected: { age: 32, gender: 'male', height: 175, weight: 78, goal: 'endurance' } },
+            { input: "As a 29-year-old female, 160 cm, 55 kg, my goal is to tone my body with Pilates.", expected: { age: 29, gender: 'female', height: 160, weight: 55, goal: 'toning' } },
+            { input: "I’m 24, male, 5’11”, 165 lbs, aiming to gain strength through gym workouts.", expected: { age: 24, gender: 'male', height: 180, weight: 75, goal: 'strength' } },
+            { input: "I’m a 31-year-old female, 5’6”, 125 lbs, and I want to reduce belly fat.", expected: { age: 31, gender: 'female', height: 168, weight: 57, goal: 'weight_loss' } },
+            { input: "I’m 27, male, 6 ft, 185 lbs, looking to gain muscle and train with free weights.", expected: { age: 27, gender: 'male', height: 183, weight: 84, goal: 'muscle_gain' } },
+            { input: "I’m a 26-year-old woman, 5’2”, 110 lbs, aiming to bulk up slightly while doing cardio.", expected: { age: 26, gender: 'female', height: 157, weight: 50, goal: 'muscle_gain' } },
+            { input: "I’m a 36-year-old male, 5’10”, 175 lbs, and my goal is fat loss through running.", expected: { age: 36, gender: 'male', height: 178, weight: 79, goal: 'weight_loss' } },
+            { input: "I’m 22, female, 5’4”, 120 lbs, looking to tone muscles with yoga and resistance bands.", expected: { age: 22, gender: 'female', height: 165, weight: 54, goal: 'toning' } },
+            { input: "At 38, male, 182 cm, 90 kg, I want to slim down while doing daily brisk walking.", expected: { age: 38, gender: 'male', height: 182, weight: 90, goal: 'weight_loss' } },
+            { input: "I’m a 30-year-old woman, 5’5”, 130 lbs, aiming for muscle gain with weightlifting.", expected: { age: 30, gender: 'female', height: 165, weight: 59, goal: 'muscle_gain' } },
+            { input: "I’m 25, male, 5’9”, 160 lbs, and I want to bulk while doing crossfit workouts.", expected: { age: 25, gender: 'male', height: 175, weight: 73, goal: 'muscle_gain' } },
+            { input: "As a 29-year-old female, 5’3”, 115 lbs, my goal is fat loss and cardio training.", expected: { age: 29, gender: 'female', height: 160, weight: 52, goal: 'weight_loss' } },
+            { input: "I’m 33, male, 178 cm, 82 kg, looking to gain strength with gym routines.", expected: { age: 33, gender: 'male', height: 178, weight: 82, goal: 'strength' } },
+            { input: "I’m a 28-year-old woman, 5’6”, 128 lbs, and I want to tone my body with pilates.", expected: { age: 28, gender: 'female', height: 168, weight: 58, goal: 'toning' } },
+            { input: "I’m 35, male, 6 ft, 185 lbs, aiming to reduce fat through running and swimming.", expected: { age: 35, gender: 'male', height: 183, weight: 84, goal: 'weight_loss' } },
+            { input: "I’m a 26-year-old female, 160 cm, 55 kg, and I want to gain muscle mass with strength training.", expected: { age: 26, gender: 'female', height: 160, weight: 55, goal: 'muscle_gain' } },
+            { input: "I’m 32, male, 180 cm, 80 kg, looking to bulk up through weightlifting and HIIT.", expected: { age: 32, gender: 'male', height: 180, weight: 80, goal: 'muscle_gain' } },
+            { input: "I’m a 24-year-old woman, 5’5”, 118 lbs, my goal is to slim down with yoga.", expected: { age: 24, gender: 'female', height: 165, weight: 54, goal: 'weight_loss' } },
+            { input: "I’m 29, male, 5’10”, 170 lbs, and I want to gain lean muscle and improve endurance.", expected: { age: 29, gender: 'male', height: 178, weight: 77, goal: 'muscle_gain' } },
+            { input: "I’m a 30-year-old female, 5’4”, 125 lbs, aiming to lose fat while doing cardio.", expected: { age: 30, gender: 'female', height: 165, weight: 57, goal: 'weight_loss' } },
+            { input: "I’m 27, male, 6 ft, 180 lbs, and I want to build strength with kettlebell training.", expected: { age: 27, gender: 'male', height: 183, weight: 82, goal: 'strength' } },
+            { input: "I’m a 25-year-old woman, 5’3”, 115 lbs, aiming to gain weight through a healthy diet and strength workouts.", expected: { age: 25, gender: 'female', height: 160, weight: 52, goal: 'weight_gain' } },
+            { input: "I’m 36, male, 5’11”, 180 lbs, and I want to reduce belly fat with HIIT and running.", expected: { age: 36, gender: 'male', height: 180, weight: 82, goal: 'weight_loss' } },
+            { input: "I’m a 22-year-old female, 160 cm, 52 kg, aiming to gain lean muscle with resistance exercises.", expected: { age: 22, gender: 'female', height: 160, weight: 52, goal: 'muscle_gain' } },
+            { input: "I’m 40, male, 6 ft, 190 lbs, my goal is fat loss through cycling and weightlifting.", expected: { age: 40, gender: 'male', height: 183, weight: 86, goal: 'weight_loss' } },
+            { input: "I’m a 28-year-old woman, 5’5”, 130 lbs, looking to tone muscles with Pilates and yoga.", expected: { age: 28, gender: 'female', height: 165, weight: 59, goal: 'toning' } },
+            { input: "I’m 26, male, 5’9”, 165 lbs, aiming to bulk up with gym sessions 4 times a week.", expected: { age: 26, gender: 'male', height: 175, weight: 75, goal: 'muscle_gain' } },
+            { input: "I’m a 30-year-old female, 5’6”, 125 lbs, and I want to reduce fat with cardio and strength training.", expected: { age: 30, gender: 'female', height: 168, weight: 57, goal: 'weight_loss' } },
+            { input: "I’m 35, male, 180 cm, 185 lbs, goal: gain muscle while maintaining endurance.", expected: { age: 35, gender: 'male', height: 180, weight: 84, goal: 'muscle_gain' } },
+            { input: "I’m a 27-year-old woman, 5’3”, 115 lbs, aiming to slim down through yoga and light weights.", expected: { age: 27, gender: 'female', height: 160, weight: 52, goal: 'weight_loss' } },
+            { input: "I’m 33, male, 5’10”, 175 lbs, and I want to gain strength with compound exercises.", expected: { age: 33, gender: 'male', height: 178, weight: 79, goal: 'strength' } },
+            { input: "I’m a 29-year-old female, 5’4”, 128 lbs, goal: tone body and improve stamina.", expected: { age: 29, gender: 'female', height: 165, weight: 58, goal: 'toning' } },
+            { input: "I’m 32, male, 6 ft, 185 lbs, aiming to cut fat with swimming and gym workouts.", expected: { age: 32, gender: 'male', height: 183, weight: 84, goal: 'weight_loss' } },
+            { input: "I’m a 25-year-old woman, 5’5”, 120 lbs, and I want to gain lean muscle with resistance training.", expected: { age: 25, gender: 'female', height: 165, weight: 54, goal: 'muscle_gain' } },
+            { input: "I’m 36, male, 5’11”, 180 lbs, my goal is fat loss and increased endurance.", expected: { age: 36, gender: 'male', height: 180, weight: 82, goal: 'weight_loss' } },
+            { input: "I’m a 28-year-old female, 5’6”, 130 lbs, aiming to tone muscles with pilates and weights.", expected: { age: 28, gender: 'female', height: 168, weight: 59, goal: 'toning' } },
+            { input: "I’m 30, male, 5’9”, 170 lbs, and I want to bulk with gym and HIIT.", expected: { age: 30, gender: 'male', height: 175, weight: 77, goal: 'muscle_gain' } },
+            { input: "I’m a 24-year-old woman, 5’3”, 115 lbs, aiming to slim down with cardio and yoga.", expected: { age: 24, gender: 'female', height: 160, weight: 52, goal: 'weight_loss' } },
+            { input: "I’m 35, male, 6 ft, 185 lbs, and my goal is muscle gain through resistance training.", expected: { age: 35, gender: 'male', height: 183, weight: 84, goal: 'muscle_gain' } },
+            { input: "I’m a 26-year-old female, 5’4”, 120 lbs, looking to gain strength with gym workouts.", expected: { age: 26, gender: 'female', height: 165, weight: 54, goal: 'strength' } },
+            { input: "I’m 32, male, 5’10”, 175 lbs, goal: fat loss through cycling and running.", expected: { age: 32, gender: 'male', height: 178, weight: 79, goal: 'weight_loss' } },
+            { input: "I’m a 29-year-old woman, 5’5”, 125 lbs, aiming to tone muscles with yoga and pilates.", expected: { age: 29, gender: 'female', height: 165, weight: 57, goal: 'toning' } },
+            { input: "I’m 27, male, 180 cm, 180 lbs, and I want to bulk with strength training.", expected: { age: 27, gender: 'male', height: 180, weight: 82, goal: 'muscle_gain' } },
+            { input: "I’m a 25-year-old female, 5’3”, 118 lbs, goal: gain muscle and improve endurance.", expected: { age: 25, gender: 'female', height: 160, weight: 54, goal: 'muscle_gain' } },
+            // Fourth set of test cases
+            { input: "I’m 28M, 5’9”, 165 lbs, want to bulk.", expected: { age: 28, gender: 'male', height: 175, weight: 75, goal: 'muscle_gain' } },
+            { input: "Female, 32, 5.4 ft, 120 lbs, aim: slim down.", expected: { age: 32, gender: 'female', height: 165, weight: 54, goal: 'weight_loss' } },
+            { input: "25 y/o man, 5.11 ft, 150 lbs, fitness goal: gain muscle.", expected: { age: 25, gender: 'male', height: 180, weight: 68, goal: 'muscle_gain' } },
+            { input: "Woman, 30, 5’5”, 130 lbs, goal: tone body.", expected: { age: 30, gender: 'female', height: 165, weight: 59, goal: 'toning' } },
+            { input: "40 yo male, 6 ft, 180 lbs, looking to lose fat.", expected: { age: 40, gender: 'male', height: 183, weight: 82, goal: 'weight_loss' } },
+            { input: "22F, 5’3”, 110 lbs, want to gain weight.", expected: { age: 22, gender: 'female', height: 160, weight: 50, goal: 'weight_gain' } },
+            { input: "Male, 35, 5.10 ft, 175 lbs, goal: strength training.", expected: { age: 35, gender: 'male', height: 178, weight: 79, goal: 'strength' } },
+            { input: "Female, 27, 5’6”, 140 lbs, wants to reduce belly fat.", expected: { age: 27, gender: 'female', height: 168, weight: 64, goal: 'weight_loss' } },
+            { input: "21-year-old man, 5.8 ft, 160 lbs, want to bulk up.", expected: { age: 21, gender: 'male', height: 177, weight: 73, goal: 'muscle_gain' } },
+            { input: "Woman, 38, 5’2”, 115 lbs, fitness goal: lean muscle.", expected: { age: 38, gender: 'female', height: 157, weight: 52, goal: 'muscle_gain' } },
+            { input: "Yo, 28M here, 5’10”, 170 lbs, looking to bulk.", expected: { age: 28, gender: 'male', height: 178, weight: 77, goal: 'muscle_gain' } },
+            { input: "25F, 5’4”, 120 lbs, want to slim.", expected: { age: 25, gender: 'female', height: 165, weight: 54, goal: 'weight_loss' } },
+            { input: "Hey, I’m 36M, 6 ft, 180 lbs, fitness goal: gain muscle.", expected: { age: 36, gender: 'male', height: 183, weight: 82, goal: 'muscle_gain' } },
+            { input: "22F, 5’3”, 110 lbs, wanna tone.", expected: { age: 22, gender: 'female', height: 160, weight: 50, goal: 'toning' } },
+            { input: "M28, 5’9”, 165 lbs, aim: strength.", expected: { age: 28, gender: 'male', height: 175, weight: 75, goal: 'strength' } },
+            { input: "F30, 5’5”, 125 lbs, goal: fat loss.", expected: { age: 30, gender: 'female', height: 165, weight: 57, goal: 'weight_loss' } },
+            { input: "32M, 180 cm, 80 kg, bulk time.", expected:{ age: 32, gender: 'male', height: 180, weight: 80, goal: 'muscle_gain' } },
+            { input: "29F, 5’6”, 130 lbs, slimming goal.", expected: { age: 29, gender: 'female', height: 168, weight: 59, goal: 'weight_loss' } },
+            { input: "Male, 35, 5’11”, 185 lbs, get ripped.", expected: { age: 35, gender: 'male', height: 180, weight: 84, goal: 'weight_loss' } },
+            { input: "Female, 24, 5’4”, 115 lbs, gain lean mass.", expected: { age: 24, gender: 'female', height: 165, weight: 52, goal: 'muscle_gain' } },
+            { input: "50M, 6’2”, 210 lbs, aim: lose fat.", expected: { age: 50, gender: 'male', height: 188, weight: 95, goal: 'weight_loss' } },
+            { input: "19F, 5’0”, 95 lbs, want to bulk.", expected: { age: 19, gender: 'female', height: 152, weight: 43, goal: 'muscle_gain' } },
+            { input: "Male, 27, 5.8 ft, 165 lbs, goal: muscle.", expected: { age: 27, gender: 'male', height: 177, weight: 75, goal: 'muscle_gain' } },
+            { input: "Female, 31, 5.55 ft, 135 lbs, tone.", expected: { age: 31, gender: 'female', height: 169, weight: 61, goal: 'toning' } },
+            { input: "40M, 6.1 ft, 195 lbs, cut fat.", expected: { age: 40, gender: 'male', height: 185, weight: 88, goal: 'weight_loss' } },
+            { input: "Woman 23, 5.25 ft, 105 lbs, build muscle.", expected: { age: 23, gender: 'female', height: 160, weight: 48, goal: 'muscle_gain' } },
+            { input: "Male, 36, 5.9 ft, 175 lbs, fat loss.", expected: { age: 36, gender: 'male', height: 180, weight: 79, goal: 'weight_loss' } },
+            { input: "Female, 28, 5.6’, 130 lbs, bulk.", expected: { age: 28, gender: 'female', height: 171, weight: 59, goal: 'muscle_gain' } },
+            { input: "33M, 5.95 ft, 180 lbs, strength training.", expected: { age: 33, gender: 'male', height: 181, weight: 82, goal: 'strength' } },
+            { input: "26F, 5.4 ft, 120 lbs, lean muscle.", expected: { age: 26, gender: 'female', height: 165, weight: 54, goal: 'muscle_gain' } },
+            // Edge cases
+            { input: "28M, goal: bulk.", expected: { age: 28, gender: 'male', goal: 'muscle_gain' } },
+            { input: "F25, weight: 120 lbs, want muscle.", expected: { age: 25, gender: 'female', weight: 54, goal: 'muscle_gain' } },
+            { input: "Male 36, height: 6 ft, aim: fat loss.", expected: { age: 36, gender: 'male', height: 183, goal: 'weight_loss' } },
+            { input: "Woman 22, 5’3”, goal: gain weight.", expected: { age: 22, gender: 'female', height: 160, goal: 'weight_gain' } },
+            { input: "30M, 180 lbs, want strength.", expected: { age: 30, gender: 'male', weight: 82, goal: 'strength' } },
+            { input: "29F, 5’5”, goal: slim.", expected: { age: 29, gender: 'female', height: 165, goal: 'weight_loss' } },
+            { input: "35M, 175 cm, aim: bulk.", expected: { age: 35, gender: 'male', height: 175, goal: 'muscle_gain' } },
+            { input: "24F, 115 lbs, goal: tone.", expected: { age: 24, gender: 'female', weight: 52, goal: 'toning' } },
+            { input: "M40, 6 ft, 190 lbs, lose fat.", expected: { age: 40, gender: 'male', height: 183, weight: 86, goal: 'weight_loss' } },
+            { input: "F28, 5’4”, 130 lbs, build muscle.", expected: { age: 28, gender: 'female', height: 165, weight: 59, goal: 'muscle_gain' } }
+        ];
+
+        function compareResults(actual, expected) {
+            const missingFields = [];
+            const mismatchedFields = [];
+            for (const key in expected) {
+                if (!(key in actual)) {
+                    missingFields.push(key);
+                } else if (actual[key] !== expected[key]) {
+                    mismatchedFields.push({ key, expected: expected[key], actual: actual[key] });
+                }
+            }
+            return { missingFields, mismatchedFields, passed: missingFields.length === 0 && mismatchedFields.length === 0 };
+        }
+
+        function displayTestResult(index, input, actual, expected, result) {
+            let html = `<div class="result-item ${result.passed ? '' : 'failed'}">`;
+            html += `<strong>Test ${index + 1}: ${input}</strong>`;
+            html += `<div><strong>Expected:</strong> ${JSON.stringify(expected)}</div>`;
+            html += `<div><strong>Actual:</strong> ${JSON.stringify(actual)}</div>`;
+            if (!result.passed) {
+                if (result.missingFields.length > 0) {
+                    html += `<div><strong>Missing Fields:</strong> ${result.missingFields.map(f => `<span class="field missing">${f}</span>`).join(', ')}</div>`;
+                }
+                if (result.mismatchedFields.length > 0) {
+                    html += `<div><strong>Mismatched Fields:</strong> ${result.mismatchedFields.map(f => `<span class="field">${f.key}: expected ${f.expected}, got ${f.actual}</span>`).join(', ')}</div>`;
+                }
+            } else {
+                html += `<div><strong>Status:</strong> Passed</div>`;
+            }
+            html += `</div>`;
+            return html;
+        }
+
+        function runTests(tests) {
+            let passed = 0;
+            let resultsHtml = '<div class="results">';
+            tests.forEach((test, index) => {
+                const actual = parsePrompt(test.input);
+                const result = compareResults(actual, test.expected);
+                if (result.passed) passed++;
+                resultsHtml += displayTestResult(index, test.input, actual, test.expected, result);
+            });
+            resultsHtml += '</div>';
+            resultsHtml += `<div class="summary ${passed === tests.length ? '' : 'poor'}">`;
+            resultsHtml += `Summary: ${passed}/${tests.length} tests passed (${((passed / tests.length) * 100).toFixed(2)}%)`;
+            resultsHtml += '</div>';
+            document.getElementById('test-results').innerHTML = resultsHtml;
+        }
+
+        window.testManualInput = function () {
+            const input = document.getElementById('manual-input').value;
+            try {
+                const result = parsePrompt(input);
+                document.getElementById('manual-results').innerHTML = `
+                    <div class="results">
+                        <strong>Input:</strong> ${input}<br>
+                        <strong>Parsed Output:</strong> <pre>${JSON.stringify(result, null, 2)}</pre>
+                    </div>`;
+            } catch (error) {
+                document.getElementById('manual-results').innerHTML = `
+                    <div class="results" style="border-left-color: #f44336;">
+                        <strong>Error:</strong> ${error.message}
+                    </div>`;
+            }
+        };
+
+        window.runAllTests = function () {
+            runTests(testCases);
+        };
+
+        window.runEdgeCases = function () {
+            const edgeCases = testCases.filter(test => !test.expected.height || !test.expected.weight || !test.expected.age || !test.expected.gender);
+            runTests(edgeCases);
+        };
+    </script>
+</body>
+</html>

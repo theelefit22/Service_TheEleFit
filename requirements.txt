@@ -1,0 +1,13 @@
+Flask
+flask-cors
+openai
+pdfplumber
+pytesseract
+Pillow
+pdf2image
+numpy
+werkzeug
+redis
+langdetect
+python-dotenv
+
