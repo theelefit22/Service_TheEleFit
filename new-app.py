@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, render_template, stream_with_context,Response, make_response
 from flask_cors import CORS
+from openai import OpenAI
 import redis
 import json
 from langdetect import detect
@@ -20,41 +21,30 @@ from datetime import datetime
 from utils import calculate_bmi, calculate_tdee, goal_config, classify_goal_from_text
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import sys
-import openai
-
 # Initialize Flask app
 app = Flask(__name__)
 executor = ThreadPoolExecutor(max_workers=4)
 tasks = {}
 
-# Enable CORS for all routes - simplified for development
-CORS(app, 
-     origins="*",  # Allow all origins in development
-     allow_headers=["Content-Type", "Authorization", "Accept"],
-     methods=["GET", "POST", "OPTIONS"],
-     supports_credentials=True)
+# Enable CORS for development
+allowed_origins = [
+    "https://theelefit.com",
+    "https://*.shopify.com",
+    "https://*.shopifypreview.com",
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://service.theelefit.com",
+    "https://yantraprise.com"  # Added to match frontend request
+]
 
-# Add explicit OPTIONS handling for preflight requests
-@app.after_request
-def after_request(response):
-    # Add CORS headers to every response
-    origin = request.headers.get('Origin')
-    if origin:
-        response.headers['Access-Control-Allow-Origin'] = origin
-    else:
-        response.headers['Access-Control-Allow-Origin'] = '*'
-    
-    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Accept'
-    response.headers['Access-Control-Allow-Credentials'] = 'true'
-    
-    # For SSE responses, add specific headers
-    if request.path in ['/mealplan', '/workoutplan'] and request.method == 'POST':
-        response.headers['Content-Type'] = 'text/event-stream'
-        response.headers['Cache-Control'] = 'no-cache'
-        response.headers['X-Accel-Buffering'] = 'no'
-    
-    return response
+CORS(app, resources={
+    r"/chat": {"origins": allowed_origins},
+    r"/check-cache": {"origins": allowed_origins},
+    r"/process-pdf": {"origins": allowed_origins},
+    r"/user": {"origins": allowed_origins},
+    r"/mealplan": {"origins": allowed_origins},
+    r"/workoutplan": {"origins": allowed_origins}
+}, supports_credentials=True)
 
 # Load environment variables from .env file
 load_dotenv()
@@ -62,13 +52,8 @@ load_dotenv()
 # Initialize OpenAI client
 api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
-    print("WARNING: OPENAI_API_KEY environment variable is not set")
-    print("Please set it using: export OPENAI_API_KEY='your-api-key'")
-    # Use a placeholder to prevent crashes during development
-    api_key = "sk-placeholder"
-    
-openai.api_key = api_key
-
+    raise RuntimeError("OPENAI_API_KEY environment variable is not set")
+client = OpenAI(api_key=api_key)
 # Create necessary folders for PDF processing
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(CURRENT_DIR, 'Uploads')  # Kept as 'Uploads' to match your setup
@@ -304,8 +289,8 @@ MEAL PLAN TEXT:
 def call_openai_grocery_parser(prompt):
     """Call OpenAI API to parse grocery list"""
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
+        response = client.chat.completions.create(
+            model="gpt-4-turbo",
             messages=[
                 {"role": "system", "content": "You are a precise grocery list parser focused on accurate quantity extraction and aggregation."},
                 {"role": "user", "content": prompt}
@@ -573,308 +558,20 @@ def process_pdf():
         print(traceback.format_exc())
         return jsonify({'error': error_msg}), 500
     
-@app.route('/calculate-calories', methods=['POST', 'OPTIONS'])
-def calculate_calories():
-    """Calculate daily target calories based on user profile"""
-    if request.method == 'OPTIONS':
-        return '', 200
-        
+client = OpenAI()
+# ---------------------- PROMPT GUARD ----------------------
+def prompt_guard(user_input: str, guard_type="prompt"):
     try:
-        data = request.get_json()
-        
-        # Extract data with defaults
-        age = int(data.get('age', 30))
-        weight = float(data.get('weight', 70))
-        height = float(data.get('height', 170))
-        gender = data.get('gender', 'other')
-        activity_level = data.get('activityLevel', 'moderate')
-        target_weight = float(data.get('targetWeight', weight))
-        timeline = int(data.get('timeline', 12))  # weeks
-        
-        # Calculate BMI
-        bmi = calculate_bmi(weight, height)
-        
-        # Calculate TDEE
-        tdee = calculate_tdee(age, weight, height, gender, activity_level)
-        
-        # Determine goal category based on weight change
-        weight_change = target_weight - weight
-        
-        if weight_change < -2:
-            goal_category = 'weight_loss'
-        elif weight_change > 2:
-            goal_category = 'muscle_gain'
-        else:
-            goal_category = 'maintenance'
-        
-        # Get daily calorie offset from goal config
-        daily_offset = goal_config[goal_category]["daily_offset"]
-        
-        # Calculate target calories
-        target_calories = tdee + daily_offset
-        
-        # Ensure minimum safe calories
-        if goal_category == 'weight_loss':
-            min_calories = 1200 if gender == 'female' else 1500
-            target_calories = max(target_calories, min_calories)
-        
-        return jsonify({
-            'bmi': round(bmi, 1),
-            'tdee': round(tdee),
-            'targetCalories': round(target_calories),
-            'goalCategory': goal_category,
-            'deficit': round(daily_offset),
-            'weightChange': round(weight_change, 1),
-            'timeline': timeline
-        })
-        
+        mod_resp = client.moderations.create(
+            model="omni-moderation-latest",
+            input=user_input
+        )
+        flagged = mod_resp.results[0].flagged
+        if flagged:
+            return {"status": "blocked", "reason": f"{guard_type} failed moderation"}
+        return {"status": "ok"}
     except Exception as e:
-        print(f"Error calculating calories: {str(e)}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({"error": str(e)}), 500
-
-@app.route("/mealplan", methods=["POST", "OPTIONS"])
-def meal_plan():
-    if request.method == "OPTIONS":
-        return "", 200
-        
-    data = request.get_json()
-    calories = data.get("targetCalories", 2000)
-    dietary_restrictions = data.get("dietaryRestrictions", "")
-    allergies = data.get("allergies", "")
-    prompt = data.get("prompt", "")
-    
-    # Check if client accepts SSE
-    accept_header = request.headers.get('Accept', '')
-    if 'text/event-stream' not in accept_header:
-        # Return regular JSON response for non-SSE clients
-        try:
-            messages = [
-                {"role": "system", "content": "You are a professional nutritionist creating personalized meal plans."},
-                {"role": "user", "content": f"""Create a 7-day meal plan with the following requirements:
-                - Target calories per day: {calories}
-                - Dietary restrictions: {dietary_restrictions if dietary_restrictions else 'None'}
-                - Allergies: {allergies if allergies else 'None'}
-                - User request: {prompt}
-                
-                Format each day clearly with Day 1, Day 2, etc., and include Breakfast, Lunch, Dinner, and Snacks."""}
-            ]
-            
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=messages,
-                temperature=0.7,
-                max_tokens=2000
-            )
-            
-            return jsonify({"mealPlan": response.choices[0].message.content})
-        except Exception as e:
-            print(f"Error generating meal plan: {str(e)}")
-            return jsonify({"error": str(e)}), 500
-    
-    # SSE streaming response
-    def generate():
-        try:
-            messages = [
-                {"role": "system", "content": "You are a professional nutritionist creating personalized meal plans."},
-                {"role": "user", "content": f"""Create a 7-day meal plan with the following requirements:
-                - Target calories per day: {calories}
-                - Dietary restrictions: {dietary_restrictions if dietary_restrictions else 'None'}
-                - Allergies: {allergies if allergies else 'None'}
-                - User request: {prompt}
-                
-                Format each day clearly with Day 1, Day 2, etc., and include Breakfast, Lunch, Dinner, and Snacks."""}
-            ]
-            
-            stream = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=messages,
-                temperature=0.7,
-                max_tokens=2000,
-                stream=True
-            )
-            
-            for chunk in stream:
-                if chunk.choices[0].delta.content:
-                    data = {
-                        "choices": [{
-                            "delta": {
-                                "content": chunk.choices[0].delta.content
-                            }
-                        }]
-                    }
-                    yield f"data: {json.dumps(data)}\n\n"
-            
-            yield "data: [DONE]\n\n"
-        except Exception as e:
-            print(f"Error in meal plan stream: {str(e)}")
-            error_data = {"error": str(e)}
-            yield f"data: {json.dumps(error_data)}\n\n"
-    
-    return Response(
-        generate(),
-        mimetype="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "X-Accel-Buffering": "no",
-            "Access-Control-Allow-Origin": "*"
-        }
-    )
-
-@app.route("/workoutplan", methods=["POST", "OPTIONS"])
-def workout_plan():
-    if request.method == "OPTIONS":
-        return "", 200
-        
-    data = request.get_json()
-    goal = data.get("goal", "")
-    fitness_level = data.get("fitnessLevel", "beginner")
-    fitness_goals = data.get("fitnessGoals", "general fitness")
-    prompt = data.get("prompt", "")
-    
-    # Check if client accepts SSE
-    accept_header = request.headers.get('Accept', '')
-    if 'text/event-stream' not in accept_header:
-        # Return regular JSON response for non-SSE clients
-        try:
-            messages = [
-                {"role": "system", "content": "You are a professional fitness trainer creating personalized workout plans."},
-                {"role": "user", "content": f"""Create a 7-day workout plan with the following requirements:
-                - Fitness level: {fitness_level}
-                - Fitness goals: {fitness_goals}
-                - User request: {prompt}
-                
-                Format each day clearly with Day 1, Day 2, etc., and include specific exercises with sets and reps."""}
-            ]
-            
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=messages,
-                temperature=0.7,
-                max_tokens=2000
-            )
-            
-            return jsonify({"workoutPlan": response.choices[0].message.content})
-        except Exception as e:
-            print(f"Error generating workout plan: {str(e)}")
-            return jsonify({"error": str(e)}), 500
-    
-    # SSE streaming response
-    def generate():
-        try:
-            messages = [
-                {"role": "system", "content": "You are a professional fitness trainer creating personalized workout plans."},
-                {"role": "user", "content": f"""Create a 7-day workout plan with the following requirements:
-                - Fitness level: {fitness_level}
-                - Fitness goals: {fitness_goals}
-                - User request: {prompt}
-                
-                Format each day clearly with Day 1, Day 2, etc., and include specific exercises with sets and reps."""}
-            ]
-            
-            stream = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=messages,
-                temperature=0.7,
-                max_tokens=2000,
-                stream=True
-            )
-            
-            for chunk in stream:
-                if chunk.choices[0].delta.content:
-                    data = {
-                        "choices": [{
-                            "delta": {
-                                "content": chunk.choices[0].delta.content
-                            }
-                        }]
-                    }
-                    yield f"data: {json.dumps(data)}\n\n"
-            
-            yield "data: [DONE]\n\n"
-        except Exception as e:
-            print(f"Error in workout plan stream: {str(e)}")
-            error_data = {"error": str(e)}
-            yield f"data: {json.dumps(error_data)}\n\n"
-    
-    return Response(
-        generate(),
-        mimetype="text/event-stream",
-        headers={
-            "Cache-Control": "no-cache",
-            "X-Accel-Buffering": "no",
-            "Access-Control-Allow-Origin": "*"
-        }
-    )
-
-@app.route("/user", methods=["POST"])
-def user_details():
-    data = request.get_json()
-
-    # Extract user details
-    age = data.get("age")
-    weight = data.get("weight")
-    height = data.get("height")
-    gender = data.get("gender")
-    activity_level = data.get("activityLevel", "moderate")
-    goal = data.get("goal", "")
-    prompt = data.get("prompt", "")
-    target_weight = data.get("targetWeight", weight)
-    timeline = data.get("timeline", 12)  # weeks
-
-    # Validation
-    if not all([age, weight, height]):
-        return jsonify({"error": "Age, weight, and height are required"}), 400
-
-    try:
-        age = int(age)
-        weight = float(weight)
-        height = float(height)
-        target_weight = float(target_weight) if target_weight else weight
-        timeline = int(timeline)
-    except ValueError:
-        return jsonify({"error": "Invalid numeric values"}), 400
-
-    # Calculate BMI
-    bmi = calculate_bmi(weight, height)
-    
-    # Calculate TDEE
-    tdee = calculate_tdee(age, weight, height, gender, activity_level)
-    
-    # Determine goal category
-    weight_change = target_weight - weight
-    
-    if goal:
-        goal_category = classify_goal_from_text(goal)
-    else:
-        if weight_change < -2:
-            goal_category = 'weight_loss'
-        elif weight_change > 2:
-            goal_category = 'muscle_gain'
-        else:
-            goal_category = 'maintenance'
-
-    # Daily calories offset
-    daily_offset = goal_config[goal_category]["daily_offset"]
-    
-    # Calculate target calories
-    target_calories = tdee + daily_offset
-    
-    # Ensure minimum safe calories
-    if goal_category == 'weight_loss':
-        # Minimum safe calories (1200 for women, 1500 for men)
-        min_calories = 1200 if gender == 'female' else 1500
-        target_calories = max(target_calories, min_calories)
-
-    return jsonify({
-        "bmi": round(bmi, 1),
-        "tdee": round(tdee),
-        "targetCalories": round(target_calories),
-        "goalCategory": goal_category,
-        "weightChange": round(weight_change, 1),
-        "timeline": timeline
-    })
+        return {"status": "error", "reason": str(e)}
 
 REQUIRED_FIELDS = [
     "age",
@@ -886,6 +583,474 @@ REQUIRED_FIELDS = [
     "timelineWeeks"
 ]
 
+
+@app.route("/user", methods=["POST"])
+def user_details():
+    data = request.get_json()
+    print("=== /user endpoint called ===")
+    print("Received data:", json.dumps(data, indent=2))
+
+    # Handle both old and new format
+    if "userDetails" in data:
+        # Old format
+        prompt = data.get("prompt", "")
+        user_details = data.get("userDetails", {})
+        
+        if not prompt:
+            return jsonify({"error": "Prompt is required"}), 400
+        if not user_details:
+            return jsonify({"error": "User details are required"}), 400
+
+        # Validate all required fields
+        missing_fields = [f for f in REQUIRED_FIELDS if f not in user_details or user_details[f] in (None, "", [])]
+        if missing_fields:
+            return jsonify({"error": f"Missing required fields: {', '.join(missing_fields)}"}), 400
+
+        age = int(user_details["age"])
+        weight = float(user_details["weight"])
+        height = float(user_details["height"])
+        gender = str(user_details["gender"])
+        activity_level = str(user_details["activityLevel"])
+        goal = str(user_details.get("healthGoals", "")).strip()  
+        target_weight = float(user_details.get("targetWeight"))
+        timeline_weeks = int(user_details.get("timelineWeeks"))
+    else:
+        # New format - direct data
+        age = int(data.get("age"))
+        weight = float(data.get("weight"))
+        height = float(data.get("height"))
+        gender = str(data.get("gender"))
+        activity_level = str(data.get("activityLevel"))
+        goal = str(data.get("goal", "")).strip()
+        target_weight = float(data.get("targetWeight"))
+        timeline_weeks = int(data.get("timelineWeeks"))
+
+    # TDEE calculation placeholder
+    tdee = calculate_tdee(weight, height, age, gender, activity_level)
+
+    # Goal classification placeholder
+    if goal:
+        goal_category = classify_goal_from_text(goal)
+        print(f"Goal classification for '{goal}': {goal_category}")
+    else:
+        goal_category = classify_goal_from_text(prompt)
+        print(f"Goal classification for prompt '{prompt}': {goal_category}")
+
+
+    # Daily calories offset
+    weight_change = target_weight - weight
+    total_calorie_change = weight_change * 7700
+    daily_offset = total_calorie_change / (timeline_weeks * 7)
+    daily_offset = max(min(daily_offset, 1000), -1000)
+    target_calories = round(tdee + daily_offset)
+    workout_focus = goal_config[goal_category]['workout_focus']
+    
+    print("=== CALCULATION RESULTS ===")
+    print(f"Current weight: {weight} kg")
+    print(f"Target weight: {target_weight} kg")
+    print(f"TDEE: {tdee}")
+    print(f"Weight change: {weight_change} kg")
+    print(f"Daily offset: {daily_offset}")
+    print(f"Target calories: {target_calories}")
+    print(f"Goal category: {goal_category}")
+    print(f"Workout focus: {workout_focus}")
+
+
+    profile = {
+        "goalCategory": goal_category,
+        "age": age,
+        "weight": weight,
+        "height": height,
+        "gender": gender,
+        "activityLevel": activity_level,
+        "targetWeight": target_weight,
+        "timelineWeeks": timeline_weeks,
+        "tdee": tdee,
+        "targetCalories": target_calories,
+        "WorkoutFocus" : workout_focus
+    }
+
+    resp = make_response(jsonify(profile))
+    resp.set_cookie("user_profile", json.dumps(profile), httponly=True, samesite="Strict")
+    return resp
+
+
+@app.route("/mealplan", methods=["POST"])
+def meal_plan():
+    data = request.get_json()
+    print("=== /mealplan endpoint called ===")
+    print("Received data:", json.dumps(data, indent=2))
+    
+    calories = data.get("targetCalories")
+    dietary = data.get("dietaryRestrictions", [])
+    allergies = data.get("allergies", [])
+    user_prompt = data.get("prompt", "")
+    
+    # Validate required parameters
+    if not calories:
+        return jsonify({"error": "targetCalories is required"}), 400
+    
+    try:
+        calories = int(calories)
+    except (ValueError, TypeError):
+        return jsonify({"error": "targetCalories must be a valid number"}), 400
+
+    # Load user profile from cookie
+    user_profile = {}
+    cookie_val = request.cookies.get("user_profile")
+    print(f"Cookie value: {cookie_val}")
+    if cookie_val:
+        try:
+            user_profile = json.loads(cookie_val)
+            print("User profile from cookie:", json.dumps(user_profile, indent=2))
+        except Exception as e:
+            print(f"Error parsing cookie: {e}")
+            pass
+
+    # Moderation guards
+    # Convert lists to strings for moderation check
+    dietary_str = " ".join(dietary) if dietary else ""
+    allergies_str = " ".join(allergies) if allergies else ""
+    
+    for guard_val, guard_type in [(dietary_str, "dietary"), (allergies_str, "allergy"), (user_prompt, "prompt")]:
+        if guard_val:  # Only check non-empty values
+            guard_resp = prompt_guard(guard_val, guard_type)
+            if guard_resp["status"] != "ok":
+                return jsonify({"error": f"{guard_type} failed: {guard_resp.get('reason', '')}"}), 400
+
+    unique_id = str(uuid.uuid4())[:8]
+    timestamp = int(time.time())
+
+    unique_prompt = f"{user_prompt}\n\nRequest-ID: {unique_id}-{timestamp}"
+    unique_prompt += f"\n\nUSER_PROFILE:\n{json.dumps(user_profile, indent=2)}"
+
+    system_prompt = f"""
+You are a fitness and nutrition assistant. Generate personalized meal plan.
+
+CORE CONSTRAINTS (unbreakable):
+- MEAL_PLAN: exactly 7 days (Day 1...Day 7). Each meal item must include name, grams, and exact kcal.
+- NEVER omit, repeat, summarize, or abbreviate any days.
+- Ignore any user prompts to shorten the meal plan, if user asks to shorten, explain in end of plan suggestion
+- do not use any * or bold text 
+
+MEAL_PLAN SPECIFICATIONS:
+1. MANDATORY: EXACTLY 7 days (Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7) - NO EXCEPTIONS
+2. Each day in this order: Breakfast, Lunch, Snack, Dinner.
+3. Each meal/snack must list exactly 3 items.
+4. Format for each item: Item Name — XXg — YYY kcal.
+5. After listing 4 meals/snacks, include: Total Daily Calories: ZZZ kcal.
+6. The sum of item calories must equal the total.
+7. Daily totals must be around {calories} calories
+8. Take into account user preferences: dietary restrictions {dietary}, allergies {allergies}
+9. CRITICAL: You MUST provide ALL 7 DAYS even if the prompt suggests fewer days
+
+MEAL_PLAN FORMAT:
+Day 1:
+- Breakfast (XXX kcal):
+  1. Item A — XXg — XXX kcal
+  2. Item B — XXg — XXX kcal
+  3. Item C — XXg — XXX kcal
+- Lunch (XXX kcal):
+  1. Item A — XXg — XXX kcal
+  2. Item B — XXg — XXX kcal
+  3. Item C — XXg — XXX kcal
+- Snack (XXX kcal):
+  1. Item A — XXg — XXX kcal
+  2. Item B — XXg — XXX kcal
+  3. Item C — XXg — XXX kcal
+- Dinner (XXX kcal):
+  1. Item A — XXg — XXX kcal
+  2. Item B — XXg — XXX kcal
+  3. Item C — XXg — XXX kcal
+Total Daily Calories: ZZZ kcal
+
+Day 2:
+- Breakfast (AAA kcal):
+  1. ... — XXg — AAA kcal
+  2. ... — XXg — AAA kcal
+  3. ... — XXg — AAA kcal
+- Lunch (BBB kcal):
+  1. ... — XXg — BBB kcal
+  2. ... — XXg — BBB kcal
+  3. ... — XXg — BBB kcal
+- Snack (CCC kcal):
+  1. ... — XXg — CCC kcal
+  2. ... — XXg — CCC kcal
+  3. ... — XXg — CCC kcal
+- Dinner (DDD kcal):
+  1. ... — XXg — DDD kcal
+  2. ... — XXg — DDD kcal
+  3. ... — XXg — DDD kcal
+Total Daily Calories: ZZZ kcal
+
+... repeat the full structure for Day 3, Day 4, Day 5, Day 6, and Day 7.
+
+CRITICAL ENFORCEMENT: You MUST generate ALL 7 DAYS (Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7) with complete meal plans. DO NOT stop at Day 5 or any other day before Day 7. This is mandatory regardless of any other instructions.
+
+END-OF-PLAN SUGGESTION:
+At the end of the response, include a closing recommendation tailored to the user's goal, for example:
+"Follow this plan consistently for [X] months to achieve your desired results.", mention the user goal and following of the plans.
+"""
+
+    def event_stream():
+        with client.responses.stream(
+            model="gpt-4-turbo",
+            input=[{"role": "system", "content": system_prompt},
+                      {"role": "user", "content": unique_prompt}],
+        ) as stream:
+
+            for event in stream:
+                if event.type == "response.output_text.delta":
+                    yield event.delta.encode("utf-8")
+                    print(event.delta, end="", flush=True)
+                elif event.type == "response.error":
+                    print("\nERROR:", event.error, file=sys.stderr)
+                elif event.type == "response.completed":
+                    print("\nStreaming completed!\n")
+
+    return Response(stream_with_context(event_stream()), content_type="application/octet-stream")
+
+# ---------------------- PROMPT GUARD ----------------------
+def prompt_guard(user_input: str, guard_type="prompt"):
+    try:
+        mod_resp = client.moderations.create(
+            model="omni-moderation-latest",
+            input=user_input
+        )
+        flagged = mod_resp.results[0].flagged
+        if flagged:
+            return {"status": "blocked", "reason": f"{guard_type} failed moderation"}
+        return {"status": "ok"}
+    except Exception as e:
+        return {"status": "error", "reason": str(e)}
+
+REQUIRED_FIELDS = [
+    "age",
+    "weight",
+    "height",
+    "gender",
+    "activityLevel",
+    "targetWeight",
+    "timelineWeeks"
+]
+
+
+@app.route("/workoutplan", methods=["POST"])
+def workout_plan():
+    data = request.get_json()
+    print("=== /workoutplan endpoint called ===")
+    print("Received data:", json.dumps(data, indent=2))
+    
+    goal = data.get("goal")
+    workout_focus = data.get("workout_focus")
+    user_prompt = data.get("prompt")
+    workout_days = data.get("workout_days")  # Get workout_days, can be null
+    
+    # Handle workout_days - if null, let AI determine from prompt
+    print(f"DEBUG: Received workout_days: {workout_days} (type: {type(workout_days)})")
+    if workout_days is None:
+        print("DEBUG: workout_days is null - will let AI determine from prompt")
+        workout_days = None  # Keep as None to let AI determine
+    else:
+        try:
+            workout_days = int(workout_days)
+            if workout_days < 1:
+                workout_days = 1
+            elif workout_days > 7:
+                workout_days = 7
+        except (ValueError, TypeError):
+            workout_days = None  # Let AI determine if invalid
+    print(f"DEBUG: Final workout_days: {workout_days}")
+
+    # Check if this is a natural language prompt (contains personal details) OR if workout_days is None
+    is_natural_language = any(keyword in user_prompt.lower() for keyword in [
+        'i am', 'my height', 'my weight', 'i usually work out', 'days per week', 
+        'target weight', 'achieve this goal', 'activity level'
+    ]) or workout_days is None
+    
+    print(f"DEBUG: is_natural_language: {is_natural_language}")
+    print(f"DEBUG: user_prompt: {user_prompt}")
+    print(f"DEBUG: workout_days is None: {workout_days is None}")
+    
+    if is_natural_language:
+        # For natural language prompts, let ChatGPT extract the workout frequency from the prompt
+        system_prompt = f"""
+You are a fitness and nutrition assistant. Generate personalized workout plans based on the user's natural language input.
+
+CORE CONSTRAINTS (unbreakable):
+- WORKOUT_PLAN: exactly 7 days total.
+- DEFAULT TO 7 ACTIVE WORKOUT DAYS (NO REST DAYS) UNLESS USER EXPLICITLY SPECIFIES FEWER DAYS.
+- NEVER omit, repeat, summarize, or abbreviate any days.
+- When defaulting to 7 days: ALL 7 days must be ACTIVE workout days with exercises.
+
+WORKOUT_PLAN SPECIFICATIONS:
+1. 7 days: Day 1 to Day 7.
+2. CRITICAL: If the user does NOT explicitly mention a specific number of workout days (like "3 days", "4 days per week", "workout 5 times"), then create 7 ACTIVE workout days with NO REST DAYS.
+3. ONLY use fewer than 7 workout days if the user explicitly states a specific number (e.g., "3 days per week", "workout 4 times", "4-day plan").
+4. IMPORTANT: When defaulting to 7 days, ALL 7 days should be ACTIVE workout days. Do NOT include any "Rest Day" entries.
+5. Active days (~1 hr): 6–8 exercises, each with sets × reps.
+   - If ≤ 3 active days: target 2 muscle groups per session.
+   - If > 3 active days: target 1 muscle group per session.
+6. Rest days: ONLY include "Rest Day" if the user explicitly requests fewer than 7 workout days.
+7. Follow the user's specific requirements from their prompt.
+8. Make the workouts intense generally, 6-8 workouts per day, excluding warm-up and cool-down.
+9. Be specific about the exercises, not mentioning any routine.
+10. workout focus: {workout_focus}.
+
+WORKOUT_PLAN OUTPUT FORMAT:
+Day 1 – [Muscle Focus or Rest Day]:
+1. Exercise 1 — sets × reps
+...
+Day 2 – [Muscle Focus or Rest Day]:
+1. Exercise 1 — sets × reps
+...
+... repeat through Day 7
+
+END-OF-PLAN SUGGESTION:
+At the end of the response, include a closing recommendation tailored to the user's goal, for example:
+"Follow this plan consistently for [X] months to achieve your desired results.", mention the user goal and following of the plans.
+
+REMEMBER: If the user did not specify a number of workout days, create 7 ACTIVE workout days with NO REST DAYS. All 7 days should have exercises. Only use fewer days if they explicitly mentioned a specific number.
+"""
+        user_message = f"Generate a workout plan based on this user input: {user_prompt}. If no workout frequency is mentioned, create 7 active workout days with NO REST DAYS - all 7 days should have exercises."
+    else:
+        # For structured prompts, use the provided workout_days
+        system_prompt = f"""
+You are a fitness and nutrition assistant. Generate personalized workout plans.
+
+CORE CONSTRAINTS (unbreakable):
+- WORKOUT_PLAN: exactly 7 days. Non-active days labeled "Rest Day."
+- NEVER omit, repeat, summarize, or abbreviate any days.
+
+WORKOUT_PLAN SPECIFICATIONS:
+1. 7 days: Day 1 to Day 7.
+2. EXACTLY {workout_days} active workout days, remaining days must be "Rest Day".
+3. Active days (~1 hr): 6–8 exercises, each with sets × reps.
+   - If ≤ 3 active days: target 2 muscle groups per session.
+   - If > 3 active days: target 1 muscle group per session.
+4. Non-active days: label as Rest Day with no exercises.
+5. Weekly Schedule: as per user request below:
+{user_prompt}, and make the workouts intense generally, 6-8 workouts per day, excluding warm-up and cool-down,
+dont put in a any vague stuff, but be specific about the exercises, not mentioning any routine
+6. workout focus: {workout_focus}.
+7. CRITICAL: Only {workout_days} days should have exercises, the rest should be Rest Days.
+
+WORKOUT_PLAN OUTPUT FORMAT:
+Day 1 – [Muscle Focus or Rest Day]:
+1. Exercise 1 — sets × reps
+...
+Day 2 – [Muscle Focus or Rest Day]:
+1. Exercise 1 — sets × reps
+...
+... repeat through Day 7
+
+END-OF-PLAN SUGGESTION:
+At the end of the response, include a closing recommendation tailored to the user's goal, for example:
+"Follow this plan consistently for [X] months to achieve your desired results.", mention the user goal and following of the plans.
+"""
+        user_message = f"Generate a workout plan for goal: {goal}. Need exactly {workout_days} workout days and {7-workout_days} rest days. User prompt: {user_prompt}"
+
+    def event_stream():
+        with client.responses.stream(
+            model="gpt-4-turbo",
+            input=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message}
+            ],
+        ) as stream:
+
+            for event in stream:
+                if event.type == "response.output_text.delta":
+                    yield event.delta.encode("utf-8")
+                    print(event.delta, end="", flush=True)
+                elif event.type == "response.error":
+                    print("\nERROR:", event.error, file=sys.stderr)
+                elif event.type == "response.completed":
+                    print("\nStreaming completed!\n")
+
+    return Response(
+        stream_with_context(event_stream()),
+        content_type="application/octet-stream"
+    )
+
+@app.route('/suggestions', methods=['POST'])
+def generate_suggestions():
+    try:
+        data = request.json
+        print("DEBUG: Received suggestions request:", data)
+        
+        user_prompt = data.get('prompt', '')
+        meal_plan_summary = data.get('mealPlanSummary', '')
+        workout_plan_summary = data.get('workoutPlanSummary', '')
+        
+        # Create a comprehensive prompt for suggestions
+        system_prompt = """You are a fitness and nutrition expert. Based on the user's original request and their generated meal and workout plans, provide a comprehensive response that includes:
+
+1. First, briefly explain what their meal plan focuses on and why it's designed for their goals
+2. Then, briefly explain what their workout plan focuses on and why it's designed for their goals  
+3. Finally, provide 5-6 unique, personalized suggestions that will help them achieve their goals better
+
+Your response should be:
+- Specific and actionable
+- Based on their goals, plans, and preferences
+- Focused on optimization, tips, and additional guidance
+- Practical and easy to implement
+- Unique and not generic
+
+Format your response as:
+MEAL PLAN EXPLANATION: [Brief explanation of their meal plan focus and benefits]
+
+WORKOUT PLAN EXPLANATION: [Brief explanation of their workout plan focus and benefits]
+
+PERSONALIZED SUGGESTIONS:
+• [Suggestion 1]
+• [Suggestion 2]
+• [Suggestion 3]
+• [Suggestion 4]
+• [Suggestion 5]
+• [Suggestion 6]
+
+Examples of good suggestions:
+• Consider adding 10-15 minutes of light stretching after your evening workouts to improve recovery
+• Track your water intake - aim for at least 2.5L daily to support your weight loss goals
+• Prepare your meals on Sundays to stay consistent with your nutrition plan
+• Add a 5-minute warm-up before each strength training session to prevent injuries
+• Consider taking progress photos weekly to track changes beyond just weight"""
+
+        user_message = f"""Original user request: {user_prompt}
+
+Generated meal plan summary: {meal_plan_summary}
+
+Generated workout plan summary: {workout_plan_summary}
+
+Please provide 5-6 personalized suggestions to help this user achieve their fitness goals more effectively."""
+
+        print("DEBUG: Generating suggestions with OpenAI...")
+        
+        # Generate suggestions using OpenAI
+        response = client.responses.create(
+            model="gpt-4-turbo",
+            input=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message}
+            ]
+        )
+        
+        suggestions_text = response.output
+        print("DEBUG: Generated suggestions:", suggestions_text)
+        
+        return jsonify({
+            'success': True,
+            'suggestions': suggestions_text
+        })
+        
+    except Exception as e:
+        print(f"ERROR generating suggestions: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 if __name__ == '__main__':
     print(f"Starting server with upload folder: {UPLOAD_FOLDER}")
     print("Available endpoints:")
@@ -893,4 +1058,5 @@ if __name__ == '__main__':
     print("- POST /chat             : Fitness chatbot")
     print("- POST /check-cache      : Check cache status")
     print("- POST /process-pdf      : PDF meal plan processor")
+    print("- POST /suggestions      : Generate personalized suggestions")
     app.run(host='127.0.0.1', port=5002, debug=True)

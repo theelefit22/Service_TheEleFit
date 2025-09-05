@@ -138,7 +138,6 @@ testCases.forEach((testCase, index) => {
   
   console.log('─'.repeat(60));
 });
-
 console.log(`\n📊 Test Results: ${passedTests}/${totalTests} tests passed`);
 console.log(`Success rate: ${((passedTests / totalTests) * 100).toFixed(1)}%`);
 
@@ -147,3 +146,4 @@ if (passedTests === totalTests) {
 } else {
   console.log('⚠️  Some tests failed. The prompt parser may need further improvements.');
 }
+

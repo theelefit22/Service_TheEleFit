@@ -98,11 +98,52 @@ export class PromptParser {
         /\b(hiit|high\s*intensity|interval\s*training)\b/gi,
         /\b(home\s*workouts|bodyweight|calisthenics)\b/gi
       ],
+      activityLevel: [
+        /\b(sedentary|inactive|not\s*active|desk\s*job|office\s*work)\b/gi,
+        /\b(lightly\s*active|light\s*activity|somewhat\s*active|occasionally\s*active)\b/gi,
+        /\b(moderately\s*active|moderate\s*activity|fairly\s*active|regularly\s*active)\b/gi,
+        /\b(very\s*active|highly\s*active|extremely\s*active|very\s*fit)\b/gi,
+        /\b(extra\s*active|super\s*active|athlete|athletic)\b/gi,
+        /\b(activity\s*level\s*[:=]?\s*(sedentary|lightly\s*active|moderately\s*active|very\s*active|extra\s*active))\b/gi
+      ],
       frequency: [
         /(\d+)\s*(?:times|x)\s*(?:per|a)\s*(?:week|wk)/gi,
         /(\d+)\s*(?:days?)\s*(?:per|a)\s*(?:week|wk)/gi,
+        /(\d+)\s*(?:times|x|days?)\s*(?:per|a)\s*(?:week|wk)/gi,
+        /work\s*out\s*(\d+)\s*(?:times|x|days?)\s*(?:per|a)\s*(?:week|wk)/gi,
+        /exercise\s*(\d+)\s*(?:times|x|days?)\s*(?:per|a)\s*(?:week|wk)/gi,
+        /train\s*(\d+)\s*(?:times|x|days?)\s*(?:per|a)\s*(?:week|wk)/gi,
+        /(\d+)\s*(?:times|x|days?)\s*(?:per|a)\s*(?:week|wk)\s*(?:workout|exercise|training)/gi,
         /every\s*day|daily|7\s*(?:times|x)\s*(?:per|a)\s*week/gi,
-        /(\d+)\s*[-–]\s*(\d+)\s*(?:times|x|days?)\s*(?:per|a)\s*(?:week|wk)/gi
+        /(\d+)\s*[-–]\s*(\d+)\s*(?:times|x|days?)\s*(?:per|a)\s*(?:week|wk)/gi,
+        /(\d+)\s*(?:times|x|days?)\s*(?:per|a)\s*(?:week|wk)\s*(?:of\s*)?(?:workout|exercise|training|gym)/gi
+      ],
+      targetWeight: [
+        /my\s*target\s*weight\s*is\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)/gi,
+        /target\s*weight\s*[:=]?\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)/gi,
+        /goal\s*weight\s*[:=]?\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)/gi,
+        /want\s*to\s*(?:be|reach|get\s*to)\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)/gi,
+        /reach\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)/gi,
+        /get\s*to\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)/gi,
+        /achieve\s*this\s*goal\s*in.*?(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)/gi,
+        /want\s*to\s*achieve.*?(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)/gi,
+        /target\s*is\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)/gi,
+        // Patterns without units but with weight context
+        /my\s*target\s*weight\s*is\s*(\d+(?:\.\d+)?)(?:\s|$|\.|,|;)/gi,
+        /target\s*weight\s*[:=]?\s*(\d+(?:\.\d+)?)(?:\s|$|\.|,|;)/gi,
+        /goal\s*weight\s*[:=]?\s*(\d+(?:\.\d+)?)(?:\s|$|\.|,|;)/gi
+      ],
+      timeline: [
+        /in\s*(\d+)\s*(?:months?|mo|month)/gi,
+        /within\s*(\d+)\s*(?:months?|mo|month)/gi,
+        /over\s*(\d+)\s*(?:months?|mo|month)/gi,
+        /(\d+)\s*(?:months?|mo|month)\s*(?:time|period|duration)/gi,
+        /achieve\s*this\s*goal\s*in\s*(\d+)\s*(?:months?|mo|month)/gi,
+        /want\s*to\s*achieve.*?in\s*(\d+)\s*(?:months?|mo|month)/gi,
+        /(\d+)\s*(?:weeks?|wk|week)/gi,
+        /(\d+)\s*(?:years?|yr|y|year)/gi,
+        /in\s*(\d+)\s*(?:weeks?|wk|week)/gi,
+        /in\s*(\d+)\s*(?:years?|yr|y|year)/gi
       ]
     };
   }
@@ -115,7 +156,10 @@ export class PromptParser {
       weight: null,
       goal: null,
       activity: [],
+      activityLevel: null,
       frequency: null,
+      targetWeight: null,
+      timeline: null,
       units: {
         height: 'cm',
         weight: 'kg'
@@ -147,8 +191,19 @@ export class PromptParser {
     // Extract activity
     result.activity = this.extractActivity(originalPrompt);
     
+    // Extract activity level
+    result.activityLevel = this.extractActivityLevel(originalPrompt);
+    
     // Extract frequency
     result.frequency = this.extractFrequency(originalPrompt);
+    
+    // Extract target weight
+    result.targetWeight = this.extractTargetWeight(originalPrompt);
+    
+    // Extract timeline
+    result.timeline = this.extractTimeline(originalPrompt);
+    
+    console.log('DEBUG: Final parsed result:', result);
 
     return result;
   }
@@ -201,10 +256,23 @@ export class PromptParser {
   }
 
   extractHeight(text) {
+    console.log('DEBUG: Extracting height from text:', text);
+    
+    // First check for explicit cm patterns (highest priority)
+    const explicitCmPattern = /(\d{2,3})\s*(?:cm|centimeters?)/gi;
+    const explicitCmMatches = [...text.matchAll(explicitCmPattern)];
+    for (const match of explicitCmMatches) {
+      const value = parseInt(match[1]);
+      if (value >= 140 && value <= 220) {
+        console.log('DEBUG: Found explicit height in cm:', value);
+        return { value, unit: 'cm' };
+      }
+    }
+    
     // Enhanced feet and inches patterns with various quote styles
     const feetInchesPatterns = [
-      /(\d+)\s*['’`]\s*(\d+)\s*["”]?/gi, // 5'9" or 5'9 or 5’9” format
-      /(\d+)\s*['’`]\s*(\d+)\s*(?:inches?|in)?/gi, // 5'9in or 5'9 inches
+      /(\d+)\s*[''`]\s*(\d+)\s*[""]?/gi, // 5'9" or 5'9 or 5'9" format
+      /(\d+)\s*[''`]\s*(\d+)\s*(?:inches?|in)?/gi, // 5'9in or 5'9 inches
       /(\d+)\s*(?:ft|feet|foot)\s*(\d+)\s*(?:inches?|in)?/gi, // 5 ft 9 in
     ];
     
@@ -253,12 +321,13 @@ export class PromptParser {
       }
     }
     
-    // Check for cm patterns
+    // Check for cm patterns (already checked above, but keeping as fallback)
     const cmPattern = /(\d{2,3})\s*(?:cm|centimeters?)/gi;
     matches = [...text.matchAll(cmPattern)];
     for (const match of matches) {
       const value = parseInt(match[1]);
       if (value >= 140 && value <= 220) {
+        console.log('DEBUG: Found height in cm (fallback):', value);
         return { value, unit: 'cm' };
       }
     }
@@ -360,13 +429,30 @@ export class PromptParser {
     
     // Priority order matters - check more specific patterns first
     
+    // Check for weight comparison first (target weight vs current weight)
+    const currentWeightMatch = lowerText.match(/(?:weight|weighing)\s*(?:is|of)?\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)?/i);
+    const targetWeightMatch = lowerText.match(/(?:target\s*weight|goal\s*weight|want\s*to\s*(?:be|reach|get\s*to)|achieve)\s*(?:is|of)?\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)?/i);
+    
+    if (currentWeightMatch && targetWeightMatch) {
+      const currentWeight = parseFloat(currentWeightMatch[1]);
+      const targetWeight = parseFloat(targetWeightMatch[1]);
+      
+      if (targetWeight < currentWeight) {
+        console.log('DEBUG: Detected weight loss goal from weight comparison:', currentWeight, '->', targetWeight);
+        return 'weight_loss';
+      } else if (targetWeight > currentWeight) {
+        console.log('DEBUG: Detected weight gain goal from weight comparison:', currentWeight, '->', targetWeight);
+        return 'weight_gain';
+      }
+    }
+    
     // Weight gain patterns (must check before muscle gain)
     if (/\b(gain\s+weight|weight\s+gain|increase\s+weight|put\s+on\s+weight)\b/i.test(lowerText)) {
       return 'weight_gain';
     }
     
     // Weight loss patterns
-    if (/\b(lose\s+weight|weight\s+loss|slim\s+down|fat\s+loss|reduce\s+fat|cut\s+fat|drop\s+weight|lose\s+fat|reduce\s+belly|slim\s+waist|cut\s+fat|fat\s+reduction|lose\s+belly\s+fat|cutting\s+fat)\b/i.test(lowerText) ||
+    if (/\b(lose\s+weight|loose\s+weight|weight\s+loss|slim\s+down|fat\s+loss|reduce\s+fat|cut\s+fat|drop\s+weight|lose\s+fat|loose\s+fat|reduce\s+belly|slim\s+waist|cut\s+fat|fat\s+reduction|lose\s+belly\s+fat|loose\s+belly\s+fat|cutting\s+fat)\b/i.test(lowerText) ||
         (/\bcut\b/i.test(lowerText) && /\b(fat|weight)\b/i.test(lowerText)) ||
         (/\bslim\b/i.test(lowerText) && !(/\bmuscle\b/i.test(lowerText)))) {
       return 'weight_loss';
@@ -447,7 +533,7 @@ export class PromptParser {
       return 'muscle_gain';
     }
     
-    if (/\b(want|wanna|need|desire|looking\s+to)\s+(?:to\s+)?(lose\s+weight|slim\s+down|drop\s+weight|cut\s+fat)\b/i.test(lowerText)) {
+    if (/\b(want|wanna|need|desire|looking\s+to)\s+(?:to\s+)?(lose\s+weight|loose\s+weight|slim\s+down|drop\s+weight|cut\s+fat)\b/i.test(lowerText)) {
       return 'weight_loss';
     }
     
@@ -478,23 +564,120 @@ export class PromptParser {
     return activities;
   }
 
-  extractFrequency(text) {
-    for (const pattern of this.patterns.frequency) {
+  extractActivityLevel(text) {
+    for (const pattern of this.patterns.activityLevel) {
       const matches = [...text.matchAll(pattern)];
       for (const match of matches) {
+        const activityLevel = match[0].toLowerCase();
+        
+        // Map to standard activity levels
+        if (activityLevel.includes('sedentary') || activityLevel.includes('inactive') || activityLevel.includes('desk job') || activityLevel.includes('office work')) {
+          return 'sedentary';
+        } else if (activityLevel.includes('lightly active') || activityLevel.includes('light activity') || activityLevel.includes('somewhat active') || activityLevel.includes('occasionally active')) {
+          return 'lightly active';
+        } else if (activityLevel.includes('moderately active') || activityLevel.includes('moderate activity') || activityLevel.includes('fairly active') || activityLevel.includes('regularly active')) {
+          return 'moderately active';
+        } else if (activityLevel.includes('very active') || activityLevel.includes('highly active') || activityLevel.includes('extremely active') || activityLevel.includes('very fit')) {
+          return 'very active';
+        } else if (activityLevel.includes('extra active') || activityLevel.includes('super active') || activityLevel.includes('athlete') || activityLevel.includes('athletic')) {
+          return 'extra active';
+        }
+      }
+    }
+    
+    return null;
+  }
+
+  extractFrequency(text) {
+    console.log('DEBUG: Extracting frequency from text:', text);
+    for (const pattern of this.patterns.frequency) {
+      const matches = [...text.matchAll(pattern)];
+      console.log('DEBUG: Pattern matches:', pattern, matches);
+      for (const match of matches) {
+        console.log('DEBUG: Processing match:', match);
         if (match[0].includes('every day') || match[0].includes('daily')) {
+          console.log('DEBUG: Found daily/every day, returning 7');
           return 7;
         } else if (match[1] && match[2]) {
           // Range (e.g., 3-4 times per week)
           const min = parseInt(match[1]);
           const max = parseInt(match[2]);
-          return Math.round((min + max) / 2);
+          const result = Math.round((min + max) / 2);
+          console.log('DEBUG: Found range, returning:', result);
+          return result;
         } else if (match[1]) {
           // Single value (e.g., 3 times per week)
-          return parseInt(match[1]);
+          const result = parseInt(match[1]);
+          console.log('DEBUG: Found single value, returning:', result);
+          return result;
         }
       }
     }
+    console.log('DEBUG: No frequency found, returning null');
+    return null;
+  }
+
+  extractTargetWeight(text) {
+    console.log('DEBUG: Extracting target weight from text:', text);
+    for (const pattern of this.patterns.targetWeight) {
+      const matches = [...text.matchAll(pattern)];
+      console.log('DEBUG: Target weight pattern matches for pattern', pattern, ':', matches);
+      for (const match of matches) {
+        console.log('DEBUG: Processing target weight match:', match);
+        const value = parseFloat(match[1]);
+        if (value && value >= 30 && value <= 300) { // Reasonable weight range
+          const fullMatch = match[0].toLowerCase();
+          console.log('DEBUG: Full match text:', fullMatch);
+          
+          // Check for explicit units
+          if (/lbs?|pounds?|lb/.test(fullMatch)) {
+            console.log('DEBUG: Found target weight in lbs, converting to kg:', value);
+            return { value: this.lbsToKg(value), unit: 'kg' };
+          } else if (/kg|kilos?|kilograms?/.test(fullMatch)) {
+            console.log('DEBUG: Found target weight in kg:', value);
+            return { value, unit: 'kg' };
+          } else {
+            // Default to kg if no unit specified but validate range
+            if (value >= 30 && value <= 200) { // Reasonable kg range
+              console.log('DEBUG: Found target weight with no unit, defaulting to kg:', value);
+              return { value, unit: 'kg' };
+            } else {
+              console.log('DEBUG: Target weight value out of reasonable range, skipping:', value);
+            }
+          }
+        }
+      }
+    }
+    console.log('DEBUG: No target weight found, returning null');
+    return null;
+  }
+
+  extractTimeline(text) {
+    console.log('DEBUG: Extracting timeline from text:', text);
+    for (const pattern of this.patterns.timeline) {
+      const matches = [...text.matchAll(pattern)];
+      console.log('DEBUG: Timeline pattern matches:', pattern, matches);
+      for (const match of matches) {
+        console.log('DEBUG: Processing timeline match:', match);
+        const value = parseInt(match[1]);
+        if (value) {
+          const fullMatch = match[0].toLowerCase();
+          
+          // Determine unit and convert to weeks
+          if (fullMatch.includes('year') || fullMatch.includes('yr') || fullMatch.includes('y')) {
+            console.log('DEBUG: Found timeline in years, converting to weeks:', value);
+            return { value: value * 52, unit: 'weeks' };
+          } else if (fullMatch.includes('month') || fullMatch.includes('mo')) {
+            console.log('DEBUG: Found timeline in months, converting to weeks:', value);
+            return { value: value * 4, unit: 'weeks' };
+          } else if (fullMatch.includes('week') || fullMatch.includes('wk')) {
+            console.log('DEBUG: Found timeline in weeks:', value);
+            return { value, unit: 'weeks' };
+          }
+        }
+      }
+    }
+    console.log('DEBUG: No timeline found, returning null');
     return null;
   }
 
