@@ -4634,10 +4634,13 @@ Fix background decorative elements
   gap: 12px;
   background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
   color: white;
-  padding: 12px 24px;
-  border-radius: 25px;
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+  padding: 16px 32px;
+  border-radius: 30px;
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
   animation: slideIn 0.3s ease-out;
+  margin: 20px auto;
+  max-width: 300px;
+  justify-content: center;
 }
 
 .generating-spinner {
@@ -4653,6 +4656,74 @@ Fix background decorative elements
   font-size: 14px;
   font-weight: 500;
   white-space: nowrap;
+}
+
+/* Streaming accordion states */
+.accordion-item.generating {
+  opacity: 0.8;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, rgba(109, 40, 217, 0.05) 100%);
+  border-left: 3px solid #7c3aed;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.accordion-item.pending {
+  opacity: 0.6;
+  background: rgba(0, 0, 0, 0.02);
+  border-left: 3px solid #e5e7eb;
+}
+
+.accordion-item.generated {
+  opacity: 1;
+  background: white;
+  border-left: 3px solid #10b981;
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Smooth accordion addition animation */
+.accordion-item {
+  animation: accordionSlideIn 0.5s ease-out;
+  transform: translateY(0);
+  transition: all 0.3s ease;
+}
+
+@keyframes accordionSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+    max-height: 0;
+    margin-bottom: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    max-height: 200px;
+    margin-bottom: 16px;
+  }
+}
+
+/* Staggered animation for multiple accordions */
+.accordion-item:nth-child(1) { animation-delay: 0ms; }
+.accordion-item:nth-child(2) { animation-delay: 100ms; }
+.accordion-item:nth-child(3) { animation-delay: 200ms; }
+.accordion-item:nth-child(4) { animation-delay: 300ms; }
+.accordion-item:nth-child(5) { animation-delay: 400ms; }
+.accordion-item:nth-child(6) { animation-delay: 500ms; }
+.accordion-item:nth-child(7) { animation-delay: 600ms; }
+
+.pending-text {
+  font-size: 12px;
+  color: #9ca3af;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 /* Green generating indicator for workout plans */
@@ -5336,6 +5407,10 @@ Fix background decorative elements
   background: #C8DA2B;
 }
 
+.recommendation-explanation::before {
+  background: #C8DA2B;
+}
+
 .explanation-header {
   display: flex;
   align-items: center;
@@ -5352,6 +5427,10 @@ Fix background decorative elements
 }
 
 .workout-explanation .explanation-icon {
+  color: #C8DA2B;
+}
+
+.recommendation-explanation .explanation-icon {
   color: #C8DA2B;
 }
 

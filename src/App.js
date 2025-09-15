@@ -18,11 +18,21 @@ import NotFoundPage from './pages/NotFoundPage';
 import CommunityPage from './pages/CommunityPage';
 import LoadingSpinner from './components/LoadingSpinner';
 import GroceryListProcessor from './pages/GroceryListProcessor';
+import TokenLogin from './components/TokenLogin';
+import AuthGuard from './components/AuthGuard';
+import ShopifyAuthGuard from './components/ShopifyAuthGuard';
+import { AuthProvider } from './contexts/AuthContext';
+import TestRedirect from './components/TestRedirect';
+import DebugRedirect from './components/DebugRedirect';
+import SessionTransferTest from './components/SessionTransferTest';
 import { seedExpertsData } from './services/seedData';
 import { auth, getUserType } from './services/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import './App.css';
 import AiCoach from './pages/AiCoach';
+import CustomerAuth from './pages/CustomerAuth';
+import ThankYouPage from './pages/ThankYouPage';
+import DetailsPage from './pages/DetailsPage';
 
 // ScrollToTop component to reset scroll on navigation
 function ScrollToTop() {
@@ -35,29 +45,13 @@ function ScrollToTop() {
   return null;
 }
 
-// ProtectedRoute component to guard routes that require authentication
-const ProtectedRoute = ({ children }) => {
-  const [authChecked, setAuthChecked] = useState(false);
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setAuthChecked(true);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  if (!authChecked) {
-    return <LoadingSpinner text="Loading..." />;
-  }
-
-  if (!user) {
-    return <Navigate to="/auth" />;
-  }
-
-  return children;
+// ProtectedRoute component using AuthGuard
+const ProtectedRoute = ({ children, allowedUserTypes = null }) => {
+  return (
+    <AuthGuard requireAuth={true} allowedUserTypes={allowedUserTypes}>
+      {children}
+    </AuthGuard>
+  );
 };
 
 // AdminProtectedRoute component specifically for admin routes
@@ -81,36 +75,13 @@ const AdminProtectedRoute = ({ children }) => {
   return children;
 };
 
-// NonAuthRoute component to prevent authenticated users from accessing certain routes
+// NonAuthRoute component using AuthGuard
 const NonAuthRoute = ({ children }) => {
-  const [authChecked, setAuthChecked] = useState(false);
-  const [user, setUser] = useState(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-        try {
-          const userType = await getUserType(currentUser.uid);
-          const redirectPath = userType === 'expert' ? '/expert-dashboard' : '/user-dashboard';
-          navigate(redirectPath, { replace: true });
-        } catch (error) {
-          console.error("Error checking user type:", error);
-          navigate('/user-dashboard', { replace: true });
-        }
-      }
-      setAuthChecked(true);
-    });
-
-    return () => unsubscribe();
-  }, [navigate]);
-
-  if (!authChecked) {
-    return <LoadingSpinner text="Loading..." />;
-  }
-
-  return !user ? children : null;
+  return (
+    <AuthGuard requireAuth={false}>
+      {children}
+    </AuthGuard>
+  );
 };
 
 // EVA Customer Route Guard
@@ -127,15 +98,20 @@ const EvaCustomerRoute = ({ children }) => {
         try {
           const userDoc = await import('./services/firebase').then(m => m.db).then(db => import('firebase/firestore').then(firestore => firestore.getDoc(firestore.doc(db, 'users', currentUser.uid))));
           if (userDoc && userDoc.exists && userDoc.exists()) {
-            setIsEvaCustomer(userDoc.data().isEvaCustomer || false);
+            const isEva = userDoc.data().isEvaCustomer || false;
+            setIsEvaCustomer(isEva);
+            console.log('🔍 EvaCustomerRoute: User authenticated, isEvaCustomer:', isEva);
           } else {
             setIsEvaCustomer(false);
+            console.log('🔍 EvaCustomerRoute: User authenticated, no user doc found, isEvaCustomer: false');
           }
         } catch (error) {
           setIsEvaCustomer(false);
+          console.log('🔍 EvaCustomerRoute: Error checking user doc, isEvaCustomer: false');
         }
       } else {
         setIsEvaCustomer(false);
+        console.log('🔍 EvaCustomerRoute: User not authenticated, isEvaCustomer: false');
       }
       setAuthChecked(true);
     });
@@ -147,9 +123,15 @@ const EvaCustomerRoute = ({ children }) => {
   }
 
   // If EVA customer and not on allowed pages, redirect to home
+  // Only restrict EVA customers, allow all other users to access all routes
+  console.log('🔍 EvaCustomerRoute: Current path:', location.pathname, 'isEvaCustomer:', isEvaCustomer);
+  
   if (isEvaCustomer && !['/', '/HomePage', '/grocery-list'].includes(location.pathname)) {
+    console.log('🔄 EvaCustomerRoute: EVA customer trying to access restricted route:', location.pathname);
     return <Navigate to="/" replace />;
   }
+  
+  console.log('✅ EvaCustomerRoute: Allowing access to route:', location.pathname);
 
   return children;
 };
@@ -160,13 +142,14 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <div className="App">
-        <ScrollToTop />
-        <Navbar />
-        <div className="content">
-          <EvaCustomerRoute>
-            <Routes>
+    <AuthProvider>
+      <Router>
+        <div className="App">
+          <ScrollToTop />
+          <Navbar />
+          <div className="content">
+            <EvaCustomerRoute>
+              <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/HomePage" element={<HomePage />} />
               <Route path="/community" element={
@@ -184,6 +167,16 @@ function App() {
                   <GroceryListProcessor />
                 </ProtectedRoute>
               } />
+              <Route path="/thank-you" element={
+                <ProtectedRoute>
+                  <ThankYouPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/details" element={
+                <ProtectedRoute>
+                  <DetailsPage />
+                </ProtectedRoute>
+              } />
               <Route path="/experts" element={<ExpertsPage />} />
               <Route path="/expert/:id" element={<ExpertDetailPage />} />
               <Route path="/register" element={<RegistrationPage />} />
@@ -192,10 +185,12 @@ function App() {
                   <AuthPage />
                 </NonAuthRoute>
               } />
+              <Route path="/auth/token" element={<TokenLogin />} />
+              <Route path="/auth/customer" element={<CustomerAuth />} />
               <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
               <Route path="/expert-profile-setup" element={<ExpertProfileSetup />} />
               <Route path="/expert-dashboard" element={
-                <ProtectedRoute>
+                <ProtectedRoute allowedUserTypes={['expert']}>
                   <ExpertDashboard />
                 </ProtectedRoute>
               } />
@@ -212,12 +207,20 @@ function App() {
                 </AdminProtectedRoute>
               } />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/test-redirect" element={
+                <ProtectedRoute>
+                  <TestRedirect />
+                </ProtectedRoute>
+              } />
+              <Route path="/debug" element={<DebugRedirect />} />
+              <Route path="/session-test" element={<SessionTransferTest />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </EvaCustomerRoute>
         </div>
       </div>
     </Router>
+    </AuthProvider>
   );
 }
 

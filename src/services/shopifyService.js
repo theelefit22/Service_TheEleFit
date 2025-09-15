@@ -9,12 +9,24 @@ const SHOPIFY_DOMAIN = '840a56-3.myshopify.com'; // Updated with a realistic dom
 // Storefront API endpoint
 const STOREFRONT_API_URL = `https://${SHOPIFY_DOMAIN}/api/2023-07/graphql.json`;
 
-// Create Axios instance for Shopify API calls
+// Admin API endpoint
+const ADMIN_API_URL = `https://${SHOPIFY_DOMAIN}/admin/api/2023-07/graphql.json`;
+
+// Create Axios instance for Storefront API calls
 const shopifyClient = axios.create({
   baseURL: STOREFRONT_API_URL,
   headers: {
     'Content-Type': 'application/json',
     'X-Shopify-Storefront-Access-Token': SHOPIFY_ACCESS_TOKEN
+  }
+});
+
+// Create Axios instance for Admin API calls
+const shopifyAdminClient = axios.create({
+  baseURL: ADMIN_API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+    'X-Shopify-Access-Token': SHOPIFY_ACCESS_TOKEN
   }
 });
 
@@ -34,6 +46,108 @@ const handleShopifyError = (error) => {
     // Something happened in setting up the request that triggered an Error
     console.error('Shopify API request error:', error.message);
     throw new Error(`Error setting up request to Shopify: ${error.message}`);
+  }
+};
+
+/**
+ * Validate a Shopify customer by ID and email
+ * @param {string} customerId - Shopify customer ID
+ * @param {string} email - Customer email
+ * @returns {Promise<object>} - Customer data if valid
+ */
+export const validateShopifyCustomer = async (customerId, email) => {
+  const query = `
+    query getCustomer($id: ID!) {
+      customer(id: $id) {
+        id
+        email
+        firstName
+        lastName
+        displayName
+        createdAt
+        updatedAt
+        acceptsMarketing
+        phone
+        defaultAddress {
+          id
+          firstName
+          lastName
+          company
+          address1
+          address2
+          city
+          province
+          country
+          zip
+          phone
+        }
+      }
+    }
+  `;
+
+  const variables = {
+    id: `gid://shopify/Customer/${customerId}`
+  };
+
+  try {
+    console.log(`Validating Shopify customer with ID: ${customerId} and email: ${email}`);
+    
+    // Try Admin API first (has full access to customer data)
+    let response;
+    try {
+      response = await shopifyAdminClient.post('', {
+        query,
+        variables
+      });
+      console.log('Using Admin API for customer validation');
+    } catch (adminError) {
+      console.log('Admin API failed, trying Storefront API:', adminError.message);
+      // Fallback to Storefront API
+      response = await shopifyClient.post('', {
+        query,
+        variables
+      });
+      console.log('Using Storefront API for customer validation');
+    }
+
+    console.log('Shopify customer validation response:', JSON.stringify(response.data, null, 2));
+    const { data } = response.data;
+    
+    if (!data || !data.customer) {
+      console.error('Customer not found in Shopify');
+      throw new Error('Customer not found in Shopify');
+    }
+    
+    const customer = data.customer;
+    
+    // Verify the email matches
+    if (customer.email.toLowerCase() !== email.toLowerCase()) {
+      console.error('Email mismatch for customer');
+      throw new Error('Email does not match customer record');
+    }
+    
+    console.log('Shopify customer validated successfully:', customer);
+    return {
+      id: customerId,
+      email: customer.email,
+      firstName: customer.firstName || '',
+      lastName: customer.lastName || '',
+      displayName: customer.displayName || '',
+      createdAt: customer.createdAt,
+      updatedAt: customer.updatedAt,
+      acceptsMarketing: customer.acceptsMarketing,
+      phone: customer.phone,
+      defaultAddress: customer.defaultAddress
+    };
+  } catch (error) {
+    console.error('Error validating Shopify customer:', error);
+    
+    // Check if it's an API error
+    if (axios.isAxiosError(error)) {
+      handleShopifyError(error);
+    }
+    
+    throw error;
   }
 };
 

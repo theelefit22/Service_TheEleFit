@@ -8,13 +8,15 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import ProfileImageUploader from '../components/ProfileImageUploader';
 import PhoneVerification from '../components/PhoneVerification';
 import { getProfileImageURL } from '../services/storageService';
+import { useAuthContext } from '../contexts/AuthContext';
 import './UserDashboard.css';
 
 
 const UserDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [currentUser, setCurrentUser] = useState(null);
+  // Use AuthContext instead of local state
+  const { user: currentUser, isAuthenticated, isLoading: authLoading } = useAuthContext();
   const [userData, setUserData] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -46,12 +48,12 @@ const UserDashboard = () => {
   const [phoneVerified, setPhoneVerified] = useState(false);
   const [isEvaCustomer, setIsEvaCustomer] = useState(false);
 
+  // Load user data when authentication state changes
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        setCurrentUser(user);
+    const loadUserData = async () => {
+      if (isAuthenticated && currentUser) {
         try {
-          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
           if (userDoc.exists()) {
             const data = userDoc.data();
             setUserData(data);
@@ -71,9 +73,9 @@ const UserDashboard = () => {
             });
 
             // Get profile image if it exists
-            if (user.uid) {
+            if (currentUser.uid) {
               try {
-                const imageUrl = await getProfileImageURL(user.uid);
+                const imageUrl = await getProfileImageURL(currentUser.uid);
                 setProfileImageUrl(imageUrl);
               } catch (error) {
                 console.error('Error fetching profile image:', error);
@@ -86,13 +88,14 @@ const UserDashboard = () => {
         } finally {
           setLoading(false);
         }
-      } else {
-        navigate('/login');
+      } else if (!authLoading) {
+        // Only redirect if auth is not loading and user is not authenticated
+        navigate('/auth');
       }
-    });
+    };
 
-    return () => unsubscribe();
-  }, [navigate, lastRefresh]);
+    loadUserData();
+  }, [isAuthenticated, currentUser, authLoading, navigate, lastRefresh]);
 
   // Refresh bookings whenever the component mounts or when returning to this page 
   // or when lastRefresh changes
@@ -255,11 +258,28 @@ const UserDashboard = () => {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
-      navigate('/auth');
+      // Clear verified customer session
+      localStorage.removeItem('verifiedCustomerSession');
+      
+      // Use the logout function from AuthContext
+      const { logout } = useAuthContext();
+      const result = await logout();
+      
+      if (result.success) {
+        console.log('Logout successful');
+        navigate('/auth');
+      } else {
+        console.error('Logout failed:', result.error);
+        // Fallback to direct signOut if context logout fails
+        await signOut(auth);
+        navigate('/auth');
+      }
     } catch (error) {
       console.error('Error signing out:', error);
       setError('Failed to log out. Please try again.');
+      // Fallback to direct signOut if context logout fails
+      await signOut(auth);
+      navigate('/auth');
     }
   };
 

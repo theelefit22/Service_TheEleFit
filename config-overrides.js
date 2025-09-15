@@ -37,5 +37,14 @@ module.exports = function override(config) {
     'process/browser': require.resolve('process/browser')
   };
   
+  // Configure SPA routing for development server
+  config.devServer = {
+    ...config.devServer,
+    historyApiFallback: true,
+    hot: true,
+    open: true,
+    port: 3000
+  };
+  
   return config;
 }; 

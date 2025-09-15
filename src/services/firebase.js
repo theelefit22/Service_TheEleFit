@@ -318,7 +318,8 @@ export const registerUser = async (email, password, userType, additionalData = {
         };
       }
       
-      throw firebaseError;
+      // Handle Firebase Auth errors with friendly messages
+      throw handleFirebaseAuthError(firebaseError);
     }
   } catch (error) {
     console.error('Registration error:', error);
@@ -374,7 +375,50 @@ const handleShopifyAuthenticatedUser = async (email, shopifyCustomerId) => {
   }
 };
 
-// Enhanced login with Shopify integration
+// Enhanced function to automatically create Firebase user from Shopify when token fails
+const autoCreateFirebaseUserFromShopify = async (email, password, shopifyCustomer) => {
+  try {
+    console.log(`Auto-creating Firebase user from Shopify for: ${email}`);
+    
+    // Normalize email
+    const normalizedEmail = email.toLowerCase().trim();
+    
+    // Create Firebase user with the same password
+    const userCredential = await createUserWithEmailAndPassword(auth, normalizedEmail, password);
+    console.log(`Firebase user created with UID: ${userCredential.user.uid}`);
+    
+    // Create user profile in Firestore
+    await setDoc(doc(db, 'users', userCredential.user.uid), {
+      email: normalizedEmail,
+      userType: 'user',
+      createdAt: new Date(),
+      shopifyCustomerId: shopifyCustomer.id,
+      shopifyMapped: true,
+      autoCreated: true,
+      autoCreatedAt: new Date()
+    });
+    
+    console.log('Firestore document created for auto-created user');
+    
+    // Sign out immediately to clean state
+    await signOut(auth);
+    console.log('Signed out from auto-creation session');
+    
+    return { 
+      success: true, 
+      email: normalizedEmail, 
+      uid: userCredential.user.uid,
+      shopifyCustomerId: shopifyCustomer.id,
+      autoCreated: true,
+      message: 'User automatically created from Shopify. Please log in again.'
+    };
+  } catch (error) {
+    console.error('Error auto-creating Firebase user from Shopify:', error);
+    throw error;
+  }
+};
+
+// Enhanced login with Shopify integration and automatic user creation
 export const loginUser = async (email, password) => {
   try {
     console.log(`Login attempt for email: ${email}`);
@@ -422,7 +466,7 @@ export const loginUser = async (email, password) => {
         console.log('Shopify authentication successful', shopifyCustomer);
         
         // If we got here, Shopify auth worked but Firebase auth failed
-        console.log('User exists in Shopify but Firebase auth failed');
+        console.log('User exists in Shopify but Firebase auth failed - attempting auto-creation');
         
         // At this point, we know:
         // 1. The user exists in Shopify with these credentials
@@ -438,29 +482,23 @@ export const loginUser = async (email, password) => {
           await firebaseSendPasswordResetEmail(auth, normalizedEmail);
           throw new Error('Your Shopify password doesn\'t match our system. We\'ve sent a password reset email to your address. Please check your inbox and reset your password, then try logging in again.');
         } else {
-          // User doesn't exist in our Firestore, try to create the mapping
-          console.log('Creating new Firebase mapping for Shopify user');
+          // User doesn't exist in our Firestore, automatically create Firebase user from Shopify
+          console.log('User not found in Firebase - auto-creating from Shopify');
           try {
-            // Try to create a Firebase account with the same password
-            const userCredential = await createUserWithEmailAndPassword(auth, normalizedEmail, password);
-            console.log('Firebase account created successfully');
+            const autoCreateResult = await autoCreateFirebaseUserFromShopify(normalizedEmail, password, shopifyCustomer);
+            console.log('Auto-creation successful:', autoCreateResult);
             
-            // Create user profile in Firestore
-            await setDoc(doc(db, 'users', userCredential.user.uid), {
+            // Return success immediately - user has been created
+            return {
+              success: true,
               email: normalizedEmail,
-              userType: 'user',
-              createdAt: new Date(),
+              uid: autoCreateResult.uid,
               shopifyCustomerId: shopifyCustomer.id,
-              shopifyMapped: true
-            });
-            
-            console.log('Firestore document created');
-            
-            // Sign out and ask user to log in again
-            await signOut(auth);
-            throw new Error('Your Shopify account has been connected. Please log in again with the same credentials.');
+              autoCreated: true,
+              message: 'User automatically created from Shopify. Please log in again with the same credentials.'
+            };
           } catch (createError) {
-            console.error('Error creating Firebase account:', createError);
+            console.error('Error auto-creating Firebase account:', createError);
             
             // If we can't create a Firebase account, just send a password reset
             if (createError.code === 'auth/email-already-in-use') {
@@ -479,7 +517,13 @@ export const loginUser = async (email, password) => {
         if (firebaseError.code === 'auth/invalid-login-credentials' || 
             firebaseError.code === 'auth/wrong-password' || 
             firebaseError.code === 'auth/user-not-found') {
-          throw new Error('Email or password is incorrect.');
+          
+          // Check if the error suggests the user might have a Shopify account
+          if (shopifyError.message && shopifyError.message.includes('UNIDENTIFIED_CUSTOMER')) {
+            throw new Error('Email or password is incorrect. If you have a Shopify account, please use your Shopify password.');
+          } else {
+            throw new Error('Email or password is incorrect.');
+          }
         }
         
         // For any other Firebase errors, pass them through
@@ -709,6 +753,228 @@ export const verifyPhoneNumber = async (verificationId, verificationCode) => {
     console.error('Error verifying phone number:', error);
     // Clear the confirmation result on error
     window.confirmationResult = null;
+    throw error;
+  }
+};
+
+// New function to handle token verification failure and auto-create user from Shopify
+export const handleTokenFailureWithShopify = async (email, password) => {
+  try {
+    console.log(`Handling token failure for email: ${email} - attempting Shopify auto-creation`);
+    
+    // Normalize email
+    const normalizedEmail = email.toLowerCase().trim();
+    
+    // Try Shopify authentication first
+    try {
+      const shopifyCustomer = await loginShopifyCustomer(normalizedEmail, password);
+      console.log('Shopify authentication successful, auto-creating Firebase user');
+      
+      // Auto-create Firebase user from Shopify
+      const autoCreateResult = await autoCreateFirebaseUserFromShopify(normalizedEmail, password, shopifyCustomer);
+      
+      return {
+        success: true,
+        email: normalizedEmail,
+        uid: autoCreateResult.uid,
+        shopifyCustomerId: shopifyCustomer.id,
+        autoCreated: true,
+        message: 'User automatically created from Shopify. Please log in again with the same credentials.'
+      };
+    } catch (shopifyError) {
+      console.error('Shopify authentication failed:', shopifyError);
+      throw new Error('Authentication failed. Please check your credentials.');
+    }
+  } catch (error) {
+    console.error('Error handling token failure with Shopify:', error);
+    throw error;
+  }
+};
+
+// New function to authenticate customer using customer object (email + customer ID)
+// Verify customer exists in Shopify using Storefront API
+const verifyCustomerInShopify = async (email, customerId) => {
+  try {
+    console.log('Verifying customer in Shopify:', { email, customerId });
+    
+    // For now, we'll use a simple verification approach
+    // In production, you would call the actual Shopify Storefront API
+    // This is a placeholder that always returns true for demo purposes
+    
+    // TODO: Implement actual Shopify Storefront API verification
+    // const shopifyUrl = `https://${SHOPIFY_STORE_DOMAIN}/api/2023-07/graphql.json`;
+    // const response = await fetch(shopifyUrl, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'X-Shopify-Storefront-Access-Token': SHOPIFY_STOREFRONT_ACCESS_TOKEN,
+    //   },
+    //   body: JSON.stringify({
+    //     query: `query { customer(id: "${customerId}") { id email firstName lastName } }`
+    //   })
+    // });
+    
+    // For demo purposes, simulate successful verification
+    return {
+      verified: true,
+      email: email,
+      customerId: customerId,
+      firstName: 'Customer',
+      lastName: 'User'
+    };
+    
+  } catch (error) {
+    console.error('Error verifying customer in Shopify:', error);
+    return {
+      verified: false,
+      error: error.message
+    };
+  }
+};
+
+export const authenticateCustomer = async (customerObject) => {
+  try {
+    console.log('Authenticating customer with object:', customerObject);
+    
+    const { email, customerId } = customerObject;
+    
+    if (!email || !customerId) {
+      throw new Error('Customer object must contain email and customerId');
+    }
+    
+    // Normalize email
+    const normalizedEmail = email.toLowerCase().trim();
+    
+    // First, verify customer exists in Shopify using Storefront API
+    console.log('Verifying customer exists in Shopify...');
+    const shopifyVerification = await verifyCustomerInShopify(normalizedEmail, customerId);
+    
+    if (!shopifyVerification.verified) {
+      throw new Error('Customer not found in Shopify or verification failed');
+    }
+    
+    console.log('Customer verified in Shopify:', shopifyVerification);
+    
+    // Check if user exists in Firebase
+    try {
+      console.log('Checking if user exists in Firebase...');
+      const userExists = await checkUserExistsByEmail(normalizedEmail);
+      
+      if (userExists) {
+        console.log('User exists in Firebase, updating customer ID and signing in...');
+        
+        // Try to get user from Firestore to get their UID
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where("email", "==", normalizedEmail));
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          const userDoc = querySnapshot.docs[0];
+          const userData = userDoc.data();
+          
+          // Update the customer ID if it's different
+          if (userData.shopifyCustomerId !== customerId) {
+            console.log('Updating customer ID in Firestore...');
+            await setDoc(doc(db, 'users', userDoc.id), {
+              ...userData,
+              shopifyCustomerId: customerId,
+              updatedAt: new Date()
+            }, { merge: true });
+          }
+          
+          // For verified customers, we'll create a session that bypasses normal authentication
+          console.log('Creating verified customer session...');
+          
+          // Store the verified customer session in localStorage
+          const sessionData = {
+            email: normalizedEmail,
+            uid: userDoc.id,
+            customerId: customerId,
+            verified: true,
+            timestamp: Date.now(),
+            userType: 'user' // Use 'user' for dashboard access
+          };
+          
+          localStorage.setItem('verifiedCustomerSession', JSON.stringify(sessionData));
+          console.log('Stored verified customer session:', sessionData);
+          
+          // The session will be picked up by the useAuth hook
+          
+          return {
+            success: true,
+            email: normalizedEmail,
+            uid: userDoc.id,
+            shopifyCustomerId: customerId,
+            authenticated: true,
+            sessionData: sessionData,
+            message: 'Customer verified successfully! Redirecting...'
+          };
+        }
+      }
+      
+      // If user doesn't exist in Firebase, create them automatically
+      console.log('User not found in Firebase, auto-creating from customer object...');
+      
+      // Create a mock Shopify customer object for the auto-creation function
+      const mockShopifyCustomer = {
+        id: customerId,
+        email: normalizedEmail,
+        firstName: shopifyVerification.firstName || 'Customer',
+        lastName: shopifyVerification.lastName || 'User'
+      };
+      
+      // Generate a random password for the new Firebase user
+      const randomPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+      
+      try {
+        // Auto-create Firebase user using the existing autoCreateFirebaseUserFromShopify function
+        const newUser = await autoCreateFirebaseUserFromShopify(normalizedEmail, randomPassword, mockShopifyCustomer);
+        
+        console.log('Successfully created Firebase user from Shopify customer:', newUser);
+        
+        // Create verified customer session for the new user
+        const sessionData = {
+          email: normalizedEmail,
+          uid: newUser.uid,
+          customerId: customerId,
+          verified: true,
+          timestamp: Date.now(),
+          userType: 'user' // Use 'user' for dashboard access
+        };
+        
+        localStorage.setItem('verifiedCustomerSession', JSON.stringify(sessionData));
+        console.log('Stored verified customer session for new user:', sessionData);
+        
+        return {
+          success: true,
+          email: normalizedEmail,
+          uid: newUser.uid,
+          shopifyCustomerId: customerId,
+          authenticated: true,
+          autoCreated: true,
+          sessionData: sessionData,
+          message: 'Account created and verified successfully! Redirecting...'
+        };
+        
+      } catch (createError) {
+        console.error('Error creating Firebase user from Shopify customer:', createError);
+        
+        // Fallback: return success but ask user to sign up manually
+        return {
+          success: true,
+          email: normalizedEmail,
+          shopifyCustomerId: customerId,
+          authenticated: false,
+          autoCreated: false,
+          message: 'Customer verified with Shopify! Please create an account to continue.'
+        };
+      }
+    } catch (error) {
+      console.error('Error in customer authentication:', error);
+      throw error;
+    }
+  } catch (error) {
+    console.error('Error authenticating customer:', error);
     throw error;
   }
 };

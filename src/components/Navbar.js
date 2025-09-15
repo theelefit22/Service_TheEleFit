@@ -8,16 +8,24 @@ import { HiOutlineUserGroup } from 'react-icons/hi';
 import './Navbar.css';
 import { db } from '../services/firebase';
 import { getDoc, doc } from 'firebase/firestore';
+import { useAuthContext } from '../contexts/AuthContext';
 
 const Navbar = () => {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [userType, setUserType] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // Use AuthContext instead of local state
+  const { user: currentUser, userType, isLoading: loading, isAuthenticated, logout } = useAuthContext();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isEvaCustomer, setIsEvaCustomer] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Debug logging
+  console.log('🔍 Navbar Debug - AuthContext state:', {
+    isAuthenticated,
+    currentUser: currentUser ? { email: currentUser.email, uid: currentUser.uid } : null,
+    userType,
+    loading
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,16 +40,13 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Check for EVA customer status when user changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        setCurrentUser(user);
+    const checkEvaCustomer = async () => {
+      if (currentUser && currentUser.uid) {
         try {
-          const type = await getUserType(user.uid);
-          setUserType(type);
-          
           // Get user data to check if they are an EVA customer
-          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
           if (userDoc.exists()) {
             const isEva = userDoc.data().isEvaCustomer || false;
             setIsEvaCustomer(isEva);
@@ -52,19 +57,15 @@ const Navbar = () => {
           }
         } catch (error) {
           console.error("Error getting user data:", error);
-          setUserType(null);
           setIsEvaCustomer(false);
         }
       } else {
-        setCurrentUser(null);
-        setUserType(null);
         setIsEvaCustomer(false);
       }
-      setLoading(false);
-    });
+    };
 
-    return () => unsubscribe();
-  }, [location.pathname, navigate]);
+    checkEvaCustomer();
+  }, [currentUser, location.pathname, navigate]);
 
   useEffect(() => {
     setMenuOpen(false);
@@ -87,10 +88,30 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
-      navigate('/');
+      // Clear verified customer session
+      localStorage.removeItem('verifiedCustomerSession');
+      
+      // Use the logout function from AuthContext
+      const result = await logout();
+      
+      if (result.success) {
+        console.log('Logout successful');
+        navigate('/');
+      } else {
+        console.error('Logout failed:', result.error);
+        // Fallback to direct signOut if context logout fails
+        if (auth.currentUser) {
+          await signOut(auth);
+          navigate('/');
+        }
+      }
     } catch (error) {
       console.error('Error signing out:', error);
+      // Fallback to direct signOut if context logout fails
+      if (auth.currentUser) {
+        await signOut(auth);
+        navigate('/');
+      }
     }
   };
 
@@ -99,7 +120,7 @@ const Navbar = () => {
   };
 
   // If user is Eva customer, show simplified navbar
-  if (currentUser && isEvaCustomer) {
+  if (isAuthenticated && currentUser && isEvaCustomer) {
     return (
       <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
         <div className="navbar-container">
@@ -193,7 +214,7 @@ const Navbar = () => {
 
           <li className="nav-item">
             <NavLink
-              to={currentUser ? "/aicoach" : "/auth"}
+              to={isAuthenticated ? "/aicoach" : "/auth"}
               className={({isActive}) => isActive ? "nav-link active" : "nav-link"}
               onClick={() => setMenuOpen(false)}
             >
@@ -203,7 +224,7 @@ const Navbar = () => {
 
           {!loading && (
             <>
-              {currentUser ? (
+              {isAuthenticated && currentUser ? (
                 <>
                   <li className="nav-item">
                     {userType === 'expert' ? (

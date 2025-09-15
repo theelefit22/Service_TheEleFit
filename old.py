@@ -453,6 +453,66 @@ def save_response_log(filename, raw_text, processed_data, error=None, ai_respons
 def index():
     return "<h2>Fitness Chatbot Backend is Running</h2>"
 
+@app.route('/chat', methods=['POST'])
+def chat():
+    """Handle fitness chatbot requests"""
+    try:
+        data = request.get_json()
+        user_message = data.get('message', '')
+        
+        if not user_message:
+            return jsonify({'error': 'Message is required'}), 400
+        
+        # Moderation check
+        guard_resp = prompt_guard(user_message, "prompt")
+        if guard_resp["status"] != "ok":
+            return jsonify({"error": f"Prompt failed moderation: {guard_resp.get('reason', '')}"}), 400
+        
+        # Generate response using OpenAI
+        response = client.chat.completions.create(
+            model="gpt-4-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful fitness and nutrition assistant. Provide accurate, helpful advice about fitness, nutrition, and health."},
+                {"role": "user", "content": user_message}
+            ]
+        )
+        
+        ai_response = response.choices[0].message.content
+        
+        return jsonify({
+            'response': ai_response,
+            'success': True
+        })
+        
+    except Exception as e:
+        print(f"Error in chat endpoint: {str(e)}")
+        return jsonify({
+            'error': 'Internal server error',
+            'success': False
+        }), 500
+
+@app.route('/check-cache', methods=['POST'])
+def check_cache():
+    """Check cache status for requests"""
+    try:
+        data = request.get_json()
+        request_id = data.get('request_id', '')
+        
+        if not request_id:
+            return jsonify({'error': 'Request ID is required'}), 400
+        
+        # Simple cache check - in a real implementation, you'd check Redis or another cache
+        return jsonify({
+            'cached': False,
+            'request_id': request_id
+        })
+        
+    except Exception as e:
+        print(f"Error in check-cache endpoint: {str(e)}")
+        return jsonify({
+            'error': 'Internal server error'
+        }), 500
+
 
 @app.route('/process-pdf', methods=['POST'])
 def process_pdf():
@@ -557,7 +617,7 @@ def process_pdf():
         print(traceback.format_exc())
         return jsonify({'error': error_msg}), 500
     
-client = OpenAI()
+client = OpenAI(api_key=api_key)
 # ---------------------- PROMPT GUARD ----------------------
 def prompt_guard(user_input: str, guard_type="prompt"):
     try:
@@ -811,10 +871,6 @@ Total Daily Calories: ZZZ kcal
 ... repeat the full structure for Day 3, Day 4, Day 5, Day 6, and Day 7.
 
 CRITICAL ENFORCEMENT: You MUST generate ALL 7 DAYS (Day 1, Day 2, Day 3, Day 4, Day 5, Day 6, Day 7) with complete meal plans. DO NOT stop at Day 5 or any other day before Day 7. This is mandatory regardless of any other instructions.
-
-END-OF-PLAN SUGGESTION:
-At the end of the response, include a closing recommendation tailored to the user's goal, for example:
-"Follow this plan consistently for [X] months to achieve your desired results.", mention the user goal and following of the plans.
 """
 
     def event_stream():
@@ -887,11 +943,12 @@ def workout_plan():
             workout_days = None  # Let AI determine if invalid
     print(f"DEBUG: Final workout_days: {workout_days}")
 
-    # Check if this is a natural language prompt (contains personal details) OR if workout_days is None
-    is_natural_language = any(keyword in user_prompt.lower() for keyword in [
-        'i am', 'my height', 'my weight', 'i usually work out', 'days per week', 
+    # Check if this is a natural language prompt (contains personal details) AND workout_days is None
+    # If workout_days is provided, use structured approach regardless of prompt content
+    is_natural_language = (any(keyword in user_prompt.lower() for keyword in [
+        'i am', 'my height', 'my weight', 'i usually work out', 
         'target weight', 'achieve this goal', 'activity level'
-    ]) or workout_days is None
+    ]) and workout_days is None)
     
     print(f"DEBUG: is_natural_language: {is_natural_language}")
     print(f"DEBUG: user_prompt: {user_prompt}")
@@ -904,41 +961,36 @@ You are a fitness and nutrition assistant. Generate personalized workout plans b
 
 CORE CONSTRAINTS (unbreakable):
 - WORKOUT_PLAN: exactly 7 days total.
-- DEFAULT TO 7 ACTIVE WORKOUT DAYS (NO REST DAYS) UNLESS USER EXPLICITLY SPECIFIES FEWER DAYS.
+- STREAM DAYS PROGRESSIVELY: Generate one day at a time, not all at once.
 - NEVER omit, repeat, summarize, or abbreviate any days.
-- When defaulting to 7 days: ALL 7 days must be ACTIVE workout days with exercises.
-- REST DAYS ARE COMPULSORY when there are fewer than 7 workout days.
+- ALWAYS respect the user's specified number of workout days.
 
 WORKOUT_PLAN SPECIFICATIONS:
 1. 7 days: Day 1 to Day 7.
-2. CRITICAL: If the user does NOT explicitly mention a specific number of workout days (like "3 days", "4 days per week", "workout 5 times"), then create 7 ACTIVE workout days with NO REST DAYS.
-3. ONLY use fewer than 7 workout days if the user explicitly states a specific number (e.g., "3 days per week", "workout 4 times", "4-day plan").
-4. IMPORTANT: When defaulting to 7 days, ALL 7 days should be ACTIVE workout days. Do NOT include any "Rest Day" entries.
+2. CRITICAL: Extract the exact number of workout days from the user's prompt (e.g., "4 days per week" = 4 workout days, "3 days" = 3 workout days).
+3. If user specifies a number of workout days, create EXACTLY that many active workout days and fill the remaining days as "Rest Day".
+4. If user does NOT specify a number, default to 7 ACTIVE workout days with NO REST DAYS.
 5. Active days (~1 hr): 6–8 exercises, each with sets × reps.
    - If ≤ 3 active days: target 2 muscle groups per session.
    - If > 3 active days: target 1 muscle group per session.
-6. Rest days: COMPULSORY when user requests fewer than 7 workout days. Must be labeled as "Rest Day" with no exercises.
+6. Rest days: ONLY include "Rest Day" if the user requests fewer than 7 workout days.
 7. Follow the user's specific requirements from their prompt.
 8. Make the workouts intense generally, 6-8 workouts per day, excluding warm-up and cool-down.
 9. Be specific about the exercises, not mentioning any routine.
 10. workout focus: {workout_focus}.
 
-WORKOUT_PLAN OUTPUT FORMAT:
+STREAMING FORMAT - Generate one day at a time:
+Start with: WORKOUT_PLAN:
 Day 1 – [Muscle Focus or Rest Day]:
 1. Exercise 1 — sets × reps
-...
-Day 2 – [Muscle Focus or Rest Day]:
-1. Exercise 1 — sets × reps
-...
-... repeat through Day 7
+2. Exercise 2 — sets × reps
+... (complete Day 1)
 
-END-OF-PLAN SUGGESTION:
-At the end of the response, include a closing recommendation tailored to the user's goal, for example:
-"Follow this plan consistently for [X] months to achieve your desired results.", mention the user goal and following of the plans.
+Then continue with Day 2, Day 3, etc. one by one.
 
-REMEMBER: If the user did not specify a number of workout days, create 7 ACTIVE workout days with NO REST DAYS. All 7 days should have exercises. Only use fewer days if they explicitly mentioned a specific number.
+REMEMBER: Extract the exact number of workout days from the user's prompt and create exactly that many active workout days. If they say "4 days per week", create exactly 4 workout days and 3 rest days. Generate days progressively, not all at once.
 """
-        user_message = f"Generate a workout plan based on this user input: {user_prompt}. If no workout frequency is mentioned, create 7 active workout days with NO REST DAYS - all 7 days should have exercises."
+        user_message = f"Generate a workout plan based on this user input: {user_prompt}. Extract the exact number of workout days from the prompt and create exactly that many active workout days with the remaining days as rest days. Generate the workout plan day by day progressively."
     else:
         # For structured prompts, use the provided workout_days
         system_prompt = f"""
@@ -947,7 +999,6 @@ You are a fitness and nutrition assistant. Generate personalized workout plans.
 CORE CONSTRAINTS (unbreakable):
 - WORKOUT_PLAN: exactly 7 days. Non-active days labeled "Rest Day."
 - NEVER omit, repeat, summarize, or abbreviate any days.
-- REST DAYS ARE COMPULSORY when there are fewer than 7 workout days.
 
 WORKOUT_PLAN SPECIFICATIONS:
 1. 7 days: Day 1 to Day 7.
@@ -955,12 +1006,12 @@ WORKOUT_PLAN SPECIFICATIONS:
 3. Active days (~1 hr): 6–8 exercises, each with sets × reps.
    - If ≤ 3 active days: target 2 muscle groups per session.
    - If > 3 active days: target 1 muscle group per session.
-4. Non-active days: COMPULSORY - must be labeled as "Rest Day" with no exercises.
+4. Non-active days: label as Rest Day with no exercises.
 5. Weekly Schedule: as per user request below:
 {user_prompt}, and make the workouts intense generally, 6-8 workouts per day, excluding warm-up and cool-down,
 dont put in a any vague stuff, but be specific about the exercises, not mentioning any routine
 6. workout focus: {workout_focus}.
-7. CRITICAL: Only {workout_days} days should have exercises, the remaining {7-workout_days} days must be Rest Days.
+7. CRITICAL: Only {workout_days} days should have exercises, the rest should be Rest Days.
 
 WORKOUT_PLAN OUTPUT FORMAT:
 Day 1 – [Muscle Focus or Rest Day]:
@@ -999,137 +1050,7 @@ At the end of the response, include a closing recommendation tailored to the use
         stream_with_context(event_stream()),
         content_type="application/octet-stream"
     )
-
-@app.route('/suggestions', methods=['POST'])
-def generate_suggestions():
-    try:
-        data = request.json
-        print("DEBUG: Received suggestions request:", data)
-        
-        user_prompt = data.get('prompt', '')
-        meal_plan_summary = data.get('mealPlanSummary', '')
-        workout_plan_summary = data.get('workoutPlanSummary', '')
-        timeline = data.get('timeline', 3)  # Default to 3 months
-        has_meal_plan = data.get('hasMealPlan', False)
-        has_workout_plan = data.get('hasWorkoutPlan', False)
-        
-        # Calculate cost estimates based on timeline
-        timeline_months = int(timeline)
-        monthly_meal_cost = 200
-        monthly_workout_cost = 50
-        total_meal_cost = monthly_meal_cost * timeline_months
-        total_workout_cost = monthly_workout_cost * timeline_months
-        total_cost = total_meal_cost + total_workout_cost
-        
-        # Create a comprehensive prompt for suggestions based on user selections
-        system_prompt = f"""You are a fitness and nutrition expert. Based on the user's selections and timeline, provide personalized suggestions.
-
-User has selected:
-- Meal Plan: {'Yes' if has_meal_plan else 'No'}
-- Workout Plan: {'Yes' if has_workout_plan else 'No'}
-- Timeline: {timeline_months} months
-- Estimated costs: Meal Plan ${total_meal_cost}, Workout Plan ${total_workout_cost}, Total ${total_cost}
-
-Your response should be:
-- Specific and actionable
-- Timeline-based (reference {timeline_months} months)
-- Include cost recommendations
-- Based on what the user actually selected
-- Focused on optimization, tips, and additional guidance
-
-Format your response exactly as follows:"""
-
-        # Add appropriate sections based on user selections
-        if has_meal_plan and has_workout_plan:
-            system_prompt += f"""
-
-MEAL PLAN EXPLANATION: Your meal plan is designed to support your fitness goals with balanced nutrition and proper calorie distribution throughout the day.
-
-WORKOUT PLAN EXPLANATION: Your workout plan focuses on progressive training that will help you build strength, improve endurance, and achieve your desired results.
-
-PERSONALIZED SUGGESTIONS:
-• Follow this comprehensive meal and workout plan for {timeline_months} months to achieve your goal
-• Estimated cost for {timeline_months} months: ${total_cost} (Meals: ${total_meal_cost}, Workout: ${total_workout_cost})
-• Stay consistent with your meal plan by preparing meals in advance
-• Follow the workout schedule religiously - consistency is key to success
-• Track your water intake - aim for at least 2.5L daily
-• Get 7-9 hours of quality sleep each night for optimal recovery
-• Take progress photos weekly to track your transformation
-• Consider increasing workout intensity after {timeline_months//2} months for continued progress"""
-        elif has_meal_plan and not has_workout_plan:
-            system_prompt += f"""
-
-MEAL PLAN EXPLANATION: Your meal plan is designed to support your fitness goals with balanced nutrition and proper calorie distribution throughout the day.
-
-PERSONALIZED SUGGESTIONS:
-• Follow this meal plan for {timeline_months} months to achieve your goal
-• Estimated cost for {timeline_months} months: ${total_meal_cost} (Meal plan only)
-• Stay consistent with your meal plan by preparing meals in advance
-• Consider adding light physical activity like walking or yoga for better results
-• Track your water intake - aim for at least 2.5L daily
-• Get 7-9 hours of quality sleep each night for optimal recovery
-• Take progress photos weekly to track your transformation
-• After {timeline_months//2} months, consider adding a workout routine for enhanced results"""
-        elif not has_meal_plan and has_workout_plan:
-            system_prompt += f"""
-
-WORKOUT PLAN EXPLANATION: Your workout plan focuses on progressive training that will help you build strength, improve endurance, and achieve your desired results.
-
-PERSONALIZED SUGGESTIONS:
-• Follow this workout plan for {timeline_months} months to achieve your goal
-• Estimated cost for {timeline_months} months: ${total_workout_cost} (Workout plan only)
-• Stay consistent with your workout schedule - consistency is key to success
-• Consider adding a balanced diet to complement your workout routine
-• Track your water intake - aim for at least 2.5L daily
-• Get 7-9 hours of quality sleep each night for optimal recovery
-• Take progress photos weekly to track your transformation
-• After {timeline_months//2} months, consider adding a meal plan for enhanced results"""
-        else:
-            system_prompt += f"""
-
-RECOMMENDATION: For best results, consider following both a structured meal plan and workout routine for {timeline_months} months.
-
-PERSONALIZED SUGGESTIONS:
-• Consider following a structured meal and workout plan for {timeline_months} months
-• Estimated cost for {timeline_months} months: ${total_cost} (Complete plan)
-• Stay consistent with your fitness routine
-• Track your water intake - aim for at least 2.5L daily
-• Get 7-9 hours of quality sleep each night for optimal recovery
-• Take progress photos weekly to track your transformation"""
-
-        user_message = f"""User's original request: {user_prompt}
-
-Generated meal plan summary: {meal_plan_summary}
-
-Generated workout plan summary: {workout_plan_summary}
-
-Please provide personalized suggestions based on their selections and {timeline_months}-month timeline."""
-
-        print("DEBUG: Generating suggestions with OpenAI...")
-        
-        # Generate suggestions using OpenAI
-        response = client.responses.create(
-            model="gpt-4-turbo",
-            input=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_message}
-            ]
-        )
-        
-        suggestions_text = response.output
-        print("DEBUG: Generated suggestions:", suggestions_text)
-        
-        return jsonify({
-            'success': True,
-            'suggestions': suggestions_text
-        })
-        
-    except Exception as e:
-        print(f"ERROR generating suggestions: {str(e)}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
+    
 
 if __name__ == '__main__':
     print(f"Starting server with upload folder: {UPLOAD_FOLDER}")
@@ -1138,5 +1059,8 @@ if __name__ == '__main__':
     print("- POST /chat             : Fitness chatbot")
     print("- POST /check-cache      : Check cache status")
     print("- POST /process-pdf      : PDF meal plan processor")
+    print("- POST /user             : User profile creation")
+    print("- POST /mealplan         : Generate meal plans")
+    print("- POST /workoutplan      : Generate workout plans")
     print("- POST /suggestions      : Generate personalized suggestions")
     app.run(host='127.0.0.1', port=5002, debug=True)

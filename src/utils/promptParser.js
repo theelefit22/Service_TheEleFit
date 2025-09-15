@@ -116,7 +116,18 @@ export class PromptParser {
         /(\d+)\s*(?:times|x|days?)\s*(?:per|a)\s*(?:week|wk)\s*(?:workout|exercise|training)/gi,
         /every\s*day|daily|7\s*(?:times|x)\s*(?:per|a)\s*week/gi,
         /(\d+)\s*[-–]\s*(\d+)\s*(?:times|x|days?)\s*(?:per|a)\s*(?:week|wk)/gi,
-        /(\d+)\s*(?:times|x|days?)\s*(?:per|a)\s*(?:week|wk)\s*(?:of\s*)?(?:workout|exercise|training|gym)/gi
+        /(\d+)\s*(?:times|x|days?)\s*(?:per|a)\s*(?:week|wk)\s*(?:of\s*)?(?:workout|exercise|training|gym)/gi,
+        // Enhanced patterns for better detection
+        /usually\s*work\s*out\s*(\d+)\s*(?:times|x|days?)\s*(?:per|a)\s*(?:week|wk)/gi,
+        /i\s*usually\s*work\s*out\s*(\d+)\s*(?:times|x|days?)\s*(?:per|a)\s*(?:week|wk)/gi,
+        /work\s*out\s*(\d+)\s*(?:times|x|days?)\s*(?:per|a)\s*(?:week|wk)\s*(?:usually|typically|normally)/gi,
+        /(\d+)\s*(?:times|x|days?)\s*(?:per|a)\s*(?:week|wk)\s*(?:workout|exercise|training|gym|work\s*out)/gi,
+        // New patterns for "for X days" format
+        /give.*?workout.*?plan.*?for\s+(\d+)\s+days/gi,
+        /workout.*?plan.*?for\s+(\d+)\s+days/gi,
+        /for\s+(\d+)\s+days.*?(?:workout|plan)/gi,
+        /(\d+)\s+days?\s+plan/gi,
+        /(\d+)\s+days?\s+workout/gi
       ],
       targetWeight: [
         /my\s*target\s*weight\s*is\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)/gi,
@@ -133,6 +144,21 @@ export class PromptParser {
         /target\s*weight\s*[:=]?\s*(\d+(?:\.\d+)?)(?:\s|$|\.|,|;)/gi,
         /goal\s*weight\s*[:=]?\s*(\d+(?:\.\d+)?)(?:\s|$|\.|,|;)/gi
       ],
+      weightChange: [
+        // Patterns for relative weight changes (lose/gain X kg) - enhanced for typos
+        /(?:lose|loose|losse)\s+(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?)/gi,
+        /(?:gain|increase)\s+(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?)/gi,
+        /(?:lose|loose|losse)\s+(\d+(?:\.\d+)?)\s*(?:lbs?|pounds?)/gi,
+        /(?:gain|increase)\s+(\d+(?:\.\d+)?)\s*(?:lbs?|pounds?)/gi,
+        /(?:drop|shed)\s+(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?)/gi,
+        /(?:put\s*on|add)\s+(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?)/gi,
+        // Without explicit units but in weight context - enhanced for typos
+        /(?:want\s*to\s*|need\s*to\s*|trying\s*to\s*)?(?:lose|loose|losse)\s+(\d+(?:\.\d+)?)(?:\s*kg|\s*kilos?|\s*pounds?|\s*lbs?)?/gi,
+        /(?:want\s*to\s*|need\s*to\s*|trying\s*to\s*)?(?:gain|increase)\s+(\d+(?:\.\d+)?)(?:\s*kg|\s*kilos?|\s*pounds?|\s*lbs?)?/gi,
+        // More flexible patterns that handle spacing and word boundaries
+        /(?:lose|loose|losse)\s+weight\s+(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?)?/gi,
+        /(?:gain|increase)\s+weight\s+(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?)?/gi
+      ],
       timeline: [
         /in\s*(\d+)\s*(?:months?|mo|month)/gi,
         /within\s*(\d+)\s*(?:months?|mo|month)/gi,
@@ -140,10 +166,9 @@ export class PromptParser {
         /(\d+)\s*(?:months?|mo|month)\s*(?:time|period|duration)/gi,
         /achieve\s*this\s*goal\s*in\s*(\d+)\s*(?:months?|mo|month)/gi,
         /want\s*to\s*achieve.*?in\s*(\d+)\s*(?:months?|mo|month)/gi,
-        /(\d+)\s*(?:weeks?|wk|week)/gi,
-        /(\d+)\s*(?:years?|yr|y|year)/gi,
         /in\s*(\d+)\s*(?:weeks?|wk|week)/gi,
-        /in\s*(\d+)\s*(?:years?|yr|y|year)/gi
+        /in\s*(\d+)\s*(?:years?|yr|y|year)/gi,
+        /(?:timeline|timeframe|time).*?(\d+)\s*(?:weeks?|months?|years?)/gi
       ]
     };
   }
@@ -159,7 +184,9 @@ export class PromptParser {
       activityLevel: null,
       frequency: null,
       targetWeight: null,
+      weightChange: null,
       timeline: null,
+      timelineWeeks: null,
       units: {
         height: 'cm',
         weight: 'kg'
@@ -200,8 +227,24 @@ export class PromptParser {
     // Extract target weight
     result.targetWeight = this.extractTargetWeight(originalPrompt);
     
+    // Extract weight change (relative changes like "lose 5kg")
+    result.weightChange = this.extractWeightChange(originalPrompt);
+    
+    // Calculate target weight from current weight + weight change if no explicit target weight
+    if (!result.targetWeight && result.weightChange && result.weight) {
+      result.targetWeight = this.calculateTargetWeightFromChange(result.weight, result.weightChange);
+    }
+    
     // Extract timeline
     result.timeline = this.extractTimeline(originalPrompt);
+    
+    // Convert timeline to weeks and set timelineWeeks for backend compatibility
+    if (result.timeline && result.timeline.value) {
+      result.timelineWeeks = result.timeline.value;
+    } else {
+      // Don't set a default timeline - let backend handle this
+      result.timelineWeeks = null;
+    }
     
     console.log('DEBUG: Final parsed result:', result);
 
@@ -429,7 +472,21 @@ export class PromptParser {
     
     // Priority order matters - check more specific patterns first
     
-    // Check for weight comparison first (target weight vs current weight)
+    // Check for relative weight changes first ("lose 5kg", "gain 5kg") - enhanced for typos
+    const loseWeightChangeMatch = lowerText.match(/(?:want\s+to\s+|need\s+to\s+|trying\s+to\s+)?(?:lose|loose|losse)\s+(?:weight\s+)?(?:\d+(?:\.\d+)?\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)|weight)/i);
+    const gainWeightChangeMatch = lowerText.match(/(?:want\s+to\s+|need\s+to\s+|trying\s+to\s+)?(?:gain|increase)\s+(?:weight\s+)?(?:\d+(?:\.\d+)?\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)|weight)/i);
+    
+    if (loseWeightChangeMatch) {
+      console.log('DEBUG: Detected weight loss goal from relative change:', loseWeightChangeMatch[0]);
+      return 'weight_loss';
+    }
+    
+    if (gainWeightChangeMatch) {
+      console.log('DEBUG: Detected weight gain goal from relative change:', gainWeightChangeMatch[0]);
+      return 'weight_gain';
+    }
+    
+    // Check for weight comparison (target weight vs current weight)
     const currentWeightMatch = lowerText.match(/(?:weight|weighing)\s*(?:is|of)?\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)?/i);
     const targetWeightMatch = lowerText.match(/(?:target\s*weight|goal\s*weight|want\s*to\s*(?:be|reach|get\s*to)|achieve)\s*(?:is|of)?\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)?/i);
     
@@ -451,10 +508,14 @@ export class PromptParser {
       return 'weight_gain';
     }
     
-    // Weight loss patterns
-    if (/\b(lose\s+weight|loose\s+weight|weight\s+loss|slim\s+down|fat\s+loss|reduce\s+fat|cut\s+fat|drop\s+weight|lose\s+fat|loose\s+fat|reduce\s+belly|slim\s+waist|cut\s+fat|fat\s+reduction|lose\s+belly\s+fat|loose\s+belly\s+fat|cutting\s+fat)\b/i.test(lowerText) ||
+    // Weight loss patterns - enhanced to catch more variations and typos
+    if (/\b(lose\s+weight|loose\s+weight|losse\s+weight|weight\s+loss|slim\s+down|fat\s+loss|reduce\s+fat|cut\s+fat|drop\s+weight|lose\s+fat|loose\s+fat|reduce\s+belly|slim\s+waist|fat\s+reduction|lose\s+belly\s+fat|loose\s+belly\s+fat|cutting\s+fat)\b/i.test(lowerText) ||
         (/\bcut\b/i.test(lowerText) && /\b(fat|weight)\b/i.test(lowerText)) ||
-        (/\bslim\b/i.test(lowerText) && !(/\bmuscle\b/i.test(lowerText)))) {
+        (/\bslim\b/i.test(lowerText) && !(/\bmuscle\b/i.test(lowerText))) ||
+        /\bi\s+want\s+to\s+lose\b/i.test(lowerText) ||
+        /\bwant\s+to\s+lose\s+weight\b/i.test(lowerText) ||
+        /\bwant\s+to\s+losse\s+weight\b/i.test(lowerText) ||
+        /\bwant\s+to\s+loose\s+weight\b/i.test(lowerText)) {
       return 'weight_loss';
     }
     
@@ -494,9 +555,9 @@ export class PromptParser {
       return 'body_recomposition';
     }
     
-    // Fitness patterns (generic)
-    if (/\b(fitness|health|healthy|wellness|overall\s+health)\b/i.test(lowerText) && 
-        /\b(goal|aim|want|improve)\b/i.test(lowerText)) {
+    // Fitness patterns (generic) - enhanced
+    if (/\b(fitness|health|healthy|wellness|overall\s+health|get\s+fit|stay\s+fit|be\s+fit)\b/i.test(lowerText) && 
+        /\b(goal|aim|want|trying|looking)\b/i.test(lowerText)) {
       return 'fitness';
     }
     
@@ -652,6 +713,54 @@ export class PromptParser {
     return null;
   }
 
+  extractWeightChange(text) {
+    console.log('DEBUG: Extracting weight change from text:', text);
+    for (const pattern of this.patterns.weightChange) {
+      const matches = [...text.matchAll(pattern)];
+      for (const match of matches) {
+        console.log('DEBUG: Processing weight change match:', match);
+        const value = parseFloat(match[1]);
+        if (value && value > 0 && value <= 50) { // Reasonable weight change range
+          const fullMatch = match[0].toLowerCase();
+          console.log('DEBUG: Full weight change match text:', fullMatch);
+          
+          // Determine if it's gain or loss - enhanced for typos
+          const isLoss = /(?:lose|loose|losse|drop|shed)/i.test(fullMatch);
+          const isGain = /(?:gain|increase|put.*on|add)/i.test(fullMatch);
+          
+          // Convert units if needed
+          let changeValue = value;
+          if (/lbs?|pounds?/i.test(fullMatch)) {
+            changeValue = this.lbsToKg(value);
+          }
+          
+          console.log('DEBUG: Found weight change:', isLoss ? `-${changeValue}` : `+${changeValue}`, 'kg');
+          return {
+            value: isLoss ? -changeValue : changeValue,
+            unit: 'kg',
+            type: isLoss ? 'loss' : 'gain'
+          };
+        }
+      }
+    }
+    console.log('DEBUG: No weight change found, returning null');
+    return null;
+  }
+
+  calculateTargetWeightFromChange(currentWeight, weightChange) {
+    if (!currentWeight || !weightChange) return null;
+    
+    const targetWeight = currentWeight + weightChange.value;
+    console.log('DEBUG: Calculated target weight from change:', currentWeight, '+', weightChange.value, '=', targetWeight);
+    
+    // Validate the result is reasonable
+    if (targetWeight > 0 && targetWeight < 300) {
+      return { value: Math.round(targetWeight * 10) / 10, unit: 'kg' };
+    }
+    
+    return null;
+  }
+
   extractTimeline(text) {
     console.log('DEBUG: Extracting timeline from text:', text);
     for (const pattern of this.patterns.timeline) {
@@ -662,6 +771,15 @@ export class PromptParser {
         const value = parseInt(match[1]);
         if (value) {
           const fullMatch = match[0].toLowerCase();
+          
+          // Skip if this appears to be an age reference
+          const beforeMatch = text.substring(Math.max(0, match.index - 5), match.index);
+          const afterMatch = text.substring(match.index + match[0].length, Math.min(text.length, match.index + match[0].length + 10));
+          
+          if (/\b(am|is|are|year|age)$/i.test(beforeMatch) || /^\s*(?:year|years)\s+old/i.test(afterMatch)) {
+            console.log('DEBUG: Skipping timeline match that appears to be age-related:', fullMatch);
+            continue;
+          }
           
           // Determine unit and convert to weeks
           if (fullMatch.includes('year') || fullMatch.includes('yr') || fullMatch.includes('y')) {

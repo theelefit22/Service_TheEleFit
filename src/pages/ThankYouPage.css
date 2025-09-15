@@ -1,0 +1,171 @@
+/* ThankYouPage.css */
+.thank-you-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFFFFF;
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Main Content Container */
+.thank-you-content {
+  background: #FFFFFF;
+  border-radius: 25px;
+  padding: 60px 40px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(78, 53, 128, 0.2);
+  border: 2px solid rgba(78, 53, 128, 0.2);
+  position: relative;
+  z-index: 2;
+  max-width: 600px;
+  width: 100%;
+}
+
+/* Animated Title */
+.thank-you-title {
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 30px;
+  color: #000000;
+  text-shadow: 2px 2px 4px rgba(78, 53, 128, 0.2);
+  line-height: 1.2;
+}
+
+.word {
+  display: inline-block;
+  margin-right: 15px;
+}
+
+.word-1 { color: #4E3580; }
+.word-2 { color: #000000; }
+.word-3 { color: #4E3580; }
+.word-4 { color: #000000; }
+.word-5 { color: #4E3580; font-weight: 900; }
+.word-6 { color: #000000; font-weight: 900; }
+
+/* Subtitle */
+.thank-you-subtitle {
+  margin-bottom: 40px;
+}
+
+.subtitle-line {
+  font-size: 18px;
+  color: #4E3580;
+  margin: 8px 0;
+  font-weight: 500;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.btn-primary, .btn-secondary {
+  padding: 15px 30px;
+  border: none;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #4E3580 0%, #000000 100%);
+  color: #FFFFFF;
+  box-shadow: 0 8px 25px rgba(78, 53, 128, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(78, 53, 128, 0.6);
+  background: linear-gradient(135deg, #5a4190 0%, #333333 100%);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.9);
+  color: #4E3580;
+  border: 2px solid #4E3580;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary:hover {
+  transform: translateY(-3px);
+  background: #4E3580;
+  color: #FFFFFF;
+  box-shadow: 0 12px 35px rgba(78, 53, 128, 0.4);
+}
+
+/* Auto Redirect Notice */
+.auto-redirect-notice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #4E3580;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .thank-you-container {
+    padding: 10px;
+  }
+  
+  .thank-you-content {
+    padding: 40px 25px;
+    margin: 0 10px;
+  }
+  
+  .thank-you-title {
+    font-size: 36px;
+  }
+  
+  .word {
+    margin-right: 8px;
+  }
+  
+  .subtitle-line {
+    font-size: 16px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .btn-primary, .btn-secondary {
+    width: 100%;
+    max-width: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  .thank-you-title {
+    font-size: 28px;
+  }
+  
+  .subtitle-line {
+    font-size: 14px;
+  }
+  
+  .btn-primary, .btn-secondary {
+    padding: 12px 25px;
+    font-size: 14px;
+  }
+}
