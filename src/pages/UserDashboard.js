@@ -16,7 +16,7 @@ const UserDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   // Use AuthContext instead of local state
-  const { user: currentUser, isAuthenticated, isLoading: authLoading } = useAuthContext();
+  const { user: currentUser, isAuthenticated, isLoading: authLoading, logout } = useAuthContext();
   const [userData, setUserData] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -262,7 +262,6 @@ const UserDashboard = () => {
       localStorage.removeItem('verifiedCustomerSession');
       
       // Use the logout function from AuthContext
-      const { logout } = useAuthContext();
       const result = await logout();
       
       if (result.success) {
