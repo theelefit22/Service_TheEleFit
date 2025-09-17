@@ -101,6 +101,8 @@ const AIFitnessCoach = () => {
   const [openSuggestionsAccordion, setOpenSuggestionsAccordion] = useState(false);
   const [copyButtonClicked, setCopyButtonClicked] = useState(false);
   const [plansComplete, setPlansComplete] = useState(false);
+  const [showWorkoutDaysConfirmation, setShowWorkoutDaysConfirmation] = useState(false);
+  const [selectedWorkoutDays, setSelectedWorkoutDays] = useState(7);
   const [profileFormData, setProfileFormData] = useState({
      age: '',
      gender: '',
@@ -118,6 +120,12 @@ const AIFitnessCoach = () => {
   const plansContainerRef = useRef(null);
   const mealAccordionRef = useRef(null);
   const workoutAccordionRef = useRef(null);
+
+  // Function to hide/show popular goals
+  const hidePopularGoals = () => {
+    const setHide = true; // Set to false if you want to show popular goals
+    return setHide;
+  };
 
   // Handle Shopify token authentication and session transfer
   useEffect(() => {
@@ -805,14 +813,17 @@ const AIFitnessCoach = () => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              age: parseInt(extractedData.age),
-              weight: parseFloat(extractedData.weight),
-              height: parseFloat(extractedData.height),
-              gender: extractedData.gender,
-              activityLevel: extractedData.activityLevel,
-              targetWeight: parseFloat(extractedData.targetWeight?.value || extractedData.weight),
-              timelineWeeks: parseInt(extractedData.timelineWeeks || extractedData.timeline?.value || 12),
-              goal: extractedData.goal || 'Get Fit'
+              prompt: fitnessGoal,
+              userDetails: {
+                age: parseInt(extractedData.age),
+                weight: parseFloat(extractedData.weight),
+                height: parseFloat(extractedData.height),
+                gender: extractedData.gender,
+                activityLevel: extractedData.activityLevel,
+                targetWeight: parseFloat(extractedData.targetWeight?.value || extractedData.weight),
+                timelineWeeks: parseInt(extractedData.timelineWeeks || extractedData.timeline?.value || 12),
+                healthGoals: extractedData.goal || 'Get Fit'
+              }
             })
           });
           
@@ -916,7 +927,7 @@ const AIFitnessCoach = () => {
     // Validate required fields
     if (!profileFormData.age || !profileFormData.gender || !profileFormData.height || 
         !profileFormData.currentWeight || !profileFormData.targetWeight || 
-        !profileFormData.activityLevel) {
+        !profileFormData.activityLevel || !profileFormData.targetTimeline) {
       setSuccessMessage('Please fill in all required fields.');
       setShowSuccessPopup(true);
       setTimeout(() => setShowSuccessPopup(false), 3000);
@@ -934,14 +945,17 @@ const AIFitnessCoach = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          age: parseInt(profileFormData.age),
-          weight: parseFloat(profileFormData.currentWeight),
-          height: parseFloat(profileFormData.height),
-          gender: profileFormData.gender,
-          activityLevel: profileFormData.activityLevel,
-          targetWeight: parseFloat(profileFormData.targetWeight),
-          timelineWeeks: parseInt(profileFormData.targetTimeline) * 4, // Convert months to weeks
-          goal: profileFormData.goal
+          prompt: fitnessGoal,
+          userDetails: {
+            age: parseInt(profileFormData.age),
+            weight: parseFloat(profileFormData.currentWeight),
+            height: parseFloat(profileFormData.height),
+            gender: profileFormData.gender,
+            activityLevel: profileFormData.activityLevel,
+            targetWeight: parseFloat(profileFormData.targetWeight),
+            timelineWeeks: parseInt(profileFormData.targetTimeline) * 4,
+            healthGoals: profileFormData.goal
+          }
         })
       });
 
@@ -1113,6 +1127,42 @@ const AIFitnessCoach = () => {
        return; // Keep showing meal plan only
      }
 
+     // User selected "Yes" - show workout days confirmation popup
+     // Extract workout days from the prompt or use default
+     let detectedDays = 7; // Default to 7 days
+     
+     if (extractedProfileData && (extractedProfileData.workoutDays || extractedProfileData.frequency)) {
+       const extractedDays = parseInt(extractedProfileData.workoutDays || extractedProfileData.frequency);
+       if (!isNaN(extractedDays) && extractedDays > 0 && extractedDays <= 7) {
+         detectedDays = extractedDays;
+       }
+     } else if (profileFormData.workoutDays) {
+       const formDays = parseInt(profileFormData.workoutDays);
+       if (!isNaN(formDays) && formDays > 0 && formDays <= 7) {
+         detectedDays = formDays;
+       }
+     }
+     
+     setSelectedWorkoutDays(detectedDays);
+     setShowWorkoutDaysConfirmation(true);
+   };
+
+  // Handle workout days confirmation
+  const handleWorkoutDaysConfirmation = async (confirmed) => {
+    setShowWorkoutDaysConfirmation(false);
+    
+    if (!confirmed) {
+      // User cancelled, go back to workout plan choice
+      setShowWorkoutPlanChoice(true);
+      return;
+    }
+    
+    // User confirmed, generate workout plan with selected days
+    await generateWorkoutPlanWithDays(selectedWorkoutDays);
+  };
+
+  // Generate workout plan with specified days
+  const generateWorkoutPlanWithDays = async (workoutDays) => {
     // Generate workout plan with streaming
     setIsStreamingWorkout(true);
     setStreamingWorkoutPlan('');
@@ -1122,7 +1172,7 @@ const AIFitnessCoach = () => {
     setIncompleteExerciseBuffer(''); // Clear incomplete exercise buffer
     setLastParsedLength(0); // Reset parsing state
     setNewlyCreatedDays(new Set()); // Clear newly created days tracking
-     console.log('Starting workout plan generation...');
+    console.log('Starting workout plan generation...');
      
     // Set a timeout to ensure streaming state is reset even if something goes wrong
     const streamingTimeout = setTimeout(() => {
@@ -1131,56 +1181,22 @@ const AIFitnessCoach = () => {
     }, 120000); // 120 seconds timeout (increased from 60 seconds)
      
      try {
-       // For natural language input (no profile selected), send the complete original prompt
-       // For profile-based input, use the structured data
+       // Use the confirmed workout days from the popup
        let workoutPrompt;
-       let workoutDays = null; // Let backend auto-detect if not specified
        
-       console.log('=== CONDITION CHECK ===');
-       console.log('useExistingProfile:', useExistingProfile);
-       console.log('showProfileForm:', showProfileForm);
-       console.log('profileFormData.workoutDays:', profileFormData.workoutDays);
-       console.log('profileFormData.goal:', profileFormData.goal);
-       console.log('Boolean check for workoutDays:', !!profileFormData.workoutDays);
-       console.log('Condition result:', useExistingProfile || showProfileForm || !!profileFormData.workoutDays);
-       console.log('fitnessGoal (original prompt):', fitnessGoal);
+       console.log('=== WORKOUT PLAN WITH CONFIRMED DAYS ===');
+       console.log('Selected workout days:', workoutDays);
+       console.log('extractedProfileData:', extractedProfileData);
+       console.log('profileFormData:', profileFormData);
        
-      // Always prioritize extracted profile data if available
-      if (extractedProfileData && (extractedProfileData.workoutDays || extractedProfileData.frequency)) {
-        // Use extracted data from natural language input
-        console.log('Using extracted profile data approach');
-        workoutDays = parseInt(extractedProfileData.workoutDays || extractedProfileData.frequency);
-        // Don't default to 5 if parsing failed - let backend determine or use 7 as full week
-        if (isNaN(workoutDays) || workoutDays <= 0) {
-          workoutDays = null; // Let backend determine from prompt
-        }
-        workoutPrompt = workoutDays ? `Generate workout plan for ${extractedProfileData.goal || 'fitness'} goal, I prefer to workout ${workoutDays} days per week` : fitnessGoal;
-      } else if (useExistingProfile || showProfileForm || !!profileFormData.workoutDays) {
-        // User has profile, is using form, or has form data - use structured approach
-        console.log('Using structured approach');
-        workoutDays = parseInt(profileFormData.workoutDays || extractedProfileData?.workoutDays);
-        // Don't default to 5 if parsing failed
-        if (isNaN(workoutDays) || workoutDays <= 0) {
-          workoutDays = null; // Let backend determine
-        }
-        workoutPrompt = `Generate workout plan for ${extractedProfileData?.goal || profileFormData.goal || 'fitness'} goal, I prefer to workout ${workoutDays} days per week`;
+       // Create prompt with the selected number of days
+       if (extractedProfileData?.goal || profileFormData.goal) {
+         workoutPrompt = `Generate workout plan for ${extractedProfileData?.goal || profileFormData.goal || 'fitness'} goal, I prefer to workout ${workoutDays} days per week`;
        } else {
-        console.log('Using pure natural language approach - sending original prompt directly to AI');
-        // Pure natural language input - send the complete original prompt directly to AI
-         workoutPrompt = fitnessGoal; // Use the original user prompt
-         workoutDays = null; // Let AI determine workout days from the prompt
+         workoutPrompt = `${fitnessGoal}. Generate workout plan for ${workoutDays} days per week`;
        }
        
-       console.log('=== WORKOUT PLAN DEBUG ===');
-       console.log('extractedProfileData:', extractedProfileData);
-       console.log('extractedProfileData.workoutDays:', extractedProfileData?.workoutDays);
-       console.log('extractedProfileData.frequency:', extractedProfileData?.frequency);
-       console.log('profileFormData:', profileFormData);
-       console.log('useExistingProfile:', useExistingProfile);
-       console.log('showProfileForm:', showProfileForm);
-       console.log('profileFormData.workoutDays:', profileFormData.workoutDays);
-       console.log('Final workout days being sent:', workoutDays);
-       
+       console.log('Final workout prompt:', workoutPrompt);
        console.log('Sending to backend:', {
          goal: extractedProfileData?.goal || profileFormData.goal || 'fitness',
          workout_focus: calculatedCalories.WorkoutFocus || 'Mixed Cardio and Strength',
@@ -2753,7 +2769,7 @@ const AIFitnessCoach = () => {
     
     if (!formData.age || !formData.gender || !formData.height || 
         !formData.currentWeight || !formData.targetWeight || 
-        !formData.activityLevel || !formData.workoutDays) {
+        !formData.activityLevel || !formData.workoutDays || !formData.timeframe) {
       setSuccessMessage('Please fill in all required fields.');
       setShowSuccessPopup(true);
       setTimeout(() => setShowSuccessPopup(false), 3000);
@@ -3574,23 +3590,24 @@ const AIFitnessCoach = () => {
             {validationError}
           </div>
         )}
-        <div className="suggestions-container">
-         
-          <div className="suggestions-title">Popular Goals:</div>
-          <div className="suggestion-chips">
-            {suggestions.map((suggestion, index) => (
-              <div
-                key={index}
-                className={`suggestion-chip ${currentPopupGoal === suggestion.text ? 'selected-goal' : ''}`}
-                data-goal={suggestion.text}
-                style={{ animation: `fadeInUp 0.5s ease forwards ${index * 0.1}s` }}
-                onClick={() => handleSuggestionClick(suggestion.text)}
-              >
-                <i className={`fas ${suggestion.icon}`}></i>
-                {suggestion.text}
-              </div>
-            ))}
-          </div>
+        {!hidePopularGoals() && (
+          <div className="suggestions-container">
+           
+            <div className="suggestions-title">Popular Goals:</div>
+            <div className="suggestion-chips">
+              {suggestions.map((suggestion, index) => (
+                <div
+                  key={index}
+                  className={`suggestion-chip ${currentPopupGoal === suggestion.text ? 'selected-goal' : ''}`}
+                  data-goal={suggestion.text}
+                  style={{ animation: `fadeInUp 0.5s ease forwards ${index * 0.1}s` }}
+                  onClick={() => handleSuggestionClick(suggestion.text)}
+                >
+                  <i className={`fas ${suggestion.icon}`}></i>
+                  {suggestion.text}
+                </div>
+              ))}
+            </div>
           {currentPopupGoal && goalData[currentPopupGoal] && (
             <div className="goal-details-container" style={{ borderTopColor: goalData[currentPopupGoal].color }}>
               <div className="goal-details-content">
@@ -3750,13 +3767,14 @@ const AIFitnessCoach = () => {
                     </div>
                   </div>
                   <div className="form-group">
-                    <label htmlFor="timeframe">Target Timeframe (months) <span className="optional-label">(Optional)</span></label>
+                    <label htmlFor="timeframe">Target Timeframe (months) <span className="required-asterisk">*</span></label>
                     <input
                       type="range"
                       id="timeframe"
                       name="timeframe"
                       min="1"
                       max="12"
+                      required
                       value={formData.timeframe}
                       onChange={handleFormChange}
                     />
@@ -3780,7 +3798,8 @@ const AIFitnessCoach = () => {
               </div>
             </div>
           )}
-        </div>
+          </div>
+        )}
       </div>
       {isLoading && (
         <div className="loading-animation" id="loadingAnimation">
@@ -4694,12 +4713,13 @@ const AIFitnessCoach = () => {
                    </select>
                  </div>
                  <div className="form-group">
-                   <label htmlFor="profileTimeline">Target Timeline (months)</label>
+                   <label htmlFor="profileTimeline">Target Timeline (months) <span className="required-asterisk">*</span></label>
                    <input
                      type="range"
                      id="profileTimeline"
                      min="1"
                      max="12"
+                     required
                      value={profileFormData.targetTimeline}
                      onChange={(e) => setProfileFormData({...profileFormData, targetTimeline: e.target.value})}
                    />
@@ -4979,8 +4999,108 @@ const AIFitnessCoach = () => {
         </div>
       )}
 
-
-
+      {/* Workout Days Confirmation Popup */}
+      {showWorkoutDaysConfirmation && (
+        <div className="workout-days-popup" style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000
+        }}>
+          <div className="popup-content" style={{
+            backgroundColor: 'white',
+            padding: '40px',
+            borderRadius: '20px',
+            maxWidth: '500px',
+            width: '90%',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)',
+            textAlign: 'center'
+          }}>
+            <h2 style={{ marginBottom: '20px', color: '#333', fontSize: '24px', fontWeight: '600' }}>
+              Confirm Workout Days
+            </h2>
+            <p style={{ marginBottom: '20px', color: '#666', fontSize: '16px', lineHeight: '1.5' }}>
+              We are generating <strong>{selectedWorkoutDays} days</strong> workout plan based on your input.
+            </p>
+            <p style={{ marginBottom: '30px', color: '#666', fontSize: '14px' }}>
+              You can change the number of days if needed:
+            </p>
+            
+            <div style={{ marginBottom: '30px' }}>
+              <label style={{ display: 'block', marginBottom: '10px', fontSize: '14px', fontWeight: '500', color: '#333' }}>
+                Number of workout days per week:
+              </label>
+              <select 
+                value={selectedWorkoutDays}
+                onChange={(e) => setSelectedWorkoutDays(parseInt(e.target.value))}
+                style={{
+                  padding: '12px 16px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  width: '120px',
+                  textAlign: 'center',
+                  backgroundColor: 'white',
+                  cursor: 'pointer'
+                }}
+              >
+                <option value={1}>1 day</option>
+                <option value={2}>2 days</option>
+                <option value={3}>3 days</option>
+                <option value={4}>4 days</option>
+                <option value={5}>5 days</option>
+                <option value={6}>6 days</option>
+                <option value={7}>7 days</option>
+              </select>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+              <button 
+                onClick={() => handleWorkoutDaysConfirmation(false)}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  backgroundColor: '#e8e8e8',
+                  color: '#666',
+                  border: 'none',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  minWidth: '90px',
+                  lineHeight: '1.2'
+                }}
+              >
+                <div>No,</div>
+                <div>Thanks</div>
+              </button>
+              <button 
+                onClick={() => handleWorkoutDaysConfirmation(true)}
+                style={{
+                  padding: '10px 20px',
+                  border: 'none',
+                  borderRadius: '8px',
+                  backgroundColor: '#7c3aed',
+                  color: 'white',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  minWidth: '110px',
+                  lineHeight: '1.2'
+                }}
+              >
+                <div>Yes, Generate</div>
+                <div>Workout Plan</div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Success Popup */}
       {showSuccessPopup && (
