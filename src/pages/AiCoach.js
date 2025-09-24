@@ -8,7 +8,9 @@ import { database, db, auth } from '../services/firebase';
 import { signInWithCustomToken, signOut } from 'firebase/auth';
 import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { parsePrompt } from '../utils/promptParser';
+import { cleanWorkoutContent, isRecommendationContent } from '../utils/test-parser';
 import { useAuth } from '../hooks/useAuth';
+
 const AIFitnessCoach = () => {
   console.log('🤖 AiCoach: Component rendered');
   console.log('🤖 AiCoach: Current URL:', window.location.href);
@@ -509,6 +511,7 @@ const AIFitnessCoach = () => {
     return { isValid: false, message: errorMessage, missingFields, suggestions };
   };
 
+  
   // Check if user has profile data in Firebase
   const checkUserProfile = async (userId) => {
     try {
@@ -517,15 +520,17 @@ const AIFitnessCoach = () => {
       
       if (userDoc.exists()) {
         const userData = userDoc.data();
+        // Check for complete profile including gender and activityLevel
         return {
-          hasProfile: !!userData.height && !!userData.weight && !!userData.age,
+          hasProfile: !!(userData.height && userData.weight && userData.age),
+          hasCompleteProfile: !!(userData.height && userData.weight && userData.age && userData.gender && userData.activityLevel),
           profileData: userData
         };
       }
-      return { hasProfile: false, profileData: null };
+      return { hasProfile: false, hasCompleteProfile: false, profileData: null };
     } catch (error) {
       console.error('Error checking user profile:', error);
-      return { hasProfile: false, profileData: null };
+      return { hasProfile: false, hasCompleteProfile: false, profileData: null };
     }
   };
 
@@ -728,7 +733,7 @@ const AIFitnessCoach = () => {
     setValidationError('');
     setIsLoading(true);
     setShowPlans(false);
-    
+  
     // Reset choice states for new recommendation
     setMealPlanChoice(null);
     setWorkoutPlanChoice(null);
@@ -736,7 +741,8 @@ const AIFitnessCoach = () => {
     try {
       // Check if user is authenticated
       if (!auth.currentUser) {
-        setValidationError('Please log in to get personalized recommendations.');
+          setErrorPopupMessage('Please log in to get personalized recommendations.');
+         setShowErrorPopup(true);
         setIsLoading(false);
         return;
       }
@@ -745,32 +751,42 @@ const AIFitnessCoach = () => {
       const extractedData = extractProfileData(fitnessGoal);
       setExtractedProfileData(extractedData);
 
-      // Check user profile status first, regardless of extracted data
-      const { hasProfile, profileData } = await checkUserProfile(auth.currentUser.uid);
+      // NEW: Check if we have extracted data from the prompt - this should take priority
+      if (extractedData.age && extractedData.gender && extractedData.height && extractedData.weight && extractedData.activityLevel) {
+        // Process as natural language input (even when no existing profile)
+        console.log('Processing with extracted data from prompt:', extractedData);
+        await handleNaturalLanguageInput(fitnessGoal, true); // bypass profile check
+        return;
+      }
 
-      if (hasProfile) {
-        // User has profile - ask if they want to use it
+      // Check user profile status
+      const { hasProfile, hasCompleteProfile, profileData } = await checkUserProfile(auth.currentUser.uid);
+
+      // If user has a complete profile, ask if they want to use it
+      if (hasCompleteProfile) {
+        // User has complete profile - ask if they want to use it
         setShowProfileChoicePopup(true);
         setIsLoading(false);
+        return;
+      }
+
+      // If we have extracted data from the prompt, use it directly
+      if (extractedData.age && extractedData.gender && extractedData.height && extractedData.weight && extractedData.activityLevel) {
+        // Process as natural language input (even when no existing profile)
+        await handleNaturalLanguageInput(fitnessGoal, true); // bypass profile check
         return;
       }
 
       // Validate extracted data and show specific error messages for missing fields
       const validation = validateProfileData(extractedData, fitnessGoal);
       if (!validation.isValid) {
-        setValidationError(validation.message);
+        setErrorPopupMessage(validation.message);
+        setShowErrorPopup(true);
         setIsLoading(false);
         return;
       }
 
-      // Check if this is natural language input with enough profile data
-      if (extractedData.age && extractedData.gender && extractedData.height && extractedData.weight && extractedData.activityLevel) {
-        // Process as natural language input (only when no existing profile)
-        await handleNaturalLanguageInput(fitnessGoal);
-        return;
-      }
-
-      // No profile exists - proceed with prompt and extracted data
+      // No profile exists or incomplete profile - proceed with prompt and extracted data
       await generatePlanWithProfileChoice(false, extractedData);
       
     } catch (error) {
@@ -1718,10 +1734,13 @@ const AIFitnessCoach = () => {
         return hasChanges ? updatedMealPlans : prevMealPlans;
       });
     } else if (type === 'workout') {
-      const workoutPlanMatch = response.match(/WORKOUT_PLAN:([\s\S]*?)(?=END-OF-PLAN SUGGESTION:|$)/i);
+      // Enhanced regex pattern to properly extract workout plan and stop before recommendations/suggestions
+      const workoutPlanMatch = response.match(/WORKOUT_PLAN:([\s\S]*?)(?=END-OF-PLAN SUGGESTION:|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|Note:|Important:|$)/i);
+      
       if (!workoutPlanMatch) return;
       
-      const workoutPlanRaw = workoutPlanMatch[1].trim();
+      // Clean the workout content to remove any trailing recommendation/suggestion content
+      let workoutPlanRaw = cleanWorkoutContent(workoutPlanMatch[1]);
       
       // Parse available days incrementally
       const workoutPlanLines = workoutPlanRaw.split('\n').map(line => line.trim()).filter(Boolean);
@@ -1782,7 +1801,12 @@ const AIFitnessCoach = () => {
           updatedWorkoutSections.sort((a, b) => a.dayNumber - b.dayNumber);
         }
       
-      workoutPlanLines.forEach(line => {
+      // Filter out any lines that contain recommendation/suggestion content
+      const filteredWorkoutLines = workoutPlanLines.filter(line => 
+        !isRecommendationContent(line)
+      );
+
+      filteredWorkoutLines.forEach(line => {
         // Check for exclusion messages like "Day 5:, 6, and 7 are not included"
         const exclusionMatch = line.match(/Day\s*(\d+)[:,]\s*(\d+),\s*and\s*(\d+)\s*are\s*not\s*included/i);
         if (exclusionMatch) {
@@ -1936,6 +1960,12 @@ const AIFitnessCoach = () => {
               return;
             }
             
+            // Skip if this line contains recommendation/suggestion content
+            if (isRecommendationContent(exercise)) {
+              console.log(`Skipping recommendation content in exercise: "${exercise}"`);
+              return;
+            }
+            
             // Add plain text exercise to the current day
              const dayData = updatedWorkoutSections.find(day => day.dayNumber === currentWorkoutDay);
           if (dayData) {
@@ -1991,10 +2021,29 @@ const AIFitnessCoach = () => {
     }
 
     const mealPlanMatch = cleanedResponse.match(/MEAL_PLAN:([\s\S]*?)(?=WORKOUT_PLAN:|$)/i);
-    let workoutPlanMatch = cleanedResponse.match(/WORKOUT_PLAN:([\s\S]*?)(?=END-OF-PLAN SUGGESTION:|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|$)/i);
+    
+    // Enhanced regex pattern to properly extract workout plan and stop before recommendations/suggestions
+    let workoutPlanMatch = cleanedResponse.match(/WORKOUT_PLAN:([\s\S]*?)(?=END-OF-PLAN SUGGESTION:|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|Note:|Important:|$)/i);
+    
     if (!workoutPlanMatch) {
       console.log('Trying alternate workout plan pattern');
-      workoutPlanMatch = cleanedResponse.match(/(?:WORKOUT|EXERCISE)[\s_]*PLAN:?([\s\S]*?)(?=END-OF-PLAN SUGGESTION:|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|$)/i);
+      workoutPlanMatch = cleanedResponse.match(/(?:WORKOUT|EXERCISE)[\s_]*PLAN:?([\s\S]*?)(?=END-OF-PLAN SUGGESTION:|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|Note:|Important:|$)/i);
+    }
+    
+    // Additional safeguard: if we still have issues, try to find the workout content by looking for day patterns
+    if (!workoutPlanMatch) {
+      console.log('Attempting to extract workout content by day patterns');
+      const workoutSectionMatch = cleanedResponse.match(/(WORKOUT_PLAN:|EXERCISE_PLAN:|###\s*Workout.*?)[\s\S]*?(?=END-OF-PLAN SUGGESTION:|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|Note:|Important:|$)/i);
+      if (workoutSectionMatch) {
+        // Extract just the content after the header
+        let content = workoutSectionMatch[0];
+        const headerMatch = content.match(/^(WORKOUT_PLAN:|EXERCISE_PLAN:|###\s*Workout.*?)([\s\S]*)/i);
+        if (headerMatch) {
+          workoutPlanMatch = [workoutSectionMatch[0], cleanWorkoutContent(headerMatch[2])];
+        } else {
+          workoutPlanMatch = [workoutSectionMatch[0], cleanWorkoutContent(workoutSectionMatch[0])];
+        }
+      }
     }
     
     if (!workoutPlanMatch && cleanedResponse.includes('###')) {
@@ -2003,44 +2052,16 @@ const AIFitnessCoach = () => {
       for (let i = 0; i < sections.length; i++) {
         if (sections[i].toLowerCase().includes('workout') || 
             sections[i].toLowerCase().includes('exercise')) {
-          workoutPlanMatch = {1: sections[i]};
+          // Make sure we stop before any recommendation content
+          const cleanSection = cleanWorkoutContent(sections[i]);
+          workoutPlanMatch = [sections[i], cleanSection];
           break;
         }
       }
     }
     
-    const defaultMealPlan = [];
-    for (let i = 1; i <= 7; i++) {
-      defaultMealPlan.push({
-        dayNumber: i,
-        meals: [
-          { type: 'Breakfast', calories: 0, items: [{ description: 'Oatmeal with berries - 1/2 cup', calories: 150 }, { description: 'Greek yogurt - 150g', calories: 120 }, { description: 'Almonds - 10 pieces', calories: 70 }] },
-          { type: 'Lunch', calories: 0, items: [{ description: 'Grilled chicken salad - 200g', calories: 200 }, { description: 'Whole grain bread - 1 slice', calories: 80 }, { description: 'Olive oil dressing - 1 tbsp', calories: 120 }] },
-          { type: 'Snack', calories: 0, items: [{ description: 'Apple - 1 medium', calories: 95 }, { description: 'Peanut butter - 1 tbsp', calories: 90 }, { description: 'Celery sticks - 2 pieces', calories: 15 }] },
-          { type: 'Dinner', calories: 0, items: [{ description: 'Baked salmon - 150g', calories: 200 }, { description: 'Steamed broccoli - 1 cup', calories: 55 }, { description: 'Brown rice - 1/2 cup', calories: 110 }] }
-        ]
-      });
-    }
-    
-    const defaultWorkout = [];
-    for (let i = 1; i <= 7; i++) {
-      defaultWorkout.push({
-        dayNumber: i,
-        workoutType: 'Rest Day',
-        exercises: []
-      });
-    }
-    
-    if (!mealPlanMatch) {
-      console.error('Response missing required meal plan section');
-      // Only set default data if no existing data
-      setMealPlansByDay(prevMealPlans => prevMealPlans.length > 0 ? prevMealPlans : defaultMealPlan);
-      setWorkoutSections(prevWorkouts => prevWorkouts.length > 0 ? prevWorkouts : defaultWorkout);
-      return;
-    }
-
-    const mealPlanRaw = mealPlanMatch[1].trim();
-    const workoutPlanRaw = workoutPlanMatch ? workoutPlanMatch[1].trim() : '';
+    const mealPlanRaw = mealPlanMatch ? mealPlanMatch[1].trim() : '';
+    const workoutPlanRaw = workoutPlanMatch ? cleanWorkoutContent(workoutPlanMatch[1]) : '';
     
     console.log('Extracted meal plan:', mealPlanRaw);
     console.log('Extracted workout plan:', workoutPlanRaw);
@@ -2058,7 +2079,7 @@ const AIFitnessCoach = () => {
         const line = fullResponseLines[i];
         
         // Check if we've reached the end-of-plan suggestion section
-        if (line.match(/END-OF-PLAN SUGGESTION|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively/i)) {
+        if (isRecommendationContent(line)) {
           foundEndOfPlanSuggestion = true;
           break; // Stop processing once we hit the recommendation section
         }
@@ -2072,20 +2093,29 @@ const AIFitnessCoach = () => {
         } else {
           if (!line.match(/meal|breakfast|lunch|dinner|snack/i) ||
               line.match(/day\s*\d+|exercise|workout|training/i)) {
-            workoutLines.push(line);
+            // Skip recommendation content
+            if (!isRecommendationContent(line)) {
+              workoutLines.push(line);
+            }
           }
         }
       }
       
       if (workoutLines.length > 0) {
         console.log('Found potential workout content:', workoutLines.join('\n'));
-        extractedWorkoutContent = workoutLines.join('\n');
+        extractedWorkoutContent = cleanWorkoutContent(workoutLines.join('\n'));
         if (!extractedWorkoutContent.match(/day\s*\d+|exercise|workout|training/i)) {
           console.log('Extracted content doesn\'t look like workout content, using default');
           extractedWorkoutContent = '';
         }
       }
     }
+
+    // Filter out any recommendation/suggestion content from the extracted workout content
+    const filteredWorkoutLines = extractedWorkoutContent.split('\n').filter(line => 
+      !isRecommendationContent(line)
+    );
+    extractedWorkoutContent = filteredWorkoutLines.join('\n');
 
     // Process meal plan for exactly 7 days
     const mealPlansByDay = [];
@@ -2686,17 +2716,17 @@ const AIFitnessCoach = () => {
     // Store extracted data for later use
     setExtractedProfileData(extractedData);
     
-    // Clear profileFormData to ensure natural language approach is used
+    // NEW: Set profileFormData with extracted data to ensure natural language approach works
     setProfileFormData({
-      age: '',
-      gender: '',
-      height: '',
-      currentWeight: '',
-      targetWeight: '',
-      activityLevel: '',
-      targetTimeline: '3',
-      workoutDays: '',
-      goal: ''
+      age: extractedData.age || '',
+      gender: extractedData.gender || '',
+      height: extractedData.height || '',
+      currentWeight: extractedData.weight || '',
+      targetWeight: extractedData.targetWeight?.value || extractedData.weight || '',
+      activityLevel: extractedData.activityLevel || 'moderate',
+      targetTimeline: extractedData.timelineWeeks ? Math.floor(extractedData.timelineWeeks / 4) : '3',
+      workoutDays: extractedData.frequency || '5',
+      goal: extractedData.goal || fitnessGoal || ''
     });
 
     // Check if we have enough data to calculate calories
@@ -2708,30 +2738,33 @@ const AIFitnessCoach = () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            age: parseInt(extractedData.age),
-            weight: parseFloat(extractedData.weight),
-            height: parseFloat(extractedData.height),
-            gender: extractedData.gender,
-            activityLevel: extractedData.activityLevel,
-            targetWeight: parseFloat(extractedData.targetWeight?.value || extractedData.weight),
-            timelineWeeks: parseInt(extractedData.timelineWeeks || extractedData.timeline?.value || 12),
-            goal: extractedData.goal || 'Get Fit'
+            prompt: prompt,
+            userDetails: {
+              age: parseInt(extractedData.age),
+              weight: parseFloat(extractedData.weight),
+              height: parseFloat(extractedData.height),
+              gender: extractedData.gender,
+              activityLevel: extractedData.activityLevel,
+              targetWeight: parseFloat(extractedData.targetWeight?.value || extractedData.weight),
+              timelineWeeks: parseInt(extractedData.timelineWeeks || extractedData.timeline?.value || 12),
+              healthGoals: extractedData.goal || 'Get Fit'
+            }
           })
         });
-        
+      
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
         }
-        
+      
         const calorieData = await response.json();
         setCalculatedCalories(calorieData);
         setIsLoading(false);
         setShowCalorieResults(true);
-        
+      
         // Store extracted data for later use
         setExtractedProfileData(extractedData);
-        
+      
       } catch (error) {
         console.error('Error calculating calories:', error);
         setIsLoading(false);
@@ -3575,21 +3608,7 @@ const AIFitnessCoach = () => {
             <i className="fas fa-exclamation-circle"></i> Please enter your fitness goal first
           </div>
         )}
-        {validationError && (
-          <div className="validation-error-message" style={{
-            backgroundColor: '#fee2e2',
-            border: '1px solid #fecaca',
-            color: '#dc2626',
-            padding: '12px 16px',
-            borderRadius: '8px',
-            marginTop: '10px',
-            fontSize: '14px',
-            lineHeight: '1.5'
-          }}>
-            <i className="fas fa-exclamation-triangle" style={{ marginRight: '8px' }}></i>
-            {validationError}
-          </div>
-        )}
+       
         {!hidePopularGoals() && (
           <div className="suggestions-container">
            
@@ -4792,133 +4811,52 @@ const AIFitnessCoach = () => {
           justifyContent: 'center',
           zIndex: 10000
         }}>
-          <div className="popup-content" style={{
-            backgroundColor: 'white',
-            padding: '40px',
-            borderRadius: '20px',
-            maxWidth: '500px',
-            width: '90%',
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)',
-            textAlign: 'center'
-          }}>
-            <h2 style={{ marginBottom: '20px', color: '#333', fontSize: '24px', fontWeight: '600' }}>
-              Your Daily Calorie Target
-            </h2>
+          <div className="popup-content">
+            <h2>Your Daily Calorie Target</h2>
             
-            <div style={{ 
-              marginBottom: '30px', 
-              padding: '25px', 
-              backgroundColor: '#f8f9fa', 
-              borderRadius: '15px',
-              border: '2px solid #e5e7eb',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
-            }}>
-              <div style={{ 
-                fontSize: '56px', 
-                fontWeight: 'bold', 
-                color: '#7c3aed', 
-                marginBottom: '8px',
-                lineHeight: '1'
-              }}>
+            <div className="calorie-target-container">
+              <div className="calorie-target-value">
                 {calculatedCalories.targetCalories}
               </div>
-              <div style={{ 
-                fontSize: '20px', 
-                color: '#666',
-                marginBottom: '8px',
-                fontWeight: '500'
-              }}>
+              <div className="calorie-target-label">
                 calories per day
               </div>
-              <div style={{ 
-                fontSize: '16px', 
-                color: '#888',
-                fontWeight: '400'
-              }}>
+              <div className="calorie-tdee-info">
                 TDEE: {calculatedCalories.tdee} calories
               </div>
               
               {/* Know More Links */}
-              <div style={{ 
-                marginTop: '8px',
-                display: 'flex',
-                gap: '8px',
-                justifyContent: 'center',
-                alignItems: 'center',
-                fontSize: '12px'
-              }}>
+              <div className="calorie-links-container">
                 <button 
                   onClick={() => navigate('/details?type=tdee')}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#4E3580',
-                    fontSize: '12px',
-                    textDecoration: 'underline',
-                    cursor: 'pointer',
-                    padding: '2px 4px',
-                    margin: 0,
-                    lineHeight: '1.2',
-                    whiteSpace: 'nowrap'
-                  }}
+                  className="calorie-link-button"
                 >
                   know more about TDEE
                 </button>
-                <span style={{ color: '#ccc', fontSize: '12px' }}>|</span>
+                <span className="calorie-link-separator">|</span>
                 <button 
                   onClick={() => navigate('/details?type=calories')}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#4E3580',
-                    fontSize: '12px',
-                    textDecoration: 'underline',
-                    cursor: 'pointer',
-                    padding: '2px 4px',
-                    margin: 0,
-                    lineHeight: '1.2',
-                    whiteSpace: 'nowrap'
-                  }}
+                  className="calorie-link-button"
                 >
                   know more about calorie calculation
                 </button>
               </div>
             </div>
             
-            <p style={{ marginBottom: '30px', color: '#666', fontSize: '16px', lineHeight: '1.5' }}>
+            <p className="calorie-info-text">
               Based on your profile, you need to consume {calculatedCalories.targetCalories} calories per day to achieve your {profileFormData.goal} goal.
             </p>
             
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+            <div className="calorie-popup-buttons">
               <button 
                 onClick={() => handleMealPlanChoice(false)}
-                style={{
-                  padding: '10px 24px',
-                  borderRadius: '8px',
-                  backgroundColor: '#e8e8e8',
-                  color: '#666',
-                  border: 'none',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  minWidth: '100px'
-                }}
+                className="calorie-popup-button cancel"
               >
                 No, Thanks
               </button>
               <button 
                 onClick={() => handleMealPlanChoice(true)}
-                style={{
-                  padding: '10px 24px',
-                  border: 'none',
-                  borderRadius: '8px',
-                  backgroundColor: '#7c3aed',
-                  color: 'white',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  minWidth: '120px'
-                }}
+                className="calorie-popup-button generate"
               >
                 Generate Meal Plan
               </button>

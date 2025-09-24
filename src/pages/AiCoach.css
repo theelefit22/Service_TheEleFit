@@ -2,7 +2,8 @@
 .ai-coach-container {
     display: flex;
     flex-direction: column;
-    padding: 32px 16px;
+    padding: 20px 16px;
+  min-height: 100vh;
     min-height: 100vh;
     align-items: center;
     width: 100% !important;
@@ -5372,10 +5373,287 @@ Fix background decorative elements
 
 .suggestion-content {
   color: #000000;
-  font-size: 14px;
-  line-height: 1.5;
+}
+
+/* Add responsive styles for the calorie results popup */
+.calorie-results-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.calorie-results-popup .popup-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 20px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.calorie-results-popup h2 {
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.calorie-target-container {
+  margin-bottom: 30px;
+  padding: 25px;
+  background-color: #f8f9fa;
+  border-radius: 15px;
+  border: 2px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+.calorie-target-value {
+  font-size: 56px;
+  font-weight: bold;
+  color: #7c3aed;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.calorie-target-label {
+  font-size: 20px;
+  color: #666;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.calorie-tdee-info {
+  font-size: 16px;
+  color: #888;
   font-weight: 400;
   margin: 0;
+  line-height: 1.5;
+}
+
+.calorie-links-container {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.calorie-link-button {
+  background: none;
+  border: none;
+  color: #4E3580;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 2px 4px;
+  margin: 0;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.calorie-link-separator {
+  color: #ccc;
+  font-size: 12px;
+}
+
+.calorie-info-text {
+  margin-bottom: 30px;
+  color: #666;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.calorie-popup-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.calorie-popup-button {
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 100px;
+  border: none;
+}
+
+.calorie-popup-button.cancel {
+  background-color: #e8e8e8;
+  color: #666;
+}
+
+.calorie-popup-button.generate {
+  background-color: #7c3aed;
+  color: white;
+}
+
+/* Responsive styles for calorie results popup */
+@media (max-width: 768px) {
+  .calorie-results-popup {
+    padding: 15px;
+  }
+  
+  .calorie-results-popup .popup-content {
+    padding: 25px 20px;
+    max-width: 95%;
+    border-radius: 16px;
+  }
+  
+  .calorie-target-container {
+    padding: 20px 15px;
+  }
+  
+  .calorie-target-value {
+    font-size: 48px;
+  }
+  
+  .calorie-target-label {
+    font-size: 18px;
+  }
+  
+  .calorie-tdee-info {
+    font-size: 14px;
+  }
+  
+  .calorie-info-text {
+    font-size: 15px;
+    margin-bottom: 25px;
+  }
+  
+  .calorie-popup-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .calorie-popup-button {
+    width: 100%;
+    min-width: unset;
+    padding: 12px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .calorie-results-popup {
+    padding: 10px;
+  }
+  
+  .calorie-results-popup .popup-content {
+    padding: 20px 15px;
+    border-radius: 12px;
+  }
+  
+  .calorie-results-popup h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+  
+  .calorie-target-container {
+    padding: 15px 12px;
+    margin-bottom: 20px;
+  }
+  
+  .calorie-target-value {
+    font-size: 36px;
+    margin-bottom: 6px;
+  }
+  
+  .calorie-target-label {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+  
+  .calorie-tdee-info {
+    font-size: 13px;
+  }
+  
+  .calorie-links-container {
+    gap: 4px;
+    font-size: 11px;
+  }
+  
+  .calorie-link-button {
+    font-size: 11px;
+    padding: 1px 2px;
+  }
+  
+  .calorie-link-separator {
+    font-size: 11px;
+  }
+  
+  .calorie-info-text {
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.4;
+  }
+  
+  .calorie-popup-buttons {
+    gap: 8px;
+  }
+  
+  .calorie-popup-button {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 350px) {
+  .calorie-results-popup {
+    padding: 5px;
+  }
+  
+  .calorie-results-popup .popup-content {
+    padding: 15px 10px;
+  }
+  
+  .calorie-results-popup h2 {
+    font-size: 18px;
+  }
+  
+  .calorie-target-value {
+    font-size: 32px;
+  }
+  
+  .calorie-target-label {
+    font-size: 14px;
+  }
+  
+  .calorie-tdee-info {
+    font-size: 12px;
+  }
+  
+  .calorie-link-button {
+    font-size: 10px;
+  }
+  
+  .calorie-link-separator {
+    font-size: 10px;
+  }
+  
+  .calorie-info-text {
+    font-size: 13px;
+  }
+  
+  .calorie-popup-button {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
 }
 
 /* Explanation Sections */
