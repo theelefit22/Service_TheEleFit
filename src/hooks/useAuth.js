@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { auth, getUserType } from '../services/firebase';
+import { auth, getUserType, restoreUserSessionAfterPhoneVerification } from '../services/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
 export const useAuth = () => {
@@ -14,6 +14,48 @@ export const useAuth = () => {
         console.log('🔐 useAuth: Auth state changed, user:', currentUser ? 'authenticated' : 'not authenticated');
         console.log('🔐 useAuth: Current user details:', currentUser ? { email: currentUser.email, uid: currentUser.uid } : null);
         
+        // Check for original user session restoration after phone verification
+        if (!currentUser) {
+          const originalUserSession = localStorage.getItem('originalUserSession');
+          if (originalUserSession) {
+            try {
+              const sessionData = JSON.parse(originalUserSession);
+              const sessionAge = Date.now() - sessionData.timestamp;
+              const maxAge = 5 * 60 * 1000; // 5 minutes
+              
+              if (sessionAge < maxAge) {
+                console.log('🔐 useAuth: Original user session found after phone verification');
+                console.log('🔐 useAuth: Restoring user session:', { email: sessionData.email, uid: sessionData.uid });
+                
+                // Restore the user session
+                setUser({ email: sessionData.email, uid: sessionData.uid });
+                setIsAuthenticated(true);
+                
+                // Get user type from Firestore
+                try {
+                  const type = await getUserType(sessionData.uid);
+                  setUserType(type);
+                  console.log('🔐 useAuth: User type restored:', type);
+                } catch (error) {
+                  console.error('Error getting user type after phone verification:', error);
+                  setUserType(null);
+                }
+                
+                // Clear the session data
+                localStorage.removeItem('originalUserSession');
+                return;
+              } else {
+                // Session expired, remove it
+                localStorage.removeItem('originalUserSession');
+                console.log('🔐 useAuth: Original user session expired, removed');
+              }
+            } catch (error) {
+              console.error('Error parsing original user session:', error);
+              localStorage.removeItem('originalUserSession');
+            }
+          }
+        }
+
         // Always check for verified customer session first
         const verifiedSession = localStorage.getItem('verifiedCustomerSession');
         console.log('🔐 useAuth: Checking verified session:', verifiedSession ? 'exists' : 'null');
@@ -125,6 +167,8 @@ export const useAuth = () => {
       
       // Clear all local storage items related to authentication
       localStorage.removeItem('verifiedCustomerSession');
+      localStorage.removeItem('phoneVerificationSession');
+      localStorage.removeItem('originalUserSession');
       localStorage.removeItem('shopifyCustomerEmail');
       localStorage.removeItem('shopifyCustomerId');
       localStorage.removeItem('shopify_email');

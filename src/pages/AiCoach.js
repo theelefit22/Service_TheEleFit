@@ -80,6 +80,8 @@ const AIFitnessCoach = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState('');
+  const [showWeightValidationPopup, setShowWeightValidationPopup] = useState(false);
+  const [weightValidationData, setWeightValidationData] = useState(null);
   
   // New states for the enhanced flow
   const [showProfileForm, setShowProfileForm] = useState(false);
@@ -335,7 +337,7 @@ const AIFitnessCoach = () => {
   };
 
   const getApiUrl = (endpoint = 'chat') => {
-    return `http://127.0.0.1:5002/${endpoint}`;
+    return `http://localhost:5002/${endpoint}`;
  
   };
 
@@ -509,6 +511,44 @@ const AIFitnessCoach = () => {
     let errorMessage = `Missing: ${missingWithExamples.join(', ')}`;
 
     return { isValid: false, message: errorMessage, missingFields, suggestions };
+  };
+
+  // Weight validation function to check if current weight equals target weight
+  const validateWeightValues = (currentWeight, targetWeight) => {
+    const current = parseFloat(currentWeight);
+    const target = parseFloat(targetWeight);
+    
+    // Check if weights are valid numbers
+    if (isNaN(current) || isNaN(target)) {
+      return { isValid: true }; // Let other validation handle invalid numbers
+    }
+    
+    // Check if current weight equals target weight (with small tolerance for floating point)
+    if (Math.abs(current - target) < 0.1) {
+      return {
+        isValid: false,
+        showPopup: true,
+        currentWeight: current,
+        targetWeight: target
+      };
+    }
+    
+    return { isValid: true };
+  };
+
+  // Function to handle weight validation popup confirmation
+  const handleWeightValidationConfirm = () => {
+    setShowWeightValidationPopup(false);
+    // Continue with the original submission process
+    if (weightValidationData && weightValidationData.continueSubmission) {
+      weightValidationData.continueSubmission();
+    }
+  };
+
+  // Function to handle weight validation popup cancellation
+  const handleWeightValidationCancel = () => {
+    setShowWeightValidationPopup(false);
+    setWeightValidationData(null);
   };
 
   
@@ -743,6 +783,7 @@ const AIFitnessCoach = () => {
       if (!auth.currentUser) {
           setErrorPopupMessage('Please log in to get personalized recommendations.');
          setShowErrorPopup(true);
+         setTimeout(() => setShowErrorPopup(false), 5000);
         setIsLoading(false);
         return;
       }
@@ -751,16 +792,24 @@ const AIFitnessCoach = () => {
       const extractedData = extractProfileData(fitnessGoal);
       setExtractedProfileData(extractedData);
 
-      // NEW: Check if we have extracted data from the prompt - this should take priority
-      if (extractedData.age && extractedData.gender && extractedData.height && extractedData.weight && extractedData.activityLevel) {
-        // Process as natural language input (even when no existing profile)
-        console.log('Processing with extracted data from prompt:', extractedData);
-        await handleNaturalLanguageInput(fitnessGoal, true); // bypass profile check
-        return;
-      }
-
       // Check user profile status
       const { hasProfile, hasCompleteProfile, profileData } = await checkUserProfile(auth.currentUser.uid);
+
+      // NEW: Check if we have extracted data from the prompt AND user has existing profile
+      if (extractedData.age && extractedData.gender && extractedData.height && extractedData.weight && extractedData.activityLevel) {
+        // If user has a complete profile, ask if they want to use it
+        if (hasCompleteProfile) {
+          // User has complete profile - ask if they want to use it
+          setShowProfileChoicePopup(true);
+          setIsLoading(false);
+          return;
+        } else {
+          // No existing profile, process as natural language input
+          console.log('Processing with extracted data from prompt:', extractedData);
+          await handleNaturalLanguageInput(fitnessGoal, true); // bypass profile check
+          return;
+        }
+      }
 
       // If user has a complete profile, ask if they want to use it
       if (hasCompleteProfile) {
@@ -770,18 +819,12 @@ const AIFitnessCoach = () => {
         return;
       }
 
-      // If we have extracted data from the prompt, use it directly
-      if (extractedData.age && extractedData.gender && extractedData.height && extractedData.weight && extractedData.activityLevel) {
-        // Process as natural language input (even when no existing profile)
-        await handleNaturalLanguageInput(fitnessGoal, true); // bypass profile check
-        return;
-      }
-
       // Validate extracted data and show specific error messages for missing fields
       const validation = validateProfileData(extractedData, fitnessGoal);
       if (!validation.isValid) {
         setErrorPopupMessage(validation.message);
         setShowErrorPopup(true);
+        setTimeout(() => setShowErrorPopup(false), 5000);
         setIsLoading(false);
         return;
       }
@@ -861,7 +904,7 @@ const AIFitnessCoach = () => {
           setIsLoading(false);
           let errorMessage = 'Failed to calculate calories. ';
           if (error.message.includes('Failed to fetch')) {
-            errorMessage += 'Make sure the backend server is running on http://localhost:5002';
+            errorMessage += 'Make sure the backend server is running on ';
           } else {
             errorMessage += 'Please try again.';
           }
@@ -874,7 +917,7 @@ const AIFitnessCoach = () => {
         const validation = validateProfileData(extractedData, fitnessGoal);
         setErrorPopupMessage(validation.message);
         setShowErrorPopup(true);
-        setTimeout(() => setShowErrorPopup(false), 8000);
+        setTimeout(() => setShowErrorPopup(false), 5000);
       }
     }
   };
@@ -950,8 +993,29 @@ const AIFitnessCoach = () => {
       return;
     }
 
+    // Validate weight values - check if current weight equals target weight
+    const weightValidation = validateWeightValues(profileFormData.currentWeight, profileFormData.targetWeight);
+    if (!weightValidation.isValid && weightValidation.showPopup) {
+      setWeightValidationData({
+        currentWeight: weightValidation.currentWeight,
+        targetWeight: weightValidation.targetWeight,
+        continueSubmission: async () => {
     setShowProfileForm(false);
     setIsLoading(true);
+          await submitProfileFormData();
+        }
+      });
+      setShowWeightValidationPopup(true);
+      return;
+    }
+
+    setShowProfileForm(false);
+    setIsLoading(true);
+    await submitProfileFormData();
+  };
+
+  // Extract the actual submission logic into a separate function
+  const submitProfileFormData = async () => {
 
     try {
       // Calculate calories using backend
@@ -994,7 +1058,7 @@ const AIFitnessCoach = () => {
       // More specific error messages
       let errorMessage = 'Failed to calculate calories. ';
       if (error.message.includes('Failed to fetch')) {
-        errorMessage += 'Make sure the backend server is running on http://localhost:5002';
+        errorMessage += 'Make sure the backend server is running';
       } else {
         errorMessage += 'Please try again.';
       }
@@ -2680,7 +2744,7 @@ const AIFitnessCoach = () => {
     setShowProfileForm(false);
     
     // First check if user has profile data (unless bypassed)
-    if (!bypassProfileCheck && auth.currentUser) {
+    if (auth.currentUser) {
       try {
         const userRef = doc(db, 'users', auth.currentUser.uid);
         const userDoc = await getDoc(userRef);
@@ -2689,10 +2753,14 @@ const AIFitnessCoach = () => {
           const userData = userDoc.data();
           // Check if user has complete profile data
           if (userData.age && userData.gender && userData.height && userData.weight && userData.activityLevel) {
-            // User has profile - show "use profile" popup
+            // User has profile - show "use profile" popup unless explicitly bypassed
+            if (!bypassProfileCheck) {
+              setUserProfileData(userData);
+              setShowProfileChoicePopup(true);
+              return;
+            }
+            // If bypassed, we still want to set the user profile data for later use
             setUserProfileData(userData);
-            setShowProfileChoicePopup(true);
-            return;
           }
         }
       } catch (error) {
@@ -2731,8 +2799,38 @@ const AIFitnessCoach = () => {
 
     // Check if we have enough data to calculate calories
     if (extractedData.age && extractedData.gender && extractedData.height && extractedData.weight && extractedData.activityLevel) {
+      // Validate weight values - check if current weight equals target weight
+      const currentWeight = extractedData.weight;
+      const targetWeight = extractedData.targetWeight?.value || extractedData.weight;
+      const weightValidation = validateWeightValues(currentWeight, targetWeight);
+      
+      if (!weightValidation.isValid && weightValidation.showPopup) {
+        setWeightValidationData({
+          currentWeight: weightValidation.currentWeight,
+          targetWeight: weightValidation.targetWeight,
+          continueSubmission: async () => {
+            setIsLoading(true);
+            await submitNaturalLanguageData(extractedData, prompt);
+          }
+        });
+        setShowWeightValidationPopup(true);
+        return;
+      }
+      
       // Calculate calories immediately
       setIsLoading(true);
+      await submitNaturalLanguageData(extractedData, prompt);
+    } else {
+      // Not enough data, show detailed error with specific missing fields
+      const validation = validateProfileData(extractedData, fitnessGoal);
+      setErrorPopupMessage(validation.message);
+      setShowErrorPopup(true);
+      setTimeout(() => setShowErrorPopup(false), 5000);
+    }
+  };
+
+  // Extract the natural language submission logic into a separate function
+  const submitNaturalLanguageData = async (extractedData, prompt) => {
       try {
         const response = await fetch(getApiUrl('user'), {
           method: 'POST',
@@ -2770,20 +2868,13 @@ const AIFitnessCoach = () => {
         setIsLoading(false);
         let errorMessage = 'Failed to calculate calories. ';
         if (error.message.includes('Failed to fetch')) {
-          errorMessage += 'Make sure the backend server is running on http://localhost:5002';
+          errorMessage += 'Make sure the backend server is running';
         } else {
           errorMessage += 'Please try again.';
         }
         setSuccessMessage(errorMessage);
         setShowSuccessPopup(true);
         setTimeout(() => setShowSuccessPopup(false), 5000);
-      }
-    } else {
-      // Not enough data, show detailed error with specific missing fields
-      const validation = validateProfileData(extractedData, fitnessGoal);
-      setErrorPopupMessage(validation.message);
-      setShowErrorPopup(true);
-      setTimeout(() => setShowErrorPopup(false), 8000);
     }
   };
 
@@ -2808,9 +2899,29 @@ const AIFitnessCoach = () => {
       setTimeout(() => setShowSuccessPopup(false), 3000);
       return;
     }
+
+    // Validate weight values - check if current weight equals target weight
+    const weightValidation = validateWeightValues(formData.currentWeight, formData.targetWeight);
+    if (!weightValidation.isValid && weightValidation.showPopup) {
+      setWeightValidationData({
+        currentWeight: weightValidation.currentWeight,
+        targetWeight: weightValidation.targetWeight,
+        continueSubmission: async () => {
+          setIsLoading(true);
+          await submitFormData();
+        }
+      });
+      setShowWeightValidationPopup(true);
+      return;
+    }
     
     // Calculate calories first - copy exact logic from handleNaturalLanguageInput
     setIsLoading(true);
+    await submitFormData();
+  };
+
+  // Extract the actual form submission logic into a separate function
+  const submitFormData = async () => {
     
     // Debug: Log form data being sent
     console.log('=== FORM SUBMISSION DEBUG ===');
@@ -2874,7 +2985,7 @@ const AIFitnessCoach = () => {
       setIsLoading(false);
       let errorMessage = 'Failed to calculate calories. ';
       if (error.message.includes('Failed to fetch')) {
-        errorMessage += 'Make sure the backend server is running on http://localhost:5002';
+        errorMessage += 'Make sure the backend server is running';
       } else {
         errorMessage += 'Please try again.';
       }
@@ -5081,6 +5192,100 @@ const AIFitnessCoach = () => {
         }}>
           <i className="fas fa-exclamation-triangle" style={{ fontSize: '20px' }}></i>
           <span style={{ fontSize: '16px', fontWeight: '500' }}>{errorPopupMessage}</span>
+        </div>
+      )}
+
+      {/* Weight Validation Popup */}
+      {showWeightValidationPopup && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 10002
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            padding: '32px',
+            borderRadius: '16px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            maxWidth: '500px',
+            width: '90%',
+            textAlign: 'center'
+          }}>
+            <div style={{
+              fontSize: '48px',
+              color: '#f59e0b',
+              marginBottom: '16px'
+            }}>
+              <i className="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 style={{
+              fontSize: '24px',
+              fontWeight: '600',
+              color: '#1f2937',
+              marginBottom: '16px'
+            }}>
+              Weight Values Are Equal
+            </h3>
+            <p style={{
+              fontSize: '16px',
+              color: '#6b7280',
+              marginBottom: '24px',
+              lineHeight: '1.5'
+            }}>
+              Your current weight ({weightValidationData?.currentWeight} kg) and target weight ({weightValidationData?.targetWeight} kg) are the same.
+              <br /><br />
+              Do you want to proceed with generating your fitness plan anyway?
+            </p>
+            <div style={{
+              display: 'flex',
+              gap: '12px',
+              justifyContent: 'center'
+            }}>
+              <button
+                onClick={handleWeightValidationCancel}
+                style={{
+                  padding: '12px 24px',
+                  backgroundColor: '#6b7280',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseOver={(e) => e.target.style.backgroundColor = '#4b5563'}
+                onMouseOut={(e) => e.target.style.backgroundColor = '#6b7280'}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleWeightValidationConfirm}
+                style={{
+                  padding: '12px 24px',
+                  backgroundColor: '#10b981',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseOver={(e) => e.target.style.backgroundColor = '#059669'}
+                onMouseOut={(e) => e.target.style.backgroundColor = '#10b981'}
+              >
+                Yes, Proceed
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

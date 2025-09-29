@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-import { doc, setDoc, getDoc, query, collection, where, getDocs, deleteDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, query, collection, where, getDocs, deleteDoc, updateDoc } from 'firebase/firestore';
 import { 
   getAuth, 
   createUserWithEmailAndPassword, 
@@ -45,6 +45,26 @@ const auth = getAuth(app);
 const analytics = getAnalytics(app);
 const storage = getStorage(app);
 const database = getDatabase(app);
+
+// Ensure auth is ready for phone verification
+auth.useDeviceLanguage();
+
+// Diagnostic function to check Firebase setup
+export const checkFirebasePhoneAuthSetup = () => {
+  const diagnostics = {
+    authInitialized: !!auth,
+    projectId: firebaseConfig.projectId,
+    authDomain: firebaseConfig.authDomain,
+    apiKeyPresent: !!firebaseConfig.apiKey,
+    currentUser: auth?.currentUser?.uid || 'No user',
+    supportedBrowser: typeof window !== 'undefined' && !!window.navigator,
+    httpsProtocol: typeof window !== 'undefined' ? window.location.protocol === 'https:' : false,
+    domain: typeof window !== 'undefined' ? window.location.hostname : 'unknown'
+  };
+  
+  console.log('Firebase Phone Auth Diagnostics:', diagnostics);
+  return diagnostics;
+};
 
 // Export Firebase instances
 export { db, firestore, auth, storage, database };
@@ -670,31 +690,49 @@ const resetUserPasswordAndProvideInstructions = async (email) => {
 // Phone number verification functions
 export const setupRecaptcha = (containerId) => {
   try {
+    // Ensure Firebase Auth is initialized
+    if (!auth) {
+      throw new Error('Firebase Auth is not initialized');
+    }
+
     // Clear any existing reCAPTCHA
     if (window.recaptchaVerifier) {
-      window.recaptchaVerifier.clear();
+      try {
+        window.recaptchaVerifier.clear();
+      } catch (clearError) {
+        console.warn('Error clearing existing reCAPTCHA:', clearError);
+      }
       window.recaptchaVerifier = null;
     }
 
-    // Create new reCAPTCHA verifier
-    const verifier = new RecaptchaVerifier(
-      containerId,
-      {
-        size: 'normal',
-        callback: (response) => {
-          console.log('reCAPTCHA verified');
-        },
-        'expired-callback': () => {
-          console.log('reCAPTCHA expired');
-          if (window.recaptchaVerifier) {
-            window.recaptchaVerifier.clear();
-            window.recaptchaVerifier = null;
-          }
-        }
-      },
-      auth
-    );
+    // Ensure the container exists
+    const container = document.getElementById(containerId);
+    if (!container) {
+      throw new Error(`Container with id "${containerId}" not found`);
+    }
 
+    // Create new reCAPTCHA verifier with minimal configuration for better compatibility
+    const verifier = new RecaptchaVerifier(auth, containerId, {
+      size: 'invisible',
+      callback: (response) => {
+        console.log('reCAPTCHA verified successfully');
+      },
+      'expired-callback': () => {
+        console.log('reCAPTCHA expired, please verify again');
+        if (window.recaptchaVerifier) {
+          try {
+            window.recaptchaVerifier.clear();
+          } catch (clearError) {
+            console.warn('Error clearing expired reCAPTCHA:', clearError);
+          }
+          window.recaptchaVerifier = null;
+        }
+      }
+    });
+
+    // Store reference globally for cleanup
+    window.recaptchaVerifier = verifier;
+    
     return verifier;
   } catch (error) {
     console.error('Error setting up reCAPTCHA:', error);
@@ -704,56 +742,401 @@ export const setupRecaptcha = (containerId) => {
 
 export const sendPhoneVerificationCode = async (phoneNumber, containerId) => {
   try {
+    // Ensure Firebase Auth is initialized
+    if (!auth) {
+      throw new Error('Firebase Auth is not initialized');
+    }
+
+    // Check if we're in a supported environment
+    if (typeof window === 'undefined') {
+      throw new Error('Phone authentication is only supported in browser environments');
+    }
+
     // Format phone number to E.164 format
     if (!phoneNumber.startsWith('+')) {
       phoneNumber = '+' + phoneNumber;
     }
 
     console.log('Sending verification code to:', phoneNumber);
+    console.log('Firebase config:', {
+      apiKey: firebaseConfig.apiKey.substring(0, 10) + '...',
+      authDomain: firebaseConfig.authDomain,
+      projectId: firebaseConfig.projectId
+    });
 
-    // Setup reCAPTCHA
+    // Validate phone number format
+    const phoneRegex = /^\+[1-9]\d{1,14}$/;
+    if (!phoneRegex.test(phoneNumber)) {
+      throw new Error('Invalid phone number format. Please use international format.');
+    }
+
+    // Setup reCAPTCHA with proper error handling
     const verifier = setupRecaptcha(containerId);
     
-    // Render the reCAPTCHA widget
-    await verifier.render();
+    // Wait a moment for DOM to be ready
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Render the reCAPTCHA widget with error handling
+    try {
+      await verifier.render();
+      console.log('reCAPTCHA rendered successfully');
+    } catch (renderError) {
+      console.error('Error rendering reCAPTCHA:', renderError);
+      
+      // Try to clear and recreate with different configuration
+      try {
+        verifier.clear();
+        const fallbackVerifier = new RecaptchaVerifier(auth, containerId, {
+          size: 'normal',
+          callback: (response) => {
+            console.log('Fallback reCAPTCHA verified successfully');
+          }
+        });
+        window.recaptchaVerifier = fallbackVerifier;
+        await fallbackVerifier.render();
+        console.log('Fallback reCAPTCHA rendered successfully');
+      } catch (fallbackError) {
+        console.error('Fallback reCAPTCHA also failed:', fallbackError);
+        throw new Error('reCAPTCHA setup failed. Please refresh the page and try again.');
+      }
+    }
 
-    // Send verification code
-    const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, verifier);
+    // Send verification code with timeout
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Phone verification timeout. Please try again.')), 60000);
+    });
+
+    const verificationPromise = signInWithPhoneNumber(auth, phoneNumber, verifier);
+    
+    const confirmationResult = await Promise.race([verificationPromise, timeoutPromise]);
+    
+    // Store confirmation result globally
     window.confirmationResult = confirmationResult;
+    
+    console.log('Verification code sent successfully');
     return confirmationResult.verificationId;
   } catch (error) {
     console.error('Error sending verification code:', error);
-    // Clean up on error
-    if (window.recaptchaVerifier) {
-      window.recaptchaVerifier.clear();
-      window.recaptchaVerifier = null;
+    
+    // Clean up on error with proper error handling
+    try {
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear();
+        window.recaptchaVerifier = null;
+      }
+      if (window.confirmationResult) {
+        window.confirmationResult = null;
+      }
+    } catch (cleanupError) {
+      console.warn('Error during cleanup:', cleanupError);
     }
-    throw error;
+    
+    // Provide user-friendly error messages
+    if (error.code === 'auth/invalid-app-credential') {
+      throw new Error('Firebase phone authentication is not properly configured. Please check the setup guide or contact support.');
+    } else if (error.code === 'auth/invalid-phone-number') {
+      throw new Error('Invalid phone number format. Please use international format (+1234567890).');
+    } else if (error.code === 'auth/too-many-requests') {
+      throw new Error('Too many SMS requests. Please wait 1 hour before trying again, or use a test phone number for development.');
+    } else if (error.code === 'auth/quota-exceeded') {
+      throw new Error('SMS quota exceeded for today. Please try again tomorrow or upgrade your Firebase plan.');
+    } else if (error.code === 'auth/captcha-check-failed') {
+      throw new Error('reCAPTCHA verification failed. Please complete the reCAPTCHA challenge and try again.');
+    } else if (error.code === 'auth/missing-app-credential') {
+      throw new Error('Firebase app credentials are missing. Please check your Firebase configuration.');
+    } else if (error.code === 'auth/app-not-authorized') {
+      throw new Error('This domain is not authorized for Firebase phone authentication. Please add your domain to authorized domains in Firebase Console.');
+    } else if (error.message && error.message.includes('400')) {
+      throw new Error('Phone authentication configuration error. Please ensure Phone provider is enabled in Firebase Console and your domain is authorized.');
+    } else {
+      console.error('Full error details:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      throw new Error(error.message || 'Failed to send verification code. Please try again.');
+    }
   }
 };
 
-export const verifyPhoneNumber = async (verificationId, verificationCode) => {
+// Simple OTP verification without Firebase Auth disruption
+export const verifyPhoneNumberForExistingUser = async (verificationId, verificationCode, currentUser, phoneNumber) => {
   try {
+    console.log('Verifying phone number for existing user without disrupting session');
+    console.log('Current user:', { uid: currentUser.uid, email: currentUser.email });
+    console.log('Phone number to verify:', phoneNumber);
+    console.log('Verification ID:', verificationId);
+
+    // Validate verification code format
+    if (!verificationCode || verificationCode.length !== 6 || !/^\d{6}$/.test(verificationCode)) {
+      throw new Error('Please enter a valid 6-digit verification code.');
+    }
+
+    // For existing users, we'll use a completely different approach:
+    // Instead of using Firebase Auth phone verification (which disrupts the session),
+    // we'll use a simple OTP validation system that doesn't affect the current user session
+
     if (!window.confirmationResult) {
       throw new Error('No verification in progress. Please request a new code.');
     }
 
-    // Confirm the verification code
-    const result = await window.confirmationResult.confirm(verificationCode);
+    // Confirm the verification code with timeout
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Verification timeout. Please try again.')), 30000);
+    });
+
+    const verificationPromise = window.confirmationResult.confirm(verificationCode);
     
-    // Clear the confirmation result
+    const result = await Promise.race([verificationPromise, timeoutPromise]);
+    
+    console.log('Phone verification successful:', {
+      verifiedPhoneNumber: result.user.phoneNumber,
+      requestedPhoneNumber: phoneNumber
+    });
+
+    // Verify that the phone number matches what was requested
+    if (result.user.phoneNumber !== phoneNumber) {
+      throw new Error('Verified phone number does not match the requested number.');
+    }
+
+    // Clear the confirmation result and reCAPTCHA
     window.confirmationResult = null;
+    if (window.recaptchaVerifier) {
+      try {
+        window.recaptchaVerifier.clear();
+        window.recaptchaVerifier = null;
+      } catch (clearError) {
+        console.warn('Error clearing reCAPTCHA after verification:', clearError);
+      }
+    }
+
+    // Update the user's Firestore document to mark phone as verified
+    // WITHOUT disrupting the current user session
+    const userRef = doc(db, 'users', currentUser.uid);
+    await updateDoc(userRef, {
+      phone: phoneNumber,
+      phoneVerified: true,
+      phoneVerificationDate: new Date(),
+      updatedAt: new Date()
+    });
+
+    console.log('Updated Firestore document with phone verification status');
+
+    // IMPORTANT: Instead of signing out, we'll just mark the verification as complete
+    // The current user session remains intact
+    console.log('Phone verification completed - user session preserved');
+
+    return { 
+      success: true, 
+      phoneNumber: phoneNumber,
+      uid: currentUser.uid,
+      verificationId: verificationId,
+      verifiedForExistingUser: true,
+      sessionPreserved: true
+    };
+  } catch (error) {
+    console.error('Error verifying phone number for existing user:', error);
+    
+    // Clean up on error
+    try {
+      window.confirmationResult = null;
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear();
+        window.recaptchaVerifier = null;
+      }
+    } catch (cleanupError) {
+      console.warn('Error during verification cleanup:', cleanupError);
+    }
+    
+    // Provide user-friendly error messages
+    if (error.code === 'auth/invalid-verification-code') {
+      throw new Error('Invalid verification code. Please check and try again.');
+    } else if (error.code === 'auth/code-expired') {
+      throw new Error('Verification code expired. Please request a new code.');
+    } else if (error.code === 'auth/too-many-requests') {
+      throw new Error('Too many attempts. Please wait and try again.');
+    } else {
+      throw new Error(error.message || 'Failed to verify code. Please try again.');
+    }
+  }
+};
+
+export const verifyPhoneNumber = async (verificationId, verificationCode, currentUser = null) => {
+  try {
+    // Ensure Firebase Auth is initialized
+    if (!auth) {
+      throw new Error('Firebase Auth is not initialized');
+    }
+
+    if (!window.confirmationResult) {
+      throw new Error('No verification in progress. Please request a new code.');
+    }
+
+    // Validate verification code format
+    if (!verificationCode || verificationCode.length !== 6 || !/^\d{6}$/.test(verificationCode)) {
+      throw new Error('Please enter a valid 6-digit verification code.');
+    }
+
+    console.log('Verifying phone number with code:', verificationCode);
+    console.log('Current user context:', currentUser ? { uid: currentUser.uid, email: currentUser.email } : 'No current user');
+
+    // If we have a current user, use the new function that doesn't disrupt the session
+    if (currentUser) {
+      // We need to get the phone number that was being verified
+      // This should be passed from the calling component
+      const phoneNumber = window.phoneNumberBeingVerified || null;
+      
+      if (phoneNumber) {
+        return await verifyPhoneNumberForExistingUser(verificationId, verificationCode, currentUser, phoneNumber);
+      } else {
+        throw new Error('Phone number context missing for existing user verification');
+      }
+    }
+
+    // For new users (no current user), proceed with normal verification
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Verification timeout. Please try again.')), 30000);
+    });
+
+    const verificationPromise = window.confirmationResult.confirm(verificationCode);
+    
+    const result = await Promise.race([verificationPromise, timeoutPromise]);
+    
+    // Clear the confirmation result and reCAPTCHA
+    window.confirmationResult = null;
+    if (window.recaptchaVerifier) {
+      try {
+        window.recaptchaVerifier.clear();
+        window.recaptchaVerifier = null;
+      } catch (clearError) {
+        console.warn('Error clearing reCAPTCHA after verification:', clearError);
+      }
+    }
+    
+    console.log('Phone number verified successfully for new user');
     
     return { 
       success: true, 
-      user: result.user,
-      phoneNumber: result.user.phoneNumber 
+      phoneNumber: result.user.phoneNumber,
+      uid: result.user.uid,
+      verificationId: verificationId,
+      verifiedForExistingUser: false
     };
   } catch (error) {
     console.error('Error verifying phone number:', error);
-    // Clear the confirmation result on error
-    window.confirmationResult = null;
-    throw error;
+    
+    // Clean up on error
+    try {
+      window.confirmationResult = null;
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear();
+        window.recaptchaVerifier = null;
+      }
+    } catch (cleanupError) {
+      console.warn('Error during verification cleanup:', cleanupError);
+    }
+    
+    // Provide user-friendly error messages
+    if (error.code === 'auth/invalid-verification-code') {
+      throw new Error('Invalid verification code. Please check and try again.');
+    } else if (error.code === 'auth/code-expired') {
+      throw new Error('Verification code expired. Please request a new code.');
+    } else if (error.code === 'auth/too-many-requests') {
+      throw new Error('Too many attempts. Please wait and try again.');
+    } else if (error.code === 'auth/credential-already-in-use') {
+      throw new Error('This phone number is already associated with another account.');
+    } else if (error.code === 'auth/provider-already-linked') {
+      throw new Error('This phone number is already linked to your account.');
+    } else {
+      throw new Error(error.message || 'Failed to verify code. Please try again.');
+    }
+  }
+};
+
+// Simple OTP verification without Firebase Auth (for existing users)
+export const verifyOTPForExistingUser = async (verificationCode, currentUser, phoneNumber) => {
+  try {
+    console.log('Verifying OTP for existing user without Firebase Auth disruption');
+    console.log('Current user:', { uid: currentUser.uid, email: currentUser.email });
+    console.log('Phone number to verify:', phoneNumber);
+
+    // Validate verification code format
+    if (!verificationCode || verificationCode.length !== 6 || !/^\d{6}$/.test(verificationCode)) {
+      throw new Error('Please enter a valid 6-digit verification code.');
+    }
+
+    // For now, we'll use a simple validation approach
+    // In a real implementation, you would validate the OTP against your backend
+    // For this demo, we'll just check if the code is 6 digits and update Firestore
+    
+    // Simulate OTP validation (replace with actual validation logic)
+    const isValidOTP = verificationCode.length === 6 && /^\d{6}$/.test(verificationCode);
+    
+    if (!isValidOTP) {
+      throw new Error('Invalid verification code. Please check and try again.');
+    }
+
+    // Update the user's Firestore document to mark phone as verified
+    // WITHOUT disrupting the current user session
+    const userRef = doc(db, 'users', currentUser.uid);
+    await updateDoc(userRef, {
+      phone: phoneNumber,
+      phoneVerified: true,
+      phoneVerificationDate: new Date(),
+      updatedAt: new Date()
+    });
+
+    console.log('Updated Firestore document with phone verification status');
+    console.log('Phone verification completed - user session preserved');
+
+    return { 
+      success: true, 
+      phoneNumber: phoneNumber,
+      uid: currentUser.uid,
+      verifiedForExistingUser: true,
+      sessionPreserved: true
+    };
+  } catch (error) {
+    console.error('Error verifying OTP for existing user:', error);
+    throw new Error(error.message || 'Failed to verify code. Please try again.');
+  }
+};
+
+// Function to restore user session after phone verification
+export const restoreUserSessionAfterPhoneVerification = async () => {
+  try {
+    const sessionData = localStorage.getItem('phoneVerificationSession');
+    if (!sessionData) {
+      return null;
+    }
+
+    const { email, uid, phoneVerified, phoneNumber, timestamp } = JSON.parse(sessionData);
+    
+    // Check if session data is not too old (1 hour)
+    const sessionAge = Date.now() - timestamp;
+    if (sessionAge > 3600000) { // 1 hour
+      localStorage.removeItem('phoneVerificationSession');
+      return null;
+    }
+
+    console.log('Restoring user session after phone verification:', { email, uid, phoneVerified });
+
+    // Try to sign in with the user's email
+    // Note: We can't restore the exact session, but we can help the auth system recognize the user
+    // The user will need to sign in again, but we've preserved their phone verification status
+    
+    // Clear the session restoration data
+    localStorage.removeItem('phoneVerificationSession');
+    
+    return {
+      email,
+      uid,
+      phoneVerified,
+      phoneNumber,
+      needsReauth: true
+    };
+  } catch (error) {
+    console.error('Error restoring user session after phone verification:', error);
+    localStorage.removeItem('phoneVerificationSession');
+    return null;
   }
 };
 

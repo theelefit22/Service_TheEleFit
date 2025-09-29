@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { sendPhoneVerificationCode, verifyPhoneNumber } from '../services/firebase';
 import './PhoneVerification.css';
 
-const PhoneVerification = () => {
+const PhoneVerification = ({ currentUser = null, onVerificationComplete = null }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [verificationId, setVerificationId] = useState('');
@@ -82,11 +82,16 @@ const PhoneVerification = () => {
     setLoading(true);
 
     try {
-      const result = await verifyPhoneNumber(verificationId, verificationCode);
+      const result = await verifyPhoneNumber(verificationId, verificationCode, currentUser);
       if (result.success) {
         setIsVerified(true);
         setError('');
         alert('Phone number verified successfully!');
+        
+        // Call completion callback if provided
+        if (onVerificationComplete) {
+          onVerificationComplete(true, result);
+        }
       }
     } catch (error) {
       console.error('Error verifying code:', error);

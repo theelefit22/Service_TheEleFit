@@ -7,6 +7,7 @@ import bookingService from '../services/bookingService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ProfileImageUploader from '../components/ProfileImageUploader';
 import PhoneVerification from '../components/PhoneVerification';
+import PhoneNumberInput from '../components/PhoneNumberInput';
 import { getProfileImageURL } from '../services/storageService';
 import { useAuthContext } from '../contexts/AuthContext';
 import './UserDashboard.css';
@@ -30,6 +31,7 @@ const UserDashboard = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
+    email: '',
     phone: '',
     age: '',
     gender: '',
@@ -42,11 +44,17 @@ const UserDashboard = () => {
   });
   const [formErrors, setFormErrors] = useState({
     height: '',
-    weight: ''
+    weight: '',
+    phone: ''
   });
   const [showPhoneVerification, setShowPhoneVerification] = useState(false);
   const [phoneVerified, setPhoneVerified] = useState(false);
   const [isEvaCustomer, setIsEvaCustomer] = useState(false);
+  const [phoneVerificationStatus, setPhoneVerificationStatus] = useState({
+    isVerified: false,
+    phoneNumber: '',
+    verificationResult: null
+  });
 
   // Load user data when authentication state changes
   useEffect(() => {
@@ -61,6 +69,7 @@ const UserDashboard = () => {
             setFormData({
               firstName: data.firstName || '',
               lastName: data.lastName || '',
+              email: data.email || currentUser.email || '',
               phone: data.phone || '',
               age: data.age || '',
               gender: data.gender || '',
@@ -71,6 +80,14 @@ const UserDashboard = () => {
               dietaryRestrictions: data.dietaryRestrictions || '',
               allergies: data.allergies || ''
             });
+
+            // Load phone verification status
+            setPhoneVerificationStatus({
+              isVerified: data.phoneVerified || false,
+              phoneNumber: data.phone || '',
+              verificationResult: data.phoneVerificationResult || null
+            });
+            setPhoneVerified(data.phoneVerified || false);
 
             // Get profile image if it exists
             if (currentUser.uid) {
@@ -352,6 +369,69 @@ const UserDashboard = () => {
     }
   };
 
+  const handlePhoneChange = (phoneNumber) => {
+    setFormData(prev => ({
+      ...prev,
+      phone: phoneNumber
+    }));
+  };
+
+  const handlePhoneValidation = (validation) => {
+    setFormErrors(prev => ({
+      ...prev,
+      phone: validation.isValid ? '' : validation.error
+    }));
+  };
+
+  const handlePhoneVerificationStatus = async (verification) => {
+    // Handle phone verification status
+    console.log('Phone verification status:', verification);
+    setPhoneVerificationStatus(verification);
+    setPhoneVerified(verification.isVerified);
+    
+    // Update form data with verified phone number while preserving email
+    if (verification.isVerified && verification.phoneNumber) {
+      setFormData(prev => ({
+        ...prev,
+        phone: verification.phoneNumber
+        // Email is preserved from currentUser.email and not overwritten
+      }));
+
+      // Update local user data with verification status
+      if (currentUser && verification.verifiedForExistingUser) {
+        try {
+          // Update local user data
+          setUserData(prev => ({
+            ...prev,
+            phone: verification.phoneNumber,
+            phoneVerified: true,
+            phoneVerificationDate: new Date()
+          }));
+          
+          console.log('User phone verification status updated locally');
+          
+          // Show success message
+          setMessage({ 
+            text: 'Phone number verified successfully! Your profile has been updated.', 
+            type: 'success' 
+          });
+          
+          // Clear message after 3 seconds
+          setTimeout(() => {
+            setMessage({ text: '', type: '' });
+          }, 3000);
+          
+        } catch (error) {
+          console.error('Error updating user phone verification status:', error);
+          setMessage({ 
+            text: 'Phone verified but failed to update profile. Please refresh the page.', 
+            type: 'error' 
+          });
+        }
+      }
+    }
+  };
+
   const handleSaveProfile = async () => {
     setIsSaving(true);
     setMessage({ text: '', type: '' });
@@ -368,15 +448,40 @@ const UserDashboard = () => {
         setIsSaving(false);
         return;
       }
+
+      if (formData.phone && formErrors.phone) {
+        setIsSaving(false);
+        return;
+      }
   
+      // Sanitize phoneVerificationResult to remove UserImpl objects
+      let sanitizedVerificationResult = null;
+      if (phoneVerificationStatus.verificationResult) {
+        sanitizedVerificationResult = {
+          success: phoneVerificationStatus.verificationResult.success || false,
+          phoneNumber: phoneVerificationStatus.verificationResult.phoneNumber || '',
+          verificationId: phoneVerificationStatus.verificationResult.verificationId || '',
+          // Remove any UserImpl objects or other non-serializable data
+        };
+      }
+
       const userRef = doc(db, 'users', currentUser.uid);
       await updateDoc(userRef, {
         ...formData,
+        email: currentUser.email, // Always preserve the email from Firebase Auth
+        phoneVerified: phoneVerificationStatus.isVerified,
+        phoneVerificationResult: sanitizedVerificationResult,
         updatedAt: new Date()
       });
   
       // ✅ Update userData in state
-      setUserData({ ...userData, ...formData });
+      setUserData({ 
+        ...userData, 
+        ...formData,
+        email: currentUser.email, // Always preserve the email from Firebase Auth
+        phoneVerified: phoneVerificationStatus.isVerified,
+        phoneVerificationResult: sanitizedVerificationResult
+      });
   
       setMessage({ text: 'Profile updated successfully!', type: 'success' });
       setIsEditing(false);
@@ -457,6 +562,7 @@ const UserDashboard = () => {
                   ×
                 </button>
                 <PhoneVerification 
+                  currentUser={currentUser}
                   onVerificationComplete={handlePhoneVerification}
                 />
               </div>
@@ -580,13 +686,17 @@ const UserDashboard = () => {
                         />
                       </div>
                       <div className="form-group">
-                        <label>Phone</label>
-                        <input
-                          type="tel"
-                          name="phone"
+                        <PhoneNumberInput
                           value={formData.phone}
-                          onChange={handleInputChange}
+                          onChange={handlePhoneChange}
+                          onValidationChange={handlePhoneValidation}
+                          onVerificationChange={handlePhoneVerificationStatus}
                           placeholder="Enter phone number"
+                          disabled={isSaving}
+                          label="Phone"
+                          showVerification={true}
+                          isAlreadyVerified={phoneVerificationStatus.isVerified}
+                          currentUser={currentUser}
                         />
                       </div>
                     </div>

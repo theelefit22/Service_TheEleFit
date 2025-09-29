@@ -9,6 +9,7 @@ import bookingService from '../services/bookingService';
 import googleCalendarService from '../services/googleCalendarService';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ProfileImageUploader from '../components/ProfileImageUploader';
+import PhoneNumberInput from '../components/PhoneNumberInput';
 import { getProfileImageURL } from '../services/storageService';
 import './ExpertDashboard.css';
 import LikesStatistics from '../components/LikesStatistics';
@@ -51,6 +52,14 @@ const ExpertDashboard = () => {
     bio: '',
     phone: '',
     availability: {}
+  });
+  const [formErrors, setFormErrors] = useState({
+    phone: ''
+  });
+  const [phoneVerificationStatus, setPhoneVerificationStatus] = useState({
+    isVerified: false,
+    phoneNumber: '',
+    verificationResult: null
   });
   const [bookings, setBookings] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(false);
@@ -186,6 +195,13 @@ const ExpertDashboard = () => {
           phone: data.phone || '',
           availability: initialAvailability
         });
+
+        // Set phone verification status
+        setPhoneVerificationStatus({
+          isVerified: data.phoneVerified || false,
+          phoneNumber: data.phone || '',
+          verificationResult: data.phoneVerificationResult || null
+        });
       } else {
         // No expert profile found
         navigate('/expert-profile-setup');
@@ -219,6 +235,74 @@ const ExpertDashboard = () => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handlePhoneChange = (phoneNumber) => {
+    setFormData(prev => ({
+      ...prev,
+      phone: phoneNumber
+    }));
+  };
+
+  const handlePhoneValidation = (validation) => {
+    setFormErrors(prev => ({
+      ...prev,
+      phone: validation.isValid ? '' : validation.error
+    }));
+  };
+
+  const handlePhoneVerification = async (verification) => {
+    // Handle phone verification status
+    console.log('Phone verification status:', verification);
+    
+    // Update phone verification status
+    setPhoneVerificationStatus(verification);
+    
+    // Update form data with verified phone number while preserving email
+    if (verification.isVerified && verification.phoneNumber) {
+      setFormData(prev => ({
+        ...prev,
+        phone: verification.phoneNumber
+        // Email is preserved from currentUser.email and not overwritten
+      }));
+
+      // Update local expert data with verification status
+      if (currentUser && verification.verifiedForExistingUser) {
+        try {
+          // Update local expert data
+          setExpertData(prev => ({
+            ...prev,
+            phone: verification.phoneNumber,
+            phoneVerified: true,
+            phoneVerificationDate: new Date()
+          }));
+          
+          console.log('Expert phone verification status updated locally');
+          
+          // Show success message
+          setMessage({
+            text: 'Phone number verified successfully! Your profile has been updated.',
+            type: 'success'
+          });
+          
+          // Clear message after 3 seconds
+          setTimeout(() => {
+            setMessage(null);
+          }, 3000);
+          
+        } catch (error) {
+          console.error('Error updating expert phone verification status:', error);
+          setMessage({
+            text: 'Phone verified but failed to update profile. Please refresh the page.',
+            type: 'error'
+          });
+        }
+      }
+    }
+    
+    if (verification.isVerified) {
+      console.log('Phone number verified successfully:', verification.phoneNumber);
+    }
   };
 
   const handleAvailabilityChange = (day, hour) => {
@@ -278,6 +362,12 @@ const ExpertDashboard = () => {
   const handleSaveProfile = async () => {
     if (!currentUser) return;
     
+    // Validate phone number before saving
+    if (formData.phone && formErrors.phone) {
+      setError('Please fix phone number validation errors before saving');
+      return;
+    }
+    
     setIsSaving(true);
     setError(null);
     
@@ -320,7 +410,7 @@ const ExpertDashboard = () => {
         });
       }
       
-      // Update expert data
+      // Update expert data - always preserve email from current user
       const updatedExpertData = {
         name: formData.name,
         specialty: formData.specialty,
@@ -328,6 +418,7 @@ const ExpertDashboard = () => {
         qualifications: formData.qualifications,
         bio: formData.bio,
         phone: formData.phone,
+        email: currentUser.email, // Always preserve email from Firebase Auth
         availableSlots: availabilitySlots,
         updatedAt: new Date()
       };
@@ -701,14 +792,17 @@ const ExpertDashboard = () => {
                     
                     <div className="form-row">
                       <div className="form-group">
-                        <label htmlFor="phone">Phone Number</label>
-                        <input
-                          type="tel"
-                          id="phone"
-                          name="phone"
+                        <PhoneNumberInput
                           value={formData.phone}
-                          onChange={handleInputChange}
-                          required
+                          onChange={handlePhoneChange}
+                          onValidationChange={handlePhoneValidation}
+                          onVerificationChange={handlePhoneVerification}
+                          placeholder="Enter phone number"
+                          disabled={isSaving}
+                          label="Phone Number"
+                          showVerification={true}
+                          isAlreadyVerified={phoneVerificationStatus.isVerified}
+                          currentUser={currentUser}
                         />
                       </div>
                       
