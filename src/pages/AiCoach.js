@@ -260,9 +260,9 @@ const AIFitnessCoach = () => {
   // Load user profile data on component mount
   useEffect(() => {
     const loadUserProfile = async () => {
-      if (auth.currentUser) {
+      if (user) {
         try {
-          const userRef = doc(db, 'users', auth.currentUser.uid);
+          const userRef = doc(db, 'users', user.uid);
           const userDoc = await getDoc(userRef);
           if (userDoc.exists()) {
             const userData = userDoc.data();
@@ -337,7 +337,7 @@ const AIFitnessCoach = () => {
   };
 
   const getApiUrl = (endpoint = 'chat') => {
-    return `http://localhost:5002/${endpoint}`;
+    return `http://127.0.0.1:5002/${endpoint}`;
  
   };
 
@@ -451,11 +451,19 @@ const AIFitnessCoach = () => {
       workoutDays: data.workoutDays,
       originalPrompt: prompt
     });
+    console.log('DEBUG: Final extracted data fields:', {
+      age: data.age,
+      gender: data.gender,
+      height: data.height,
+      weight: data.weight,
+      activityLevel: data.activityLevel
+    });
     return data;
   };
 
   // Validation function to check for required fields and return specific error messages
   const validateProfileData = (extractedData, originalPrompt) => {
+    console.log('DEBUG: validateProfileData called with:', extractedData);
     const missingFields = [];
     const suggestions = [];
 
@@ -577,9 +585,9 @@ const AIFitnessCoach = () => {
   // Save profile data to Firebase
   const saveProfileData = async (data) => {
     try {
-      if (!auth.currentUser) return false;
+      if (!user) return false;
       
-      const userRef = doc(db, 'users', auth.currentUser.uid);
+      const userRef = doc(db, 'users', user.uid);
       await setDoc(userRef, {
         height: data.height,
         weight: data.weight,
@@ -649,11 +657,11 @@ const AIFitnessCoach = () => {
       setPlansComplete(true); // Plans are complete for non-streaming response
 
       // Check for profile updates - always compare extracted data with existing profile
-      if (Object.keys(extractedData).length > 0 && auth.currentUser) {
+      if (Object.keys(extractedData).length > 0 && user) {
         const changedFields = {};
         
         // Check if user has a profile
-        const userRef = doc(db, 'users', auth.currentUser.uid);
+        const userRef = doc(db, 'users', user.uid);
         const userDoc = await getDoc(userRef);
         const hasProfile = userDoc.exists() && userDoc.data().height && userDoc.data().weight;
         
@@ -746,7 +754,7 @@ const AIFitnessCoach = () => {
   };
 
   const getExistingProfileDetails = async () => {
-    const userRef = doc(db, 'users', auth.currentUser.uid);
+    const userRef = doc(db, 'users', user.uid);
     const userDoc = await getDoc(userRef);
     const userData = userDoc.data();
     
@@ -779,8 +787,8 @@ const AIFitnessCoach = () => {
     setWorkoutPlanChoice(null);
 
     try {
-      // Check if user is authenticated
-      if (!auth.currentUser) {
+      // Check if user is authenticated using the useAuth hook
+      if (!isAuthenticated || !user) {
           setErrorPopupMessage('Please log in to get personalized recommendations.');
          setShowErrorPopup(true);
          setTimeout(() => setShowErrorPopup(false), 5000);
@@ -793,7 +801,7 @@ const AIFitnessCoach = () => {
       setExtractedProfileData(extractedData);
 
       // Check user profile status
-      const { hasProfile, hasCompleteProfile, profileData } = await checkUserProfile(auth.currentUser.uid);
+      const { hasProfile, hasCompleteProfile, profileData } = await checkUserProfile(user.uid);
 
       // NEW: Check if we have extracted data from the prompt AND user has existing profile
       if (extractedData.age && extractedData.gender && extractedData.height && extractedData.weight && extractedData.activityLevel) {
@@ -924,8 +932,8 @@ const AIFitnessCoach = () => {
 
      const loadProfileDataToForm = async () => {
      try {
-       if (auth.currentUser) {
-         const userRef = doc(db, 'users', auth.currentUser.uid);
+       if (user) {
+         const userRef = doc(db, 'users', user.uid);
          const userDoc = await getDoc(userRef);
          if (userDoc.exists()) {
            const userData = userDoc.data();
@@ -949,14 +957,14 @@ const AIFitnessCoach = () => {
 
   const handleUpdateProfile = async () => {
     try {
-      if (auth.currentUser) {
+      if (user) {
         // Save only the changed fields
         const profileData = {
           ...changedProfileFields,
           updatedAt: serverTimestamp()
         };
 
-        const userRef = doc(db, 'users', auth.currentUser.uid);
+        const userRef = doc(db, 'users', user.uid);
         await setDoc(userRef, profileData, { merge: true });
         
         // Update local user profile data
@@ -1106,6 +1114,7 @@ const AIFitnessCoach = () => {
           targetCalories: calculatedCalories.targetCalories,
           dietaryRestrictions: [], // Empty array is fine now - backend handles it properly
           allergies: [], // Empty array is fine now - backend handles it properly
+          healthGoals: extractedProfileData?.healthGoals || profileFormData?.goal,
           prompt: `Generate meal plan for ${extractedProfileData?.goal || profileFormData.goal || 'fitness'} goal`
         })
       });
@@ -1545,9 +1554,9 @@ const AIFitnessCoach = () => {
   // Check for profile updates after plan generation
   const checkForProfileUpdates = async () => {
     try {
-      if (!auth.currentUser) return;
+      if (!user) return;
       
-      const userRef = doc(db, 'users', auth.currentUser.uid);
+      const userRef = doc(db, 'users', user.uid);
       const userDoc = await getDoc(userRef);
       
       if (userDoc.exists()) {
@@ -1591,9 +1600,33 @@ const AIFitnessCoach = () => {
 
   const handleCopyDefaultPrompt = async () => {
     try {
-      const defaultPrompt = `I am a [age]-year-old [gender], my height is [height] cm, weight is [weight] kg. My activity level is [activity level] (e.g., sedentary, lightly active, moderately active, very active). I usually work out [number of workout days] days per week. My target weight is [target weight] kg, and I want to achieve this goal in [target timeline] weeks/months.`;
+      let defaultPrompt = `I am a [age]-year-old [gender], my height is [height] cm, weight is [weight] kg. My activity level is [activity level] (e.g., sedentary, lightly active, moderately active, very active). I usually work out [number of workout days] days per week. My target weight is [target weight] kg, and I want to achieve this goal in [target timeline] weeks/months.`;
 
+      // If user has profile data, populate the prompt with actual values
+      if (userProfileData) {
+        const age = userProfileData.age || '[age]';
+        const gender = userProfileData.gender || '[gender]';
+        const height = userProfileData.height || '[height]';
+        const weight = userProfileData.weight || '[weight]';
+        const activityLevel = userProfileData.activityLevel || '[activity level]';
+        const workoutDays = userProfileData.workoutDays || '[number of workout days]';
+        const targetWeight = userProfileData.targetWeight || '[target weight]';
+        const timeline = userProfileData.targetTimeline || '[target timeline]';
+
+        // Only include the example text if we don't have actual activity level data
+        const activityLevelText = userProfileData.activityLevel 
+          ? `My activity level is ${activityLevel}.`
+          : `My activity level is ${activityLevel} (e.g., sedentary, lightly active, moderately active, very active).`;
+
+        defaultPrompt = `I am a ${age}-year-old ${gender}, my height is ${height} cm, weight is ${weight} kg. ${activityLevelText} I usually work out ${workoutDays} days per week. My target weight is ${targetWeight} kg, and I want to achieve this goal in ${timeline} weeks/months.`;
+      }
+
+      // Copy to clipboard
       await navigator.clipboard.writeText(defaultPrompt);
+      
+      // Automatically paste into fitness goal input field
+      setFitnessGoal(defaultPrompt);
+      
       setCopyButtonClicked(true);
       setTimeout(() => setCopyButtonClicked(false), 2000);
     } catch (error) {
@@ -1768,12 +1801,12 @@ const AIFitnessCoach = () => {
           }
         
           // Parse meal items
-          const itemMatch = line.match(/^(?:\d+\.|[\-•●])\s*(.*?)\s*—\s*(.*?)\s*—\s*(\d+)\s*(?:kcal|calories?|cal)$/i);
+          const itemMatch = line.match(/^(?:\d+\.|[\-•●])\s*(.*?)\s*[-–—]\s*(.*?)\s*[-–—]\s*(\d+)\s*(?:kcal|calories?|cal)$/i);
           if (itemMatch && currentDay && currentMealType && currentDay <= 7) {
             const itemName = itemMatch[1].trim();
             const itemQty = itemMatch[2].trim();
             const itemCalories = parseInt(itemMatch[3]) || 0;
-            const description = itemQty ? `${itemName} — ${itemQty}` : itemName;
+            const description = itemQty ? `${itemName} - ${itemQty}` : itemName;
             
             const dayData = updatedMealPlans.find(day => day.dayNumber === currentDay);
             if (dayData) {
@@ -1799,7 +1832,7 @@ const AIFitnessCoach = () => {
       });
     } else if (type === 'workout') {
       // Enhanced regex pattern to properly extract workout plan and stop before recommendations/suggestions
-      const workoutPlanMatch = response.match(/WORKOUT_PLAN:([\s\S]*?)(?=END-OF-PLAN SUGGESTION:|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|Note:|Important:|$)/i);
+      const workoutPlanMatch = response.match(/WORKOUT_PLAN:([\s\S]*?)(?=END-OF-PLAN SUGGESTION:|END-OF-PLAN SUGG:|END-OF-PLAN:|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|Note:|Important:|Remember to|Make sure to|Don't forget to|It's important to|You should|Try to|Consider|Keep in mind|months to achieve|desired results|Follow this plan consistently|for.*months|achieve your desired|your goal and following|END-OF-PLAN SUGGESTIONS|END-OF-PLAN SUGGEST|$)/i);
       
       if (!workoutPlanMatch) return;
       
@@ -1871,6 +1904,11 @@ const AIFitnessCoach = () => {
       );
 
       filteredWorkoutLines.forEach(line => {
+        // Preprocess line to fix common OCR issues
+        line = line
+          .replace(/(\d+)\s*x\s*(\d+)/g, '$1 × $2') // Only convert x to × when between numbers (multiplication)
+          .replace(/\s+/g, ' ') // Normalize whitespace
+          .trim();
         // Check for exclusion messages like "Day 5:, 6, and 7 are not included"
         const exclusionMatch = line.match(/Day\s*(\d+)[:,]\s*(\d+),\s*and\s*(\d+)\s*are\s*not\s*included/i);
         if (exclusionMatch) {
@@ -1973,17 +2011,87 @@ const AIFitnessCoach = () => {
           return;
         }
         
-          // Parse exercises using number-based approach - only process when exercise number changes
-          const exerciseNumberMatch = line.match(/^(\d+)\s*[.)]\s*(.*)/);
+          // Handle potential OCR line breaks and continuation lines
+          // Check if this line might be a continuation of the previous exercise
+          if (currentWorkoutDay && line.trim() && !line.match(/^Day\s*\d+/i) && !line.match(/^\d+\s*[.)]/)) {
+            const dayData = updatedWorkoutSections.find(day => day.dayNumber === currentWorkoutDay);
+            if (dayData && dayData.exercises.length > 0) {
+              const lastExercise = dayData.exercises[dayData.exercises.length - 1];
+              const currentLine = line.trim();
+              
+              // Check if this line looks like it should be appended to the last exercise
+              // (e.g., sets/reps that got split to a new line)
+              if (currentLine.match(/^\d+\s*[x×]\s*\d+/) || // Sets x reps format
+                  currentLine.match(/^\d+\s*[-–—]\s*\d+/) || // Sets - reps format
+                  currentLine.match(/per\s+side/i) || // "per side" text
+                  currentLine.match(/^\d+\s*reps?/i) || // Just reps
+                  currentLine.match(/^\d+\s*sets?/i)) { // Just sets
+                
+                // Append to the last exercise
+                lastExercise.description += ' ' + currentLine;
+                hasChanges = true;
+                console.log(`Appended continuation to exercise ${lastExercise.number}: ${currentLine}`);
+                return;
+              }
+            }
+          }
+          
+          // Handle orphaned numbers (like "5" appearing alone before "Dumbbell Shrugs")
+          // Skip lines that are just a single number without context
+          if (line.trim().match(/^\d+$/) && line.trim().length <= 2) {
+            console.log(`Skipping orphaned number: "${line.trim()}"`);
+            return;
+          }
+        
+          // Parse exercises using improved number-based approach with better OCR handling
+          // Handle various formats: "1. Exercise", "1 Exercise", "1) Exercise", etc.
+          const exerciseNumberMatch = line.match(/^(\d+)\s*[.)]\s*(.*)/) || 
+                                    line.match(/^(\d+)\s+(.*)/) ||
+                                    line.match(/^(\d+)\s*[-–—]\s*(.*)/);
+          
           if (currentWorkoutDay && exerciseNumberMatch) {
             const exerciseNumber = parseInt(exerciseNumberMatch[1]);
-            const exerciseText = exerciseNumberMatch[2].trim();
+            let exerciseText = exerciseNumberMatch[2].trim();
+            
+            // Clean up common OCR issues
+            exerciseText = exerciseText
+              .replace(/(\d+)\s*x\s*(\d+)/g, '$1 × $2') // Only convert x to × when between numbers (multiplication)
+              .replace(/\s+/g, ' ') // Normalize whitespace
+              .trim();
+            
+            // Only convert dashes to regular hyphen if they appear to be separators (not part of exercise name)
+            // Look for patterns like "Exercise Name - 4 x 8" or "Exercise Name — 4 x 8"
+            if (exerciseText.match(/\s+[-–—]\s+\d+\s*[x×]/)) {
+              exerciseText = exerciseText.replace(/\s+[-–—]\s+/, ' - ');
+            }
             
             console.log(`Found exercise ${exerciseNumber}: "${exerciseText}"`);
           
           // Skip if exercise is too short or incomplete (likely streaming artifact)
             if (exerciseText.length < 3) {
               console.log(`Skipping incomplete exercise: "${exerciseText}"`);
+            return;
+          }
+            
+            // Skip if this looks like a day header or recommendation content
+            if (exerciseText.toLowerCase().includes('day') && exerciseText.length < 20) {
+              console.log(`Skipping day header: "${exerciseText}"`);
+              return;
+            }
+            
+            // Skip if this is just "END-" or similar end markers
+            if (exerciseText.match(/^END[-–—]?$/i) || exerciseText.match(/^END\s*$/i)) {
+              console.log(`Skipping end marker: "${exerciseText}"`);
+              return;
+            }
+            
+            // Skip suggestion content like "Follow", "Follow this", etc.
+            if (exerciseText.match(/^Follow(\s+this)?\s*$/i) || 
+                exerciseText.match(/^Follow(\s+this)?\s*plan/i) ||
+                exerciseText.match(/^Remember\s+to/i) ||
+                exerciseText.match(/^Make\s+sure\s+to/i) ||
+                exerciseText.match(/^Don't\s+forget\s+to/i)) {
+              console.log(`Skipping suggestion content: "${exerciseText}"`);
             return;
           }
           
@@ -2012,15 +2120,49 @@ const AIFitnessCoach = () => {
             return;
           }
           
-          // Fallback: handle exercises without numbers (plain text)
+          // Fallback: handle exercises without numbers (plain text) with improved OCR handling
           if (currentWorkoutDay && /^[A-Za-z]/.test(line) && !line.match(/^Day\s*\d+/i)) {
-            const exercise = line.trim();
+            let exercise = line.trim();
+            
+            // Clean up common OCR issues in plain text exercises
+            exercise = exercise
+              .replace(/(\d+)\s*x\s*(\d+)/g, '$1 × $2') // Only convert x to × when between numbers (multiplication)
+              .replace(/\s+/g, ' ') // Normalize whitespace
+              .trim();
+            
+            // Only convert dashes to regular hyphen if they appear to be separators (not part of exercise name)
+            // Look for patterns like "Exercise Name - 4 x 8" or "Exercise Name — 4 x 8"
+            if (exercise.match(/\s+[-–—]\s+\d+\s*[x×]/)) {
+              exercise = exercise.replace(/\s+[-–—]\s+/, ' - ');
+            }
             
             console.log(`Processing plain text exercise: "${exercise}"`);
             
             // Skip if exercise is too short or incomplete
             if (exercise.length < 3) {
               console.log(`Skipping incomplete exercise: "${exercise}"`);
+              return;
+            }
+            
+            // Skip if this looks like a day header
+            if (exercise.toLowerCase().includes('day') && exercise.length < 20) {
+              console.log(`Skipping day header: "${exercise}"`);
+              return;
+            }
+            
+            // Skip if this is just "END-" or similar end markers
+            if (exercise.match(/^END[-–—]?$/i) || exercise.match(/^END\s*$/i)) {
+              console.log(`Skipping end marker: "${exercise}"`);
+              return;
+            }
+            
+            // Skip suggestion content like "Follow", "Follow this", etc.
+            if (exercise.match(/^Follow(\s+this)?\s*$/i) || 
+                exercise.match(/^Follow(\s+this)?\s*plan/i) ||
+                exercise.match(/^Remember\s+to/i) ||
+                exercise.match(/^Make\s+sure\s+to/i) ||
+                exercise.match(/^Don't\s+forget\s+to/i)) {
+              console.log(`Skipping suggestion content: "${exercise}"`);
               return;
             }
             
@@ -2087,11 +2229,11 @@ const AIFitnessCoach = () => {
     const mealPlanMatch = cleanedResponse.match(/MEAL_PLAN:([\s\S]*?)(?=WORKOUT_PLAN:|$)/i);
     
     // Enhanced regex pattern to properly extract workout plan and stop before recommendations/suggestions
-    let workoutPlanMatch = cleanedResponse.match(/WORKOUT_PLAN:([\s\S]*?)(?=END-OF-PLAN SUGGESTION:|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|Note:|Important:|$)/i);
+    let workoutPlanMatch = cleanedResponse.match(/WORKOUT_PLAN:([\s\S]*?)(?=END-OF-PLAN SUGGESTION:|END-OF-PLAN SUGG:|END-OF-PLAN:|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|Note:|Important:|Remember to|Make sure to|Don't forget to|It's important to|You should|Try to|Consider|Keep in mind|months to achieve|desired results|Follow this plan consistently|for.*months|achieve your desired|your goal and following|END-OF-PLAN SUGGESTIONS|END-OF-PLAN SUGGEST|$)/i);
     
     if (!workoutPlanMatch) {
       console.log('Trying alternate workout plan pattern');
-      workoutPlanMatch = cleanedResponse.match(/(?:WORKOUT|EXERCISE)[\s_]*PLAN:?([\s\S]*?)(?=END-OF-PLAN SUGGESTION:|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|Note:|Important:|$)/i);
+      workoutPlanMatch = cleanedResponse.match(/(?:WORKOUT|EXERCISE)[\s_]*PLAN:?([\s\S]*?)(?=END-OF-PLAN SUGGESTION:|END-OF-PLAN SUGG:|END-OF-PLAN:|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|Note:|Important:|Remember to|Make sure to|Don't forget to|It's important to|You should|Try to|Consider|Keep in mind|months to achieve|desired results|Follow this plan consistently|for.*months|achieve your desired|your goal and following|END-OF-PLAN SUGGESTIONS|END-OF-PLAN SUGGEST|$)/i);
     }
     
     // Additional safeguard: if we still have issues, try to find the workout content by looking for day patterns
@@ -2239,12 +2381,12 @@ const AIFitnessCoach = () => {
         return;
       }
 
-      const itemMatch = line.match(/^(?:\d+\.|[\-•●])\s*(.*?)\s*—\s*(.*?)\s*—\s*(\d+)\s*(?:kcal|calories?|cal)$/i);
+      const itemMatch = line.match(/^(?:\d+\.|[\-•●])\s*(.*?)\s*[-–—]\s*(.*?)\s*[-–—]\s*(\d+)\s*(?:kcal|calories?|cal)$/i);
       if (itemMatch) {
         const itemName = cleanItemText(itemMatch[1]);
         const itemQty = itemMatch[2].trim();
         const itemCalories = parseInt(itemMatch[3]) || 0;
-        const description = itemQty ? `${itemName} — ${itemQty}` : itemName;
+        const description = itemQty ? `${itemName} - ${itemQty}` : itemName;
         
         if (currentDay && currentMealType && currentDay <= 7) {
           const dayIndex = currentDay - 1;
@@ -2744,9 +2886,9 @@ const AIFitnessCoach = () => {
     setShowProfileForm(false);
     
     // First check if user has profile data (unless bypassed)
-    if (auth.currentUser) {
+    if (user) {
       try {
-        const userRef = doc(db, 'users', auth.currentUser.uid);
+        const userRef = doc(db, 'users', user.uid);
         const userDoc = await getDoc(userRef);
         
         if (userDoc.exists()) {

@@ -20,7 +20,7 @@ export const cleanWorkoutContent = (content) => {
   if (!content) return '';
   
   // Split the content and take only the part before any recommendation/suggestion keywords
-  const cleanContent = content.split(/END-OF-PLAN SUGGESTION:|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|Note:|Important:/i)[0];
+  const cleanContent = content.split(/END-OF-PLAN SUGGESTION:|END-OF-PLAN SUGG:|END-OF-PLAN:|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|Note:|Important:|Remember to|Make sure to|Don't forget to|It's important to|You should|Try to|Consider|Keep in mind|Follow this|^Follow$|months to achieve|desired results|Follow this plan consistently|for.*months|achieve your desired|your goal and following|END-OF-PLAN SUGGESTIONS|END-OF-PLAN SUGGEST/i)[0];
   
   return cleanContent.trim();
 };
@@ -31,15 +31,35 @@ export const isRecommendationContent = (line) => {
   
   const recommendationPatterns = [
     /Follow this plan/i,
+    /Follow this/i,
+    /^Follow$/i,
     /consistently.*achieve/i,
     /END-OF-PLAN SUGGESTION/i,
+    /END-OF-PLAN SUGG/i,
+    /END-OF-PLAN/i,
     /Closing Recommendation/i,
     /To achieve your goal/i,
     /To effectively/i,
     /RECOMMENDATION:/i,
     /SUGGESTION:/i,
     /Note:/i,
-    /Important:/i
+    /Important:/i,
+    /Remember to/i,
+    /Make sure to/i,
+    /Don't forget to/i,
+    /It's important to/i,
+    /You should/i,
+    /Try to/i,
+    /Consider/i,
+    /Keep in mind/i,
+    /months to achieve/i,
+    /desired results/i,
+    /Follow this plan consistently/i,
+    /for.*months/i,
+    /achieve your desired/i,
+    /your goal and following/i,
+    /END-OF-PLAN SUGGESTIONS/i,
+    /END-OF-PLAN SUGGEST/i
   ];
   
   return recommendationPatterns.some(pattern => pattern.test(line));

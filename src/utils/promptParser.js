@@ -69,6 +69,11 @@ export class PromptParser {
         
         // Weight with label
         /weight\s*[:=]?\s*(\d+(?:\.\d+)?)\s*(?:kg|lbs?)?/gi,
+        /my\s*weight\s*is\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)?/gi,
+        
+        // "weighing" patterns - enhanced
+        /weighing\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)?/gi,
+        /weigh\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)?/gi,
         
         // Standalone numbers that might be weight (context-dependent)
         // Will be handled in extractWeight logic
@@ -100,11 +105,11 @@ export class PromptParser {
       ],
       activityLevel: [
         /\b(sedentary|inactive|not\s*active|desk\s*job|office\s*work)\b/gi,
-        /\b(lightly\s*active|light\s*activity|somewhat\s*active|occasionally\s*active)\b/gi,
-        /\b(moderately\s*active|moderate\s*activity|fairly\s*active|regularly\s*active)\b/gi,
-        /\b(very\s*active|highly\s*active|extremely\s*active|very\s*fit)\b/gi,
-        /\b(extra\s*active|super\s*active|athlete|athletic)\b/gi,
-        /\b(activity\s*level\s*[:=]?\s*(sedentary|lightly\s*active|moderately\s*active|very\s*active|extra\s*active))\b/gi
+        /\b(lightly\s*active|light\s*activity|somewhat\s*active|occasionally\s*active|light)\b/gi,
+        /\b(moderately\s*active|moderate\s*activity|fairly\s*active|regularly\s*active|generally\s*active|moderate)\b/gi,
+        /\b(very\s*active|highly\s*active|extremely\s*active|very\s*fit|very)\b/gi,
+        /\b(extra\s*active|super\s*active|athlete|athletic|extra)\b/gi,
+        /\b(activity\s*level\s*[:=]?\s*(sedentary|lightly\s*active|moderately\s*active|very\s*active|extra\s*active|light|moderate|very|extra))\b/gi
       ],
       frequency: [
         /(\d+)\s*(?:times|x)\s*(?:per|a)\s*(?:week|wk)/gi,
@@ -161,8 +166,10 @@ export class PromptParser {
       ],
       timeline: [
         /in\s*(\d+)\s*(?:months?|mo|month)/gi,
+        /in\s*the\s*next\s*(\d+)\s*(?:months?|mo|month)/gi,
         /within\s*(\d+)\s*(?:months?|mo|month)/gi,
         /over\s*(\d+)\s*(?:months?|mo|month)/gi,
+        /over\s*the\s*next\s*(\d+)\s*(?:months?|mo|month)/gi,
         /(\d+)\s*(?:months?|mo|month)\s*(?:time|period|duration)/gi,
         /achieve\s*this\s*goal\s*in\s*(\d+)\s*(?:months?|mo|month)/gi,
         /want\s*to\s*achieve.*?in\s*(\d+)\s*(?:months?|mo|month)/gi,
@@ -252,15 +259,20 @@ export class PromptParser {
   }
 
   extractAge(text) {
+    console.log('DEBUG: Extracting age from text:', text);
     for (const pattern of this.patterns.age) {
       const matches = [...text.matchAll(pattern)];
+      console.log('DEBUG: Age pattern matches for pattern', pattern, ':', matches);
       for (const match of matches) {
         const age = parseInt(match[1]);
+        console.log('DEBUG: Processing age match:', match, 'age:', age);
         if (age && age >= 10 && age <= 120) {
+          console.log('DEBUG: Found valid age:', age);
           return age;
         }
       }
     }
+    console.log('DEBUG: No age found, returning null');
     return null;
   }
 
@@ -415,19 +427,32 @@ export class PromptParser {
   }
 
   extractWeight(text) {
+    console.log('DEBUG: Extracting weight from text:', text);
+    
     // First try explicit patterns with units
     for (const pattern of this.patterns.weight) {
       const matches = [...text.matchAll(pattern)];
+      console.log('DEBUG: Weight pattern matches for pattern', pattern, ':', matches);
       for (const match of matches) {
         const value = parseFloat(match[1]);
+        console.log('DEBUG: Processing weight match:', match, 'value:', value);
         if (value) {
           const fullMatch = match[0].toLowerCase();
+          console.log('DEBUG: Full match text:', fullMatch);
           
           // Check for explicit units
           if (/lbs?|pounds?|lb/.test(fullMatch)) {
+            console.log('DEBUG: Found weight in lbs, converting to kg:', value);
             return { value: this.lbsToKg(value), unit: 'kg' };
           } else if (/kg|kilos?|kilograms?/.test(fullMatch)) {
+            console.log('DEBUG: Found weight in kg:', value);
             return { value, unit: 'kg' };
+          } else if (/weighing|weigh/.test(fullMatch)) {
+            // For "weighing" patterns without explicit units, default to kg if reasonable range
+            if (value >= 30 && value <= 200) {
+              console.log('DEBUG: Found weight from weighing pattern, defaulting to kg:', value);
+              return { value, unit: 'kg' };
+            }
           }
         }
       }
@@ -634,13 +659,13 @@ export class PromptParser {
         // Map to standard activity levels
         if (activityLevel.includes('sedentary') || activityLevel.includes('inactive') || activityLevel.includes('desk job') || activityLevel.includes('office work')) {
           return 'sedentary';
-        } else if (activityLevel.includes('lightly active') || activityLevel.includes('light activity') || activityLevel.includes('somewhat active') || activityLevel.includes('occasionally active')) {
+        } else if (activityLevel.includes('lightly active') || activityLevel.includes('light activity') || activityLevel.includes('somewhat active') || activityLevel.includes('occasionally active') || activityLevel === 'light') {
           return 'lightly active';
-        } else if (activityLevel.includes('moderately active') || activityLevel.includes('moderate activity') || activityLevel.includes('fairly active') || activityLevel.includes('regularly active')) {
+        } else if (activityLevel.includes('moderately active') || activityLevel.includes('moderate activity') || activityLevel.includes('fairly active') || activityLevel.includes('regularly active') || activityLevel.includes('generally active') || activityLevel === 'moderate') {
           return 'moderately active';
-        } else if (activityLevel.includes('very active') || activityLevel.includes('highly active') || activityLevel.includes('extremely active') || activityLevel.includes('very fit')) {
+        } else if (activityLevel.includes('very active') || activityLevel.includes('highly active') || activityLevel.includes('extremely active') || activityLevel.includes('very fit') || activityLevel === 'very') {
           return 'very active';
-        } else if (activityLevel.includes('extra active') || activityLevel.includes('super active') || activityLevel.includes('athlete') || activityLevel.includes('athletic')) {
+        } else if (activityLevel.includes('extra active') || activityLevel.includes('super active') || activityLevel.includes('athlete') || activityLevel.includes('athletic') || activityLevel === 'extra') {
           return 'extra active';
         }
       }
