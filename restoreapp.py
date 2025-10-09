@@ -872,16 +872,8 @@ consider mentioning the target weight {target_weight} kg and timeline {timeline_
         def process_and_stream_day(day_text):
             # Process the day block, but preserve original formatting
             processed_day = process_single_day(day_text)
-            # Overlay processed calorie values onto original text, preserving whitespace
-            import re
-            # Find all calorie values in processed_day
-            processed_kcal = re.findall(r'(\d+) kcal', processed_day)
-            # Replace only the kcal values in the original day_text, one by one
-            def replace_kcal(match):
-                value = processed_kcal.pop(0) if processed_kcal else match.group(1)
-                return f"{value} kcal"
-            output = re.sub(r'(\d+) kcal', replace_kcal, day_text)
-            for char in output:
+            # Use the processed day directly instead of trying to overlay values
+            for char in processed_day:
                 yield char.encode("utf-8")
 
         day_count = 0
@@ -957,8 +949,11 @@ consider mentioning the target weight {target_weight} kg and timeline {timeline_
 
         print(full_text, flush=True)
 
+    print("Frontend send data:")
+    print("Response type: Streaming response (application/octet-stream)")
+    print("Content: Meal plan with 7 days of meals and calorie calculations")
+    
     return Response(stream_with_context(event_stream()), content_type="application/octet-stream")
-
 
 
 # ---------------------- PROMPT GUARD ----------------------
@@ -995,9 +990,8 @@ def workout_plan():
     goal = data.get("goal")
     workout_focus = data.get("workout_focus")
     user_prompt = data.get("prompt")
-    workout_days = data.get("workout_days")
-    target_weight = float(data.get("targetWeight"))
-    timeline_weeks = int(data.get("timelineWeeks"))
+    workout_days = data.get("workout_days")  # Get workout_days, can be null
+    
 
     print(f"DEBUG: user_prompt: {user_prompt}")
     print(f"DEBUG: workout_days is None: {workout_days is None}")
@@ -1009,27 +1003,23 @@ You are a fitness and nutrition assistant. Generate personalized workout plans.
 CORE CONSTRAINTS (unbreakable):
 - WORKOUT_PLAN: exactly 7 days. Non-active days labeled "Rest Day."
 - NEVER omit, repeat, summarize, or abbreviate any days.
-- Do NOT use vague terms like 'HIIT', 'cardio', 'circuit', 'strength', 'full body', or any other generic routines.
-- Only provide specific exercises with sets × reps.
-- If an exercise requires equipment, specify it (e.g., Dumbbell, Resistance Band, Bodyweight).
 
 WORKOUT_PLAN SPECIFICATIONS:
 1. 7 days: Day 1 to Day 7.
 2. EXACTLY {workout_days} active workout days, remaining days must be "Rest Day".
-3. Active days (~1 hr): 6–8 exercises per day.
+3. Active days (~1 hr): 6–8 exercises, each with sets × reps.
    - If ≤ 3 active days: target 2 muscle groups per session.
    - If > 3 active days: target 1 muscle group per session.
 4. Non-active days: label as Rest Day with no exercises.
 5. Weekly Schedule: as per user request below:
-{user_prompt}, make workouts intense but specific. No vague terms. Include exact exercises, sets × reps, and target muscles.
+{user_prompt}, and make the workouts intense generally, 6-8 workouts per day, excluding warm-up and cool-down,
+dont put in a any vague stuff, but be specific about the exercises, not mentioning any routine
 6. workout focus: {workout_focus}.
-7. CRITICAL: Only {workout_days} days should have exercises, the rest must be Rest Days.
-8. Cardio exercises like cycling or running, dont mention any sets just mention duration like 20 minutes
+7. CRITICAL: Only {workout_days} days should have exercises, the rest should be Rest Days.
 
 WORKOUT_PLAN OUTPUT FORMAT:
 Day 1 – [Muscle Focus or Rest Day]:
 1. Exercise 1 — sets × reps
-2. Exercise 2 — sets × reps
 ...
 Day 2 – [Muscle Focus or Rest Day]:
 1. Exercise 1 — sets × reps
@@ -1037,18 +1027,18 @@ Day 2 – [Muscle Focus or Rest Day]:
 ... repeat through Day 7
 
 END-OF-PLAN SUGGESTION:
-At the end of the response, include a closing recommendation tailored to the user's goal, the user's target weight of {target_weight} kg, and timeline of {timeline_weeks} weeks, for example:
-"Follow this meal plan consistently for [X] months to achieve your desired results.",
- mentioning the uniqueness of the plan and importance of following it.. Make it 2lines max.
- call it END-OF-PLAN-SUGGESTION.
+At the end of the response, include a closing recommendation tailored to the user's goal, for example:
+"Follow this plan consistently for [X] months to achieve your desired results.", mention the user goal and following of the plans.
 """
     user_message = f"Generate a workout plan for goal: {goal}. Need exactly {workout_days} workout days and {7-workout_days} rest days. User prompt: {user_prompt}"
 
     def event_stream():
         with client.responses.stream(
-            model="gpt-5-mini",
-            input=[{"role": "system", "content": system_prompt},
-                      {"role": "user", "content": user_message}],
+            model="gpt-4-turbo",
+            input=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message}
+            ],
         ) as stream:
 
             for event in stream:
@@ -1060,7 +1050,10 @@ At the end of the response, include a closing recommendation tailored to the use
                 elif event.type == "response.completed":
                     print("\nStreaming completed!\n")
 
-    return Response(stream_with_context(event_stream()), content_type="application/octet-stream")
+    return Response(
+        stream_with_context(event_stream()),
+        content_type="application/octet-stream"
+    )
     
 
 if __name__ == '__main__':

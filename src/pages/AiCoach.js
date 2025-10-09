@@ -11,6 +11,867 @@ import { parsePrompt } from '../utils/promptParser';
 import { cleanWorkoutContent, isRecommendationContent } from '../utils/test-parser';
 import { useAuth } from '../hooks/useAuth';
 
+// Missing Profile Fields Form Component
+const MissingProfileFieldsForm = ({ missingFields, currentProfileData, onSave, onGenerate, onCancel }) => {
+  const [weightError, setWeightError] = useState('');
+    const [ageError, setAgeError] = useState('');
+    const [heightError, setHeightError] = useState('');
+    const [currentWeightError, setCurrentWeightError] = useState('');
+    const [targetWeightError, setTargetWeightError] = useState('');
+  
+  const [formData, setFormData] = useState({
+    age: currentProfileData?.age || '',
+    height: currentProfileData?.height || '',
+    heightUnit: currentProfileData?.heightUnit || 'cm',
+    weight: currentProfileData?.weight || '',
+    weightUnit: currentProfileData?.weightUnit || 'kg',
+    gender: currentProfileData?.gender || '',
+    activityLevel: currentProfileData?.activityLevel || '',
+    workoutDays: currentProfileData?.workoutDays || '5', // Pre-fill from profile
+    targetWeight: currentProfileData?.targetWeight || '', // Pre-fill from profile
+    targetWeightUnit: currentProfileData?.targetWeightUnit || 'kg',
+    targetTimeline: currentProfileData?.targetTimeline || '3', // Pre-fill from profile
+      targetTimelineUnit: 'months'
+  });
+
+  // Update form data when currentProfileData changes
+  useEffect(() => {
+    const newFormData = {
+      age: currentProfileData?.age || '',
+      height: currentProfileData?.height || '',
+      heightUnit: currentProfileData?.heightUnit || 'cm',
+      weight: currentProfileData?.weight || '',
+      weightUnit: currentProfileData?.weightUnit || 'kg',
+      gender: currentProfileData?.gender || '',
+      activityLevel: currentProfileData?.activityLevel || '',
+      workoutDays: currentProfileData?.workoutDays || '5', // Pre-fill from profile
+      targetWeight: currentProfileData?.targetWeight || '', // Pre-fill from profile
+      targetWeightUnit: currentProfileData?.targetWeightUnit || 'kg',
+      targetTimeline: currentProfileData?.targetTimeline || '3', // Pre-fill from profile
+      targetTimelineUnit: 'months'
+    };
+    setFormData(newFormData);
+  }, [currentProfileData]);
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => {
+      const newFormData = {
+      ...prev,
+      [field]: value
+      };
+
+      // Check age validation when age changes
+      if (field === 'age') {
+        validateAge(value);
+      }
+
+      // Check height validation when height or height unit changes
+      if (field === 'height' || field === 'heightUnit') {
+        const height = field === 'height' ? value : newFormData.height;
+        const unit = field === 'heightUnit' ? value : newFormData.heightUnit;
+        validateHeight(height, unit);
+      }
+
+      // Check current weight validation when weight or weight unit changes
+      if (field === 'weight' || field === 'weightUnit') {
+        const weight = field === 'weight' ? value : newFormData.weight;
+        const unit = field === 'weightUnit' ? value : newFormData.weightUnit;
+        validateCurrentWeight(weight, unit);
+      }
+
+      // Check target weight validation when target weight or target weight unit changes
+      if (field === 'targetWeight' || field === 'targetWeightUnit') {
+        const targetWeight = field === 'targetWeight' ? value : newFormData.targetWeight;
+        const unit = field === 'targetWeightUnit' ? value : newFormData.targetWeightUnit;
+        validateTargetWeight(targetWeight, unit);
+      }
+
+      // Check weight comparison validation when weight, target weight, or their units change
+    if (field === 'weight' || field === 'targetWeight' || field === 'weightUnit' || field === 'targetWeightUnit') {
+        const currentWeight = field === 'weight' ? value : newFormData.weight;
+        const targetWeight = field === 'targetWeight' ? value : newFormData.targetWeight;
+        const currentUnit = field === 'weightUnit' ? value : newFormData.weightUnit;
+        const targetUnit = field === 'targetWeightUnit' ? value : newFormData.targetWeightUnit;
+      
+      validateWeights(currentWeight, targetWeight, currentUnit, targetUnit);
+    }
+
+      return newFormData;
+    });
+  };
+
+  const validateWeights = (currentWeight, targetWeight, currentUnit, targetUnit) => {
+    const current = parseFloat(currentWeight);
+    const target = parseFloat(targetWeight);
+    
+    // Check if units are different
+    if (currentUnit && targetUnit && currentUnit !== targetUnit) {
+      setWeightError('Current weight and target weight should use the same units');
+      return;
+    }
+    
+    // Check if weights are equal
+    if (!isNaN(current) && !isNaN(target) && current === target) {
+      setWeightError('Current weight and target weight should not be the same');
+    } else {
+      setWeightError('');
+    }
+  };
+
+  const validateAge = (age) => {
+    const ageNum = parseFloat(age);
+    
+    if (!age || age === '') {
+      setAgeError('Age is required');
+      return;
+    }
+    
+    if (isNaN(ageNum)) {
+      setAgeError('Please enter a valid age');
+      return;
+    }
+    
+    if (ageNum < 13) {
+      setAgeError('Age must be at least 13 years');
+      return;
+    }
+    
+    if (ageNum > 120) {
+      setAgeError('Age must be less than 120 years');
+      return;
+    }
+    
+    setAgeError('');
+  };
+
+  const validateHeight = (height, unit) => {
+    const heightNum = parseFloat(height);
+    
+    if (!height || height === '') {
+      setHeightError('Height is required');
+      return;
+    }
+    
+    if (isNaN(heightNum)) {
+      setHeightError('Please enter a valid height');
+      return;
+    }
+    
+    if (unit === 'cm') {
+      if (heightNum < 90) {
+        setHeightError('Height must be at least 90 cm');
+        return;
+      }
+      if (heightNum > 250) {
+        setHeightError('Height must be less than 250 cm');
+        return;
+      }
+    } else if (unit === 'ft') {
+      if (heightNum < 3) {
+        setHeightError('Height must be at least 3 ft');
+        return;
+      }
+      if (heightNum > 8) {
+        setHeightError('Height must be less than 8 ft');
+        return;
+      }
+    }
+    
+    setHeightError('');
+  };
+
+  const validateCurrentWeight = (weight, unit) => {
+    const weightNum = parseFloat(weight);
+    
+    if (!weight || weight === '') {
+      setCurrentWeightError('Current weight is required');
+      return;
+    }
+    
+    if (isNaN(weightNum)) {
+      setCurrentWeightError('Please enter a valid weight');
+      return;
+    }
+    
+    if (weightNum <= 0) {
+      setCurrentWeightError('Weight must be greater than 0');
+      return;
+    }
+    
+    if (unit === 'kg') {
+      if (weightNum < 30) {
+        setCurrentWeightError('Weight must be at least 30 kg');
+        return;
+      }
+      if (weightNum > 650) {
+        setCurrentWeightError('Weight must be less than 650 kg');
+        return;
+      }
+    } else if (unit === 'lbs') {
+      if (weightNum < 66) {
+        setCurrentWeightError('Weight must be at least 66 lbs');
+        return;
+      }
+      if (weightNum > 1433) {
+        setCurrentWeightError('Weight must be less than 1433 lbs');
+        return;
+      }
+    }
+    
+    setCurrentWeightError('');
+  };
+
+  const validateTargetWeight = (weight, unit) => {
+    const weightNum = parseFloat(weight);
+    
+    if (!weight || weight === '') {
+      setTargetWeightError('Target weight is required');
+      return;
+    }
+    
+    if (isNaN(weightNum)) {
+      setTargetWeightError('Please enter a valid weight');
+      return;
+    }
+    
+    if (weightNum <= 0) {
+      setTargetWeightError('Weight must be greater than 0');
+      return;
+    }
+    
+    if (unit === 'kg') {
+      if (weightNum < 30) {
+        setTargetWeightError('Weight must be at least 30 kg');
+        return;
+      }
+      if (weightNum > 650) {
+        setTargetWeightError('Weight must be less than 650 kg');
+        return;
+      }
+    } else if (unit === 'lbs') {
+      if (weightNum < 66) {
+        setTargetWeightError('Weight must be at least 66 lbs');
+        return;
+      }
+      if (weightNum > 1433) {
+        setTargetWeightError('Weight must be less than 1433 lbs');
+        return;
+      }
+    }
+    
+    setTargetWeightError('');
+  };
+
+
+  const getFieldLabel = (field) => {
+    const labels = {
+      age: 'Age',
+      height: 'Height',
+      weight: 'Weight',
+      gender: 'Gender',
+      activityLevel: 'Activity Level',
+      workoutDays: 'Workout Days per Week',
+      targetWeight: 'Target Weight',
+      targetTimeline: 'Target Timeline'
+    };
+    return labels[field] || field;
+  };
+
+  const isFieldRequired = (field) => {
+    // Always require all fields for the default prompt
+    const alwaysRequired = ['age', 'height', 'weight', 'gender', 'activityLevel', 'targetWeight', 'targetTimeline', 'workoutDays'];
+    return alwaysRequired.includes(field);
+  };
+
+  return (
+    <div style={{ textAlign: 'left' }}>
+      <div className="form-row" style={{ 
+        display: 'grid', 
+        gridTemplateColumns: window.innerWidth < 768 ? '1fr' : '1fr 1fr', 
+        gap: '16px', 
+        marginBottom: '20px' 
+      }}>
+        {/* Age Field */}
+        <div className="form-group" style={{
+          background: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: '12px',
+          padding: '16px',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.04)',
+          transition: 'all 0.2s ease'
+        }}>
+          <label style={{
+            display: 'block',
+            fontWeight: '600',
+            color: '#374151',
+            marginBottom: '8px',
+            fontSize: '14px'
+          }}>
+            Age
+            {isFieldRequired('age') && <span style={{ color: '#ef4444', fontWeight: '600' }}> *</span>}
+          </label>
+          <input
+            type="number"
+            value={formData.age || ''}
+            onChange={(e) => {
+              handleInputChange('age', e.target.value);
+            }}
+            onBlur={(e) => {
+              validateAge(e.target.value);
+            }}
+            placeholder="Enter age"
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              border: ageError ? '1px solid #ef4444' : '1px solid #d1d5db',
+              borderRadius: '8px',
+              fontSize: '16px',
+              color: '#374151',
+              background: '#ffffff',
+              transition: 'all 0.2s ease',
+              boxSizing: 'border-box'
+            }}
+            required={isFieldRequired('age')}
+            min="13"
+            max="120"
+          />
+          {ageError && (
+            <div style={{
+              color: '#ef4444',
+              fontSize: '12px',
+              marginTop: '4px',
+              fontWeight: '500'
+            }}>
+              {ageError}
+            </div>
+          )}
+        </div>
+
+        {/* Height Field with Unit Selection */}
+        <div className="form-group" style={{
+          background: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: '12px',
+          padding: '16px',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.04)',
+          transition: 'all 0.2s ease'
+        }}>
+          <label style={{
+            display: 'block',
+            fontWeight: '600',
+            color: '#374151',
+            marginBottom: '8px',
+            fontSize: '14px'
+          }}>
+            Height
+            {isFieldRequired('height') && <span style={{ color: '#ef4444', fontWeight: '600' }}> *</span>}
+          </label>
+          <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+            <input
+              type="number"
+              value={formData.height || ''}
+              onChange={(e) => {
+                handleInputChange('height', e.target.value);
+              }}
+              onBlur={(e) => {
+                validateHeight(e.target.value, formData.heightUnit);
+              }}
+              placeholder="Enter height"
+              style={{
+                flex: '1 1 65%',
+                padding: '12px 16px',
+                border: heightError ? '1px solid #ef4444' : '1px solid #d1d5db',
+                borderRadius: '8px',
+                fontSize: '16px',
+                color: '#374151',
+                background: '#ffffff',
+                transition: 'all 0.2s ease',
+                boxSizing: 'border-box',
+                width: '65%'
+              }}
+              required={isFieldRequired('height')}
+              min={formData.heightUnit === 'ft' ? '3' : '90'}
+              max={formData.heightUnit === 'ft' ? '8' : '250'}
+              step={formData.heightUnit === 'ft' ? '0.1' : '1'}
+            />
+            <select
+              value={formData.heightUnit || 'cm'}
+              onChange={(e) => {
+                console.log('Height unit changed:', e.target.value);
+                handleInputChange('heightUnit', e.target.value);
+              }}
+              style={{
+                flex: '0 0 35%',
+                padding: '12px 8px',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                fontSize: '16px',
+                color: '#374151',
+                background: '#ffffff',
+                transition: 'all 0.2s ease',
+                boxSizing: 'border-box',
+                width: '35%',
+                fontWeight: '500',
+                textAlign: 'left',
+                minWidth: '60px'
+              }}
+            >
+              <option value="cm">cm</option>
+              <option value="ft">ft</option>
+            </select>
+          </div>
+          {heightError && (
+            <div style={{
+              color: '#ef4444',
+              fontSize: '12px',
+              marginTop: '4px',
+              fontWeight: '500'
+            }}>
+              {heightError}
+            </div>
+          )}
+        </div>
+
+        {/* Weight Field with Unit Selection */}
+        <div className="form-group" style={{
+          background: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: '12px',
+          padding: '16px',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.04)',
+          transition: 'all 0.2s ease'
+        }}>
+          <label style={{
+            display: 'block',
+            fontWeight: '600',
+            color: '#374151',
+            marginBottom: '8px',
+            fontSize: '14px'
+          }}>
+            Weight
+            {isFieldRequired('weight') && <span style={{ color: '#ef4444', fontWeight: '600' }}> *</span>}
+          </label>
+          <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+            <input
+              type="number"
+              value={formData.weight || ''}
+              onChange={(e) => {
+                handleInputChange('weight', e.target.value);
+              }}
+              onBlur={(e) => {
+                validateCurrentWeight(e.target.value, formData.weightUnit);
+              }}
+              placeholder="Enter weight"
+              style={{
+                flex: '1 1 70%',
+                padding: '12px 16px',
+                border: currentWeightError ? '1px solid #ef4444' : '1px solid #d1d5db',
+                borderRadius: '8px',
+                fontSize: '16px',
+                color: '#374151',
+                background: '#ffffff',
+                transition: 'all 0.2s ease',
+                boxSizing: 'border-box',
+                width: '70%'
+              }}
+              required={isFieldRequired('weight')}
+              min="30"
+              max="650"
+            />
+            <select
+              value={formData.weightUnit || 'kg'}
+              onChange={(e) => {
+                console.log('Weight unit changed:', e.target.value);
+                handleInputChange('weightUnit', e.target.value);
+              }}
+              style={{
+                flex: '0 0 35%',
+                padding: '12px 8px',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                fontSize: '16px',
+                color: '#374151',
+                background: '#ffffff',
+                transition: 'all 0.2s ease',
+                boxSizing: 'border-box',
+                width: '35%',
+                fontWeight: '500',
+                textAlign: 'left',
+                minWidth: '60px'
+              }}
+            >
+              <option value="kg">kg</option>
+              <option value="lbs">lbs</option>
+            </select>
+          </div>
+          {currentWeightError && (
+            <div style={{
+              color: '#ef4444',
+              fontSize: '12px',
+              marginTop: '4px',
+              fontWeight: '500'
+            }}>
+              {currentWeightError}
+            </div>
+          )}
+        </div>
+
+        {/* Gender Field */}
+        <div className="form-group" style={{
+          background: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: '12px',
+          padding: '16px',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.04)',
+          transition: 'all 0.2s ease'
+        }}>
+          <label style={{
+            display: 'block',
+            fontWeight: '600',
+            color: '#374151',
+            marginBottom: '8px',
+            fontSize: '14px'
+          }}>
+            Gender
+            {isFieldRequired('gender') && <span style={{ color: '#ef4444', fontWeight: '600' }}> *</span>}
+          </label>
+          <select
+            value={formData.gender || ''}
+            onChange={(e) => handleInputChange('gender', e.target.value)}
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              fontSize: '16px',
+              color: '#374151',
+              background: '#ffffff',
+              transition: 'all 0.2s ease',
+              boxSizing: 'border-box'
+            }}
+            required={isFieldRequired('gender')}
+          >
+            <option value="">Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        </div>
+
+      <div className="form-row" style={{ 
+        display: 'grid', 
+        gridTemplateColumns: window.innerWidth < 768 ? '1fr' : '1fr 1fr', 
+        gap: '16px', 
+        marginBottom: '20px' 
+      }}>
+        {/* Activity Level Field */}
+        <div className="form-group" style={{
+          background: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: '12px',
+          padding: '16px',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.04)',
+          transition: 'all 0.2s ease'
+        }}>
+          <label style={{
+            display: 'block',
+            fontWeight: '600',
+            color: '#374151',
+            marginBottom: '8px',
+            fontSize: '14px'
+          }}>
+            Activity Level
+            {isFieldRequired('activityLevel') && <span style={{ color: '#ef4444', fontWeight: '600' }}> *</span>}
+          </label>
+          <select
+            value={formData.activityLevel || ''}
+            onChange={(e) => handleInputChange('activityLevel', e.target.value)}
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              fontSize: '16px',
+              color: '#374151',
+              background: '#ffffff',
+              transition: 'all 0.2s ease',
+              boxSizing: 'border-box'
+            }}
+            required={isFieldRequired('activityLevel')}
+          >
+            <option value="">Select Activity Level</option>
+            <option value="sedentary">Sedentary</option>
+            <option value="light">Lightly Active</option>
+            <option value="moderate">Moderately Active</option>
+            <option value="active">Very Active</option>
+            <option value="very-active">Extra Active</option>
+          </select>
+        </div>
+
+        {/* Workout Days Field */}
+        <div className="form-group" style={{
+          background: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: '12px',
+          padding: '16px',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.04)',
+          transition: 'all 0.2s ease'
+        }}>
+          <label style={{
+            display: 'block',
+            fontWeight: '600',
+            color: '#374151',
+            marginBottom: '8px',
+            fontSize: '14px'
+          }}>
+            Workout Days per Week
+            {isFieldRequired('workoutDays') && <span style={{ color: '#ef4444', fontWeight: '600' }}> *</span>}
+          </label>
+          <select
+            value={formData.workoutDays || '5'}
+            onChange={(e) => handleInputChange('workoutDays', e.target.value)}
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              border: '1px solid #d1d5db',
+              borderRadius: '8px',
+              fontSize: '16px',
+              color: '#374151',
+              background: '#ffffff',
+              transition: 'all 0.2s ease',
+              boxSizing: 'border-box'
+            }}
+            required={isFieldRequired('workoutDays')}
+          >
+            <option value="">Select Days</option>
+            <option value="1">1 day</option>
+            <option value="2">2 days</option>
+            <option value="3">3 days</option>
+            <option value="4">4 days</option>
+            <option value="5">5 days</option>
+            <option value="6">6 days</option>
+            <option value="7">7 days</option>
+          </select>
+        </div>
+        </div>
+
+      <div className="form-row" style={{ 
+        display: 'grid', 
+        gridTemplateColumns: window.innerWidth < 768 ? '1fr' : '1fr 1fr', 
+        gap: '16px', 
+        marginBottom: '20px' 
+      }}>
+        {/* Target Weight Field with Unit Selection */}
+        <div className="form-group" style={{
+          background: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: '12px',
+          padding: '16px',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.04)',
+          transition: 'all 0.2s ease'
+        }}>
+          <label style={{
+            display: 'block',
+            fontWeight: '600',
+            color: '#374151',
+            marginBottom: '8px',
+            fontSize: '14px'
+          }}>
+            Target Weight
+            {isFieldRequired('targetWeight') && <span style={{ color: '#ef4444', fontWeight: '600' }}> *</span>}
+          </label>
+          <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+            <input
+              type="number"
+              value={formData.targetWeight || ''}
+              onChange={(e) => {
+                handleInputChange('targetWeight', e.target.value);
+              }}
+              onBlur={(e) => {
+                validateTargetWeight(e.target.value, formData.targetWeightUnit);
+              }}
+              placeholder="Enter target weight"
+              style={{
+                flex: '1 1 65%',
+                padding: '12px 16px',
+                border: targetWeightError ? '1px solid #ef4444' : '1px solid #d1d5db',
+                borderRadius: '8px',
+                fontSize: '16px',
+                color: '#374151',
+                background: '#ffffff',
+                transition: 'all 0.2s ease',
+                boxSizing: 'border-box',
+                width: '65%'
+              }}
+              required={isFieldRequired('targetWeight')}
+              min="30"
+              max="650"
+            />
+            <select
+              value={formData.targetWeightUnit || 'kg'}
+              onChange={(e) => {
+                console.log('Target weight unit changed:', e.target.value);
+                handleInputChange('targetWeightUnit', e.target.value);
+              }}
+              style={{
+                flex: '0 0 35%',
+                padding: '12px 8px',
+                border: '1px solid #d1d5db',
+                borderRadius: '8px',
+                fontSize: '16px',
+                color: '#374151',
+                background: '#ffffff',
+                transition: 'all 0.2s ease',
+                boxSizing: 'border-box',
+                width: '35%',
+                fontWeight: '500',
+                textAlign: 'left',
+                minWidth: '60px'
+              }}
+            >
+              <option value="kg">kg</option>
+              <option value="lbs">lbs</option>
+            </select>
+          </div>
+          {targetWeightError && (
+            <div style={{
+              color: '#ef4444',
+              fontSize: '12px',
+              marginTop: '4px',
+              fontWeight: '500'
+            }}>
+              {targetWeightError}
+            </div>
+          )}
+          {weightError && (
+            <div style={{
+              color: '#ef4444',
+              fontSize: '14px',
+              marginTop: '8px',
+              fontWeight: '500'
+            }}>
+              {weightError}
+            </div>
+          )}
+        </div>
+
+        {/* Target Timeline Field with Unit Selection */}
+        <div className="form-group" style={{
+          background: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: '12px',
+          padding: '16px',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.04)',
+          transition: 'all 0.2s ease'
+        }}>
+          <label style={{
+            display: 'block',
+            fontWeight: '600',
+            color: '#374151',
+            marginBottom: '8px',
+            fontSize: '14px'
+          }}>
+            Target Timeline (months)
+            {isFieldRequired('targetTimeline') && <span style={{ color: '#ef4444', fontWeight: '600' }}> *</span>}
+          </label>
+            <input
+            type="range"
+            value={formData.targetTimeline || '3'}
+              onChange={(e) => {
+                handleInputChange('targetTimeline', e.target.value);
+              }}
+              style={{
+              width: '100%',
+              padding: '8px 0',
+              background: 'transparent',
+              outline: 'none',
+              marginBottom: '8px'
+              }}
+              required={isFieldRequired('targetTimeline')}
+              min="1"
+            max="12"
+            step="1"
+          />
+          <div style={{
+            fontSize: '14px',
+            color: '#6b7280',
+            fontWeight: '500',
+            textAlign: 'center',
+            padding: '4px 8px',
+            background: '#f3f4f6',
+            borderRadius: '6px',
+            border: '1px solid #e5e7eb',
+            marginTop: '8px'
+          }}>
+            {formData.targetTimeline || '3'} months
+          </div>
+        </div>
+      </div>
+
+      <div style={{
+        display: 'flex',
+        gap: '15px',
+        justifyContent: 'center',
+        marginTop: '30px'
+      }}>
+        <button 
+          type="button"
+          onClick={onCancel}
+          style={{
+            padding: '12px 24px',
+            borderRadius: '8px',
+            backgroundColor: '#e8e8e8',
+            color: '#666',
+            border: 'none',
+            fontSize: '14px',
+            fontWeight: '500',
+            cursor: 'pointer',
+            minWidth: '80px'
+          }}
+        >
+          Cancel
+        </button>
+        <button 
+          type="button"
+          onClick={() => onSave(formData)}
+          style={{
+            padding: '12px 24px',
+            border: 'none',
+            borderRadius: '8px',
+            backgroundColor: '#10b981',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500',
+            cursor: 'pointer',
+            minWidth: '100px'
+          }}
+        >
+          Save
+        </button>
+        <button 
+          type="button"
+          onClick={() => onGenerate(formData)}
+          style={{
+            padding: '12px 24px',
+            border: 'none',
+            borderRadius: '8px',
+            backgroundColor: '#7c3aed',
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: '500',
+            cursor: 'pointer',
+            minWidth: '120px'
+          }}
+        >
+          Generate
+        </button>
+      </div>
+    </div>
+  );
+};
+
+
 const AIFitnessCoach = () => {
   console.log('🤖 AiCoach: Component rendered');
   console.log('🤖 AiCoach: Current URL:', window.location.href);
@@ -47,6 +908,7 @@ const AIFitnessCoach = () => {
   const [weeklySchedule, setWeeklySchedule] = useState(7);
   const [expectedResults, setExpectedResults] = useState('');
   const [endOfPlanSuggestion, setEndOfPlanSuggestion] = useState('');
+  const [workoutPlanSuggestion, setWorkoutPlanSuggestion] = useState('');
   const [inputError, setInputError] = useState(false);
   const [inputLocked, setInputLocked] = useState(false);
   const [isCustomerLoggedIn, setIsCustomerLoggedIn] = useState(false);
@@ -80,8 +942,8 @@ const AIFitnessCoach = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [showErrorPopup, setShowErrorPopup] = useState(false);
   const [errorPopupMessage, setErrorPopupMessage] = useState('');
-  const [showWeightValidationPopup, setShowWeightValidationPopup] = useState(false);
-  const [weightValidationData, setWeightValidationData] = useState(null);
+  const [showMissingProfileFieldsPopup, setShowMissingProfileFieldsPopup] = useState(false);
+  const [missingProfileFieldsData, setMissingProfileFieldsData] = useState({});
   
   // New states for the enhanced flow
   const [showProfileForm, setShowProfileForm] = useState(false);
@@ -93,8 +955,10 @@ const AIFitnessCoach = () => {
   const [mealPlanChoice, setMealPlanChoice] = useState(null); // Track meal plan choice
   const [workoutPlanChoice, setWorkoutPlanChoice] = useState(null); // Track workout plan choice
   const [streamingMealPlan, setStreamingMealPlan] = useState('');
+  const [originalMealPlanResponse, setOriginalMealPlanResponse] = useState(''); // Store original response
   const [streamingWorkoutPlan, setStreamingWorkoutPlan] = useState('');
     const [isStreamingMeal, setIsStreamingMeal] = useState(false);
+  const [currentMealDay, setCurrentMealDay] = useState(0); // Track current day being generated
   const [isStreamingWorkout, setIsStreamingWorkout] = useState(false);
   const [incompleteExerciseBuffer, setIncompleteExerciseBuffer] = useState('');
   const [exerciseBuffer, setExerciseBuffer] = useState({});
@@ -103,6 +967,7 @@ const AIFitnessCoach = () => {
   const [personalizedSuggestions, setPersonalizedSuggestions] = useState('');
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [openSuggestionsAccordion, setOpenSuggestionsAccordion] = useState(false);
+  const [userHasToggledAccordion, setUserHasToggledAccordion] = useState(false);
   const [copyButtonClicked, setCopyButtonClicked] = useState(false);
   const [plansComplete, setPlansComplete] = useState(false);
   const [showWorkoutDaysConfirmation, setShowWorkoutDaysConfirmation] = useState(false);
@@ -111,13 +976,188 @@ const AIFitnessCoach = () => {
      age: '',
      gender: '',
      height: '',
+     heightUnit: 'cm',
      currentWeight: '',
+     currentWeightUnit: 'kg',
      targetWeight: '',
+     targetWeightUnit: 'kg',
      activityLevel: '',
      targetTimeline: '3',
      workoutDays: '5',
      goal: ''
    });
+  const [profileWeightError, setProfileWeightError] = useState('');
+  const [profileAgeError, setProfileAgeError] = useState('');
+  const [profileHeightError, setProfileHeightError] = useState('');
+  const [profileCurrentWeightError, setProfileCurrentWeightError] = useState('');
+  const [profileTargetWeightError, setProfileTargetWeightError] = useState('');
+
+  // Profile weight validation function
+  const validateProfileWeights = (currentWeight, targetWeight, currentUnit, targetUnit) => {
+    const current = parseFloat(currentWeight);
+    const target = parseFloat(targetWeight);
+    
+    // Check if units are different
+    if (currentUnit && targetUnit && currentUnit !== targetUnit) {
+      setProfileWeightError('Current weight and target weight should use the same units');
+      return;
+    }
+    
+    // Check if weights are equal
+    if (!isNaN(current) && !isNaN(target) && current === target) {
+      setProfileWeightError('Current weight and target weight should not be the same');
+    } else {
+      setProfileWeightError('');
+    }
+  };
+
+  // Profile age validation function
+  const validateProfileAge = (age) => {
+    const ageNum = parseFloat(age);
+    
+    if (!age || age === '') {
+      setProfileAgeError('Age is required');
+      return;
+    }
+    
+    if (isNaN(ageNum)) {
+      setProfileAgeError('Please enter a valid age');
+      return;
+    }
+    
+    if (ageNum < 13) {
+      setProfileAgeError('Age must be at least 13 years');
+      return;
+    }
+    
+    if (ageNum > 120) {
+      setProfileAgeError('Age must be less than 120 years');
+      return;
+    }
+    
+    setProfileAgeError('');
+  };
+
+  // Profile height validation function
+  const validateProfileHeight = (height, unit) => {
+    const heightNum = parseFloat(height);
+    
+    if (!height || height === '') {
+      setProfileHeightError('Height is required');
+      return;
+    }
+    
+    if (isNaN(heightNum)) {
+      setProfileHeightError('Please enter a valid height');
+      return;
+    }
+    
+    if (unit === 'cm') {
+      if (heightNum < 90) {
+        setProfileHeightError('Height must be at least 90 cm');
+        return;
+      }
+      if (heightNum > 250) {
+        setProfileHeightError('Height must be less than 250 cm');
+        return;
+      }
+    } else if (unit === 'ft') {
+      if (heightNum < 3) {
+        setProfileHeightError('Height must be at least 3 ft');
+        return;
+      }
+      if (heightNum > 8) {
+        setProfileHeightError('Height must be less than 8 ft');
+        return;
+      }
+    }
+    
+    setProfileHeightError('');
+  };
+
+  // Profile current weight validation function
+  const validateProfileCurrentWeight = (weight, unit) => {
+    const weightNum = parseFloat(weight);
+    
+    if (!weight || weight === '') {
+      setProfileCurrentWeightError('Current weight is required');
+      return;
+    }
+    
+    if (isNaN(weightNum)) {
+      setProfileCurrentWeightError('Please enter a valid weight');
+      return;
+    }
+    
+    if (weightNum <= 0) {
+      setProfileCurrentWeightError('Weight must be greater than 0');
+      return;
+    }
+    
+    if (unit === 'kg') {
+      if (weightNum < 30) {
+        setProfileCurrentWeightError('Weight must be at least 30 kg');
+        return;
+      }
+      if (weightNum > 650) {
+        setProfileCurrentWeightError('Weight must be less than 650 kg');
+        return;
+      }
+    } else if (unit === 'lbs') {
+      if (weightNum < 66) {
+        setProfileCurrentWeightError('Weight must be at least 66 lbs');
+        return;
+      }
+      if (weightNum > 1433) {
+        setProfileCurrentWeightError('Weight must be less than 1433 lbs');
+        return;
+      }
+    }
+    
+    setProfileCurrentWeightError('');
+  };
+
+  // Profile target weight validation function
+  const validateProfileTargetWeight = (weight, unit) => {
+    const weightNum = parseFloat(weight);
+    
+    if (!weight || weight === '') {
+      setProfileTargetWeightError('Target weight is required');
+      return;
+    }
+    
+    if (isNaN(weightNum)) {
+      setProfileTargetWeightError('Please enter a valid weight');
+      return;
+    }
+    
+    if (weightNum <= 0) {
+      setProfileTargetWeightError('Weight must be greater than 0');
+      return;
+    }
+    
+    if (unit === 'kg') {
+      if (weightNum < 30) {
+        setProfileTargetWeightError('Weight must be at least 30 kg');
+        return;
+      }
+      if (weightNum > 650) {
+        setProfileTargetWeightError('Weight must be less than 650 kg');
+        return;
+      }
+    } else if (unit === 'lbs') {
+      if (weightNum < 66) {
+        setProfileTargetWeightError('Weight must be at least 66 lbs');
+        return;
+      }
+      if (weightNum > 1433) {
+        setProfileTargetWeightError('Weight must be less than 1433 lbs');
+        return;
+      }
+    }
+    
+    setProfileTargetWeightError('');
+  };
 
   // Refs
   const loadingAnimationRef = useRef(null);
@@ -257,7 +1297,7 @@ const AIFitnessCoach = () => {
     };
   }, []);
 
-  // Load user profile data on component mount
+  // Load user profile data when user changes
   useEffect(() => {
     const loadUserProfile = async () => {
       if (user) {
@@ -267,14 +1307,19 @@ const AIFitnessCoach = () => {
           if (userDoc.exists()) {
             const userData = userDoc.data();
             setUserProfileData(userData);
+          } else {
+            setUserProfileData(null);
           }
         } catch (error) {
           console.error('Error loading user profile:', error);
+          setUserProfileData(null);
         }
+      } else {
+        setUserProfileData(null);
       }
     };
     loadUserProfile();
-  }, []);
+  }, [user]);
 
   // Data
   const suggestions = [
@@ -337,7 +1382,7 @@ const AIFitnessCoach = () => {
   };
 
   const getApiUrl = (endpoint = 'chat') => {
-    return `http://127.0.0.1:5002/${endpoint}`;
+    return `https://yantraprise.com/${endpoint}`;
  
   };
 
@@ -544,20 +1589,7 @@ const AIFitnessCoach = () => {
     return { isValid: true };
   };
 
-  // Function to handle weight validation popup confirmation
-  const handleWeightValidationConfirm = () => {
-    setShowWeightValidationPopup(false);
-    // Continue with the original submission process
-    if (weightValidationData && weightValidationData.continueSubmission) {
-      weightValidationData.continueSubmission();
-    }
-  };
 
-  // Function to handle weight validation popup cancellation
-  const handleWeightValidationCancel = () => {
-    setShowWeightValidationPopup(false);
-    setWeightValidationData(null);
-  };
 
   
   // Check if user has profile data in Firebase
@@ -941,8 +1973,11 @@ const AIFitnessCoach = () => {
              age: userData.age || '',
              gender: userData.gender || '',
              height: userData.height || '',
+             heightUnit: userData.heightUnit || 'cm',
              currentWeight: userData.weight || '',
+             currentWeightUnit: userData.weightUnit || 'kg',
              targetWeight: userData.weight || '', // Default to current weight
+             targetWeightUnit: userData.targetWeightUnit || userData.weightUnit || 'kg',
              activityLevel: userData.activityLevel || '',
              targetTimeline: '3', // Default
              workoutDays: '5', // Default to 5 days
@@ -991,6 +2026,17 @@ const AIFitnessCoach = () => {
   const handleProfileFormSubmit = async (e) => {
     e.preventDefault();
     
+    // Validate age, height, and weights first
+    validateProfileAge(profileFormData.age);
+    validateProfileHeight(profileFormData.height, profileFormData.heightUnit);
+    validateProfileCurrentWeight(profileFormData.currentWeight, profileFormData.currentWeightUnit);
+    validateProfileTargetWeight(profileFormData.targetWeight, profileFormData.targetWeightUnit);
+    
+    // Check if there are any validation errors
+    if (profileAgeError || profileHeightError || profileCurrentWeightError || profileTargetWeightError) {
+      return;
+    }
+    
     // Validate required fields
     if (!profileFormData.age || !profileFormData.gender || !profileFormData.height || 
         !profileFormData.currentWeight || !profileFormData.targetWeight || 
@@ -1001,21 +2047,23 @@ const AIFitnessCoach = () => {
       return;
     }
 
-    // Validate weight values - check if current weight equals target weight
-    const weightValidation = validateWeightValues(profileFormData.currentWeight, profileFormData.targetWeight);
-    if (!weightValidation.isValid && weightValidation.showPopup) {
-      setWeightValidationData({
-        currentWeight: weightValidation.currentWeight,
-        targetWeight: weightValidation.targetWeight,
-        continueSubmission: async () => {
-    setShowProfileForm(false);
-    setIsLoading(true);
-          await submitProfileFormData();
-        }
-      });
-      setShowWeightValidationPopup(true);
+    // Check weight validation (units and values)
+    const currentWeight = parseFloat(profileFormData.currentWeight);
+    const targetWeight = parseFloat(profileFormData.targetWeight);
+    
+    // Check if units are different
+    if (profileFormData.currentWeightUnit && profileFormData.targetWeightUnit && 
+        profileFormData.currentWeightUnit !== profileFormData.targetWeightUnit) {
+      setProfileWeightError('Current weight and target weight should use the same units');
       return;
     }
+    
+    // Check if weights are equal
+    if (!isNaN(currentWeight) && !isNaN(targetWeight) && currentWeight === targetWeight) {
+      setProfileWeightError('Current weight and target weight should not be the same');
+      return;
+    }
+
 
     setShowProfileForm(false);
     setIsLoading(true);
@@ -1091,12 +2139,14 @@ const AIFitnessCoach = () => {
     // Generate meal plan with streaming and live accordion updates
     setIsStreamingMeal(true);
     setStreamingMealPlan('');
+    setOriginalMealPlanResponse(''); // Clear original response
     setShowPlans(true); // Show the plans section immediately
     setMealPlansByDay([]); // Clear previous data
     setWorkoutSections([]);
     setPlansComplete(false); // Reset plans complete status
     setNoWorkoutPlan(false); // Reset no workout plan flag
     setIncompleteExerciseBuffer(''); // Clear incomplete exercise buffer
+    setCurrentMealDay(0); // Reset current meal day counter
     
     // Set a timeout to ensure streaming state is reset even if something goes wrong
     const mealStreamingTimeout = setTimeout(() => {
@@ -1115,6 +2165,8 @@ const AIFitnessCoach = () => {
           dietaryRestrictions: [], // Empty array is fine now - backend handles it properly
           allergies: [], // Empty array is fine now - backend handles it properly
           healthGoals: extractedProfileData?.healthGoals || profileFormData?.goal,
+          targetWeight: extractedProfileData?.targetWeight?.value || profileFormData?.targetWeight,
+          timelineWeeks: parseInt(extractedProfileData?.targetTimeline || profileFormData?.targetTimeline || 12),
           prompt: `Generate meal plan for ${extractedProfileData?.goal || profileFormData.goal || 'fitness'} goal`
         })
       });
@@ -1128,6 +2180,10 @@ const AIFitnessCoach = () => {
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let accumulatedText = '';
+      let currentDayBuffer = '';
+      let completedDays = 0;
+      let isProcessingDay = false;
+      let processedDayNumbers = new Set(); // Track which day numbers we've processed
 
       while (true) {
         const { done, value } = await reader.read();
@@ -1135,32 +2191,190 @@ const AIFitnessCoach = () => {
         
         const chunk = decoder.decode(value, { stream: true });
         accumulatedText += chunk;
+        currentDayBuffer += chunk;
         setStreamingMealPlan(accumulatedText);
         
-        // Parse and update meal plans in real-time
-        try {
-          const liveResponse = `MEAL_PLAN:${accumulatedText}`;
-          // Parse immediately for UI updates
-          parseResponseLiveImmediate(liveResponse, 'meal');
+        // Check if we have a complete day (look for "Day X:" followed by next "Day Y:" or end)
+        const dayPattern = /Day\s+(\d+):/g;
+        const dayMatches = [...currentDayBuffer.matchAll(dayPattern)];
+        
+        // Process complete days as they arrive
+        while (dayMatches.length >= 2) {
+          // We have at least 2 days, process the first complete day
+          const firstDayStart = dayMatches[0].index;
+          const secondDayStart = dayMatches[1].index;
+          const completeDayText = currentDayBuffer.substring(firstDayStart, secondDayStart);
+          
+          // Parse and add the complete day
+          try {
+            const dayResponse = `MEAL_PLAN:${completeDayText}`;
+            parseResponseLiveImmediate(dayResponse, 'meal');
+            
+            // Extract the actual day number from the response
+            const dayNumberMatch = completeDayText.match(/Day\s+(\d+):/);
+            if (dayNumberMatch) {
+              const dayNumber = parseInt(dayNumberMatch[1]);
+              if (dayNumber >= 1 && dayNumber <= 7 && !processedDayNumbers.has(dayNumber)) {
+                processedDayNumbers.add(dayNumber);
+                completedDays = processedDayNumbers.size; // Count actual processed days
+                setCurrentMealDay(completedDays);
+                console.log(`Completed day ${dayNumber} of meal plan (${completedDays} total processed)`);
+                if (completedDays >= 7) {
+                  console.log(`DEBUG: currentMealDay set to ${completedDays}, will show "Finalizing meal plan..."`);
+                } else {
+                  console.log(`DEBUG: currentMealDay set to ${completedDays}, will show "Generating Day ${completedDays + 1} of 7..."`);
+                }
+                console.log(`DEBUG: Progress will show "${completedDays} of 7 days completed"`);
+              }
+            }
         } catch (parseError) {
-          // Continue streaming even if parsing fails temporarily
-          console.log('Temporary parse error (continuing):', parseError.message);
-          // Fallback: try to create days from text
-          createDaysFromText(accumulatedText, 'meal');
+            console.log('Error parsing complete day:', parseError.message);
+          }
+          
+          // Remove the processed day from buffer
+          currentDayBuffer = currentDayBuffer.substring(secondDayStart);
+          
+          // Recheck for day patterns in the remaining buffer
+          const remainingDayMatches = [...currentDayBuffer.matchAll(dayPattern)];
+          if (remainingDayMatches.length < 2) {
+            break;
+          }
+          dayMatches.splice(0, 1); // Remove the first match
+          dayMatches[0] = remainingDayMatches[0]; // Update the first match
         }
         
-        // Force UI update to ensure real-time display
-        if (accumulatedText.includes('Day')) {
-          // Trigger a re-render by updating the state
+        // Check if we have a complete day followed by END-OF-PLAN or end of stream
+        if (dayMatches.length === 1 && completedDays < 7) {
+          const dayStart = dayMatches[0].index;
+          const suggestionIndex = currentDayBuffer.search(/END-OF-PLAN[\s-]?SUGGESTION/i) !== -1 ? 
+            currentDayBuffer.search(/END-OF-PLAN[\s-]?SUGGESTION/i) : 
+            currentDayBuffer.indexOf('**End-of-Plan Suggestion:**') !== -1 ?
+            currentDayBuffer.indexOf('**End-of-Plan Suggestion:**') :
+            currentDayBuffer.indexOf('**Recommendation:**');
+          const totalCaloriesIndex = currentDayBuffer.indexOf('Total Daily Calories:');
+          
+          // If we found "Total Daily Calories" after the day start, we might have a complete day
+          if (totalCaloriesIndex > dayStart) {
+            // We have a complete day followed by total calories
+            const completeDayText = currentDayBuffer.substring(dayStart, totalCaloriesIndex + 50); // Include some extra characters
+            
+            // Parse and add the complete day
+            try {
+              const dayResponse = `MEAL_PLAN:${completeDayText}`;
+              parseResponseLiveImmediate(dayResponse, 'meal');
+              
+              // Extract the actual day number from the response
+              const dayNumberMatch = completeDayText.match(/Day\s+(\d+):/);
+              if (dayNumberMatch) {
+                const dayNumber = parseInt(dayNumberMatch[1]);
+                if (dayNumber >= 1 && dayNumber <= 7 && !processedDayNumbers.has(dayNumber)) {
+                  processedDayNumbers.add(dayNumber);
+                  completedDays = processedDayNumbers.size; // Count actual processed days
+                  setCurrentMealDay(completedDays);
+                  console.log(`Completed final day ${dayNumber} of meal plan (${completedDays} total processed)`);
+                  if (completedDays >= 7) {
+                    console.log(`DEBUG: currentMealDay set to ${completedDays}, will show "Finalizing meal plan..."`);
+                  } else {
+                    console.log(`DEBUG: currentMealDay set to ${completedDays}, will show "Generating Day ${completedDays + 1} of 7..."`);
+                  }
+                  console.log(`DEBUG: Progress will show "${completedDays} of 7 days completed"`);
+                }
+              }
+            } catch (parseError) {
+              console.log('Error parsing final day:', parseError.message);
+            }
+          } else if (suggestionIndex > dayStart) {
+            // We have a complete day followed by suggestion
+            const completeDayText = currentDayBuffer.substring(dayStart, suggestionIndex);
+            
+            // Parse and add the complete day
+            try {
+              const dayResponse = `MEAL_PLAN:${completeDayText}`;
+              parseResponseLiveImmediate(dayResponse, 'meal');
+              
+              // Extract the actual day number from the response
+              const dayNumberMatch = completeDayText.match(/Day\s+(\d+):/);
+              if (dayNumberMatch) {
+                const dayNumber = parseInt(dayNumberMatch[1]);
+                if (dayNumber >= 1 && dayNumber <= 7 && !processedDayNumbers.has(dayNumber)) {
+                  processedDayNumbers.add(dayNumber);
+                  completedDays = processedDayNumbers.size; // Count actual processed days
+                  setCurrentMealDay(completedDays);
+                  console.log(`Completed final day ${dayNumber} of meal plan (${completedDays} total processed)`);
+                  if (completedDays >= 7) {
+                    console.log(`DEBUG: currentMealDay set to ${completedDays}, will show "Finalizing meal plan..."`);
+                  } else {
+                    console.log(`DEBUG: currentMealDay set to ${completedDays}, will show "Generating Day ${completedDays + 1} of 7..."`);
+                  }
+                  console.log(`DEBUG: Progress will show "${completedDays} of 7 days completed"`);
+                }
+              }
+            } catch (parseError) {
+              console.log('Error parsing final day:', parseError.message);
+            }
+            
+            // Extract the suggestion text
+            const suggestionText = currentDayBuffer.substring(suggestionIndex);
+            console.log('DEBUG: Suggestion text to parse:', suggestionText.substring(0, 200) + '...');
+            const suggestionMatch = suggestionText.match(/END-OF-PLAN[\s-]?SUGGESTION:?\s*(.*)/i) || 
+              suggestionText.match(/\*\*End-of-Plan Suggestion:\*\*\s*(.*)/i) ||
+              suggestionText.match(/\*\*Recommendation:\*\*\s*(.*)/i);
+            if (suggestionMatch) {
+              const extractedSuggestion = suggestionMatch[1].trim();
+              console.log('DEBUG: Extracted suggestion from streaming:', extractedSuggestion);
+              setEndOfPlanSuggestion(extractedSuggestion);
+              // Suggestions will be auto-opened by useEffect when first available
+              console.log('DEBUG: Set endOfPlanSuggestion and opened accordion');
+            }
+          }
+        }
+        
+        // Force UI update to show completed days
+        if (completedDays > 0) {
           setMealPlansByDay(prev => [...prev]);
         }
       }
 
-      // Final parse for complete meal plan
+      // Process any remaining content in the buffer (last day and suggestions)
+      if (currentDayBuffer.trim()) {
+        try {
+          const finalResponse = `MEAL_PLAN:${currentDayBuffer}`;
+          parseResponseLiveImmediate(finalResponse, 'meal');
+          
+          // Also extract suggestion from remaining buffer
+          console.log('DEBUG: Final buffer to check for suggestions:', currentDayBuffer.substring(0, 200) + '...');
+          const suggestionMatch = currentDayBuffer.match(/END-OF-PLAN[\s-]?SUGGESTION:?\s*(.*)/i) || 
+            currentDayBuffer.match(/\*\*End-of-Plan Suggestion:\*\*\s*(.*)/i) ||
+            currentDayBuffer.match(/\*\*Recommendation:\*\*\s*(.*)/i);
+          if (suggestionMatch) {
+            const extractedSuggestion = suggestionMatch[1].trim();
+            console.log('DEBUG: Extracted suggestion from final buffer:', extractedSuggestion);
+            setEndOfPlanSuggestion(extractedSuggestion);
+            // Suggestions will be auto-opened by useEffect when first available
+            console.log('DEBUG: Set endOfPlanSuggestion from final buffer and opened accordion');
+          }
+        } catch (parseError) {
+          console.log('Error parsing final content:', parseError.message);
+        }
+      }
+
+      // Store the original response for accurate parsing
+      setOriginalMealPlanResponse(accumulatedText);
+      
+      // Debug: Show what backend is streaming to frontend
+      console.log('DEBUG: Backend streaming response to frontend:');
+      console.log(accumulatedText);
+      
+      // Parse the original response to get accurate calorie values
+      parseOriginalResponse(accumulatedText);
+      
+      // Final parse for complete meal plan (this will handle any remaining content and suggestions)
       const finalResponse = `MEAL_PLAN:${accumulatedText}`;
       parseResponse(finalResponse);
       clearTimeout(mealStreamingTimeout); // Clear the timeout since we completed successfully
       setIsStreamingMeal(false);
+      setCurrentMealDay(completedDays); // Use actual count of processed days
+      console.log(`DEBUG: Final completion - currentMealDay set to ${completedDays}, will show "Finalizing meal plan..." and "${completedDays} of 7 days completed"`);
       setShowWorkoutPlanChoice(true);
       
       // Plans are not complete yet - waiting for user to choose workout plan
@@ -1169,6 +2383,8 @@ const AIFitnessCoach = () => {
       console.error('Error generating meal plan:', error);
       clearTimeout(mealStreamingTimeout); // Clear the timeout since we had an error
       setIsStreamingMeal(false);
+      setCurrentMealDay(0); // Reset current meal day on error
+      console.log('DEBUG: Error occurred - currentMealDay reset to 0');
       let errorMessage = 'Failed to generate meal plan. ';
       if (error.message.includes('400')) {
         errorMessage += 'Invalid request format. Please check your profile data.';
@@ -1206,9 +2422,17 @@ const AIFitnessCoach = () => {
        setNoWorkoutPlan(true); // Set flag to show no workout animation
        
        // Generate suggestions even when user selects No to workout plan
+       // Use actual backend suggestions if available, otherwise fallback
+       if (endOfPlanSuggestion) {
+         setPersonalizedSuggestions(endOfPlanSuggestion);
+       } else {
        const fallbackSuggestions = generateFallbackSuggestions();
        setPersonalizedSuggestions(fallbackSuggestions);
-       setOpenSuggestionsAccordion(true);
+       }
+       // Auto-open suggestions when they are first generated
+       if (!userHasToggledAccordion) {
+         setOpenSuggestionsAccordion(true);
+       }
        
        setSuccessMessage('Thank you for using AI Coach!');
        setShowSuccessPopup(true);
@@ -1302,6 +2526,8 @@ const AIFitnessCoach = () => {
            goal: extractedProfileData?.goal || profileFormData.goal || 'fitness',
            workout_focus: calculatedCalories.WorkoutFocus || 'Mixed Cardio and Strength',
            workout_days: workoutDays,
+           targetWeight: extractedProfileData?.targetWeight?.value || profileFormData?.targetWeight,
+           timelineWeeks: parseInt(extractedProfileData?.targetTimeline || profileFormData?.targetTimeline || 12),
            prompt: workoutPrompt
          })
        });
@@ -1400,6 +2626,21 @@ const AIFitnessCoach = () => {
       const finalResponse = `WORKOUT_PLAN:${accumulatedText}`;
       parseResponseLiveImmediate(finalResponse, 'workout');
       
+      // Extract workout plan suggestion (only if this is a workout plan response)
+      const workoutSuggestionMatch = accumulatedText.match(/END-OF-PLAN[\s-]?SUGGESTION:?\s*(.*)/i) || 
+        accumulatedText.match(/\*\*End-of-Plan Suggestion:\*\*\s*(.*)/i) ||
+        accumulatedText.match(/\*\*Recommendation:\*\*\s*(.*)/i);
+      if (workoutSuggestionMatch) {
+        const extractedWorkoutSuggestion = workoutSuggestionMatch[1].trim();
+        console.log('DEBUG: Extracted workout plan suggestion:', extractedWorkoutSuggestion);
+        
+        // Set workout plan suggestion - this should be separate from meal plan suggestion
+          setWorkoutPlanSuggestion(extractedWorkoutSuggestion);
+        console.log('DEBUG: Set workout plan suggestion:', extractedWorkoutSuggestion);
+        
+        // Suggestions will be auto-opened by useEffect when first available
+      }
+      
       console.log('Workout plan generation completed, setting isStreamingWorkout to false');
       clearTimeout(streamingTimeout); // Clear the timeout since we completed successfully
       setIsStreamingWorkout(false);
@@ -1413,10 +2654,17 @@ const AIFitnessCoach = () => {
       setPlansComplete(true);
       
       // Generate suggestions after both meal and workout plans are complete
-      // Use fallback suggestions for now (API can be added later)
+      // Use actual backend suggestions if available, otherwise fallback
+      if (endOfPlanSuggestion) {
+        setPersonalizedSuggestions(endOfPlanSuggestion);
+      } else {
       const fallbackSuggestions = generateFallbackSuggestions();
       setPersonalizedSuggestions(fallbackSuggestions);
-      setOpenSuggestionsAccordion(true);
+      }
+      // Auto-open suggestions when they are first generated
+      if (!userHasToggledAccordion) {
+        setOpenSuggestionsAccordion(true);
+      }
       
       // Show profile update popup if form data differs from existing profile
       setTimeout(() => {
@@ -1457,13 +2705,19 @@ const AIFitnessCoach = () => {
       setIsLoadingSuggestions(true);
       setPersonalizedSuggestions('');
       
-      // Generate fallback suggestions based on user inputs instead of AI
+      // Use actual backend suggestions if available, otherwise generate fallback suggestions
+      if (endOfPlanSuggestion) {
+        setPersonalizedSuggestions(endOfPlanSuggestion);
+      } else {
       const fallbackSuggestions = generateFallbackSuggestions();
       setPersonalizedSuggestions(fallbackSuggestions);
+      }
       
-      console.log('DEBUG: Generated user-based suggestions:', fallbackSuggestions);
-      // Auto-expand suggestions when they're loaded
-      setOpenSuggestionsAccordion(true);
+      console.log('DEBUG: Generated suggestions:', endOfPlanSuggestion || 'fallback suggestions');
+      // Auto-expand suggestions when they're loaded (only if user hasn't manually controlled it)
+      if (!userHasToggledAccordion) {
+        setOpenSuggestionsAccordion(true);
+      }
       
     } catch (error) {
       console.error('Error generating suggestions:', error);
@@ -1598,27 +2852,56 @@ const AIFitnessCoach = () => {
   };
 
 
+  // Function to check if user has all required profile fields for default prompt
+  const checkRequiredProfileFields = (profileData) => {
+    const requiredFields = ['age', 'height', 'weight', 'gender', 'activityLevel'];
+    const missingFields = [];
+    
+    requiredFields.forEach(field => {
+      if (!profileData || !profileData[field]) {
+        missingFields.push(field);
+      }
+    });
+    
+    return {
+      hasAllFields: missingFields.length === 0,
+      missingFields: missingFields
+    };
+  };
+
   const handleCopyDefaultPrompt = async () => {
     try {
-      let defaultPrompt = `I am a [age]-year-old [gender], my height is [height] cm, weight is [weight] kg. My activity level is [activity level] (e.g., sedentary, lightly active, moderately active, very active). I usually work out [number of workout days] days per week. My target weight is [target weight] kg, and I want to achieve this goal in [target timeline] weeks/months.`;
+      // Always show popup with all fields pre-filled from profile data
+        setMissingProfileFieldsData({
+        missingFields: [], // No missing fields since we're pre-filling everything
+          currentProfileData: userProfileData || {}
+        });
+        setShowMissingProfileFieldsPopup(true);
+        return;
+
+        let defaultPrompt = `I am a [age]-year-old [gender], my height is [height] cm, weight is [weight] kg. My activity level is [activity level] (e.g., sedentary, lightly active, moderately active, very active). I want to workout [number of workout days] days per week. My target weight is [target weight] kg, and I want to achieve this goal in [target timeline] months.`;
 
       // If user has profile data, populate the prompt with actual values
       if (userProfileData) {
         const age = userProfileData.age || '[age]';
         const gender = userProfileData.gender || '[gender]';
         const height = userProfileData.height || '[height]';
+        const heightUnit = userProfileData.heightUnit || 'cm';
         const weight = userProfileData.weight || '[weight]';
+        const weightUnit = userProfileData.weightUnit || 'kg';
         const activityLevel = userProfileData.activityLevel || '[activity level]';
         const workoutDays = userProfileData.workoutDays || '[number of workout days]';
         const targetWeight = userProfileData.targetWeight || '[target weight]';
+        const targetWeightUnit = userProfileData.targetWeightUnit || 'kg';
         const timeline = userProfileData.targetTimeline || '[target timeline]';
+        const timelineUnit = userProfileData.targetTimelineUnit || 'weeks';
 
         // Only include the example text if we don't have actual activity level data
         const activityLevelText = userProfileData.activityLevel 
           ? `My activity level is ${activityLevel}.`
           : `My activity level is ${activityLevel} (e.g., sedentary, lightly active, moderately active, very active).`;
 
-        defaultPrompt = `I am a ${age}-year-old ${gender}, my height is ${height} cm, weight is ${weight} kg. ${activityLevelText} I usually work out ${workoutDays} days per week. My target weight is ${targetWeight} kg, and I want to achieve this goal in ${timeline} weeks/months.`;
+        defaultPrompt = `I am a ${age}-year-old ${gender}, my height is ${height} ${heightUnit}, weight is ${weight} ${weightUnit}. ${activityLevelText} I want to workout ${workoutDays} days per week. My target weight is ${targetWeight} ${targetWeightUnit}, and I want to achieve this goal in ${timeline} ${timelineUnit}.`;
       }
 
       // Copy to clipboard
@@ -1634,6 +2917,162 @@ const AIFitnessCoach = () => {
     }
   };
 
+  // Validation function for profile data
+  const validateProfileDataForSave = (formData) => {
+    const errors = [];
+    
+    // Validate age
+    const age = parseFloat(formData.age);
+    if (!formData.age || isNaN(age) || age < 13 || age > 120) {
+      errors.push('Please enter a valid age (13-120 years)');
+    }
+    
+    // Validate height
+    const height = parseFloat(formData.height);
+    if (!formData.height || isNaN(height)) {
+      errors.push('Please enter a valid height');
+    } else if (formData.heightUnit === 'cm' && (height < 90 || height > 250)) {
+      errors.push('Height must be between 90-250 cm');
+    } else if (formData.heightUnit === 'ft' && (height < 3 || height > 8)) {
+      errors.push('Height must be between 3-8 ft');
+    }
+    
+    // Validate weight
+    const weight = parseFloat(formData.weight);
+    if (!formData.weight || isNaN(weight)) {
+      errors.push('Please enter a valid weight');
+    } else if (formData.weightUnit === 'kg' && (weight < 30 || weight > 650)) {
+      errors.push('Weight must be between 30-650 kg');
+    } else if (formData.weightUnit === 'lbs' && (weight < 66 || weight > 1433)) {
+      errors.push('Weight must be between 66-1433 lbs');
+    }
+    
+    // Validate gender
+    if (!formData.gender) {
+      errors.push('Please select a gender');
+    }
+    
+    // Validate activity level
+    if (!formData.activityLevel) {
+      errors.push('Please select an activity level');
+    }
+    
+    return errors;
+  };
+
+  // Handler for saving profile data only
+  const handleSaveProfile = async (formData) => {
+    console.log('DEBUG: handleSaveProfile called with:', formData);
+    try {
+      if (!isAuthenticated || !user) {
+        setErrorPopupMessage('Please log in to save your profile.');
+        setShowErrorPopup(true);
+        setTimeout(() => setShowErrorPopup(false), 5000);
+        return;
+      }
+
+      // Validate all form data before saving
+      const validationErrors = validateProfileDataForSave(formData);
+      if (validationErrors.length > 0) {
+        // Don't show popup error - let the individual field validation errors show below inputs
+        return;
+      }
+
+      // Update user profile with the new data, but exclude target weight, timeline, and workout days
+      const userRef = doc(db, 'users', user.uid);
+      const { targetWeight: targetW, targetWeightUnit: targetWU, targetTimeline: targetT, targetTimelineUnit: targetTU, workoutDays: workoutD, ...dataToSave } = formData;
+      
+      // Ensure important profile fields are included in the data to save
+      const updatedProfileData = {
+        ...userProfileData,
+        ...dataToSave,
+        age: formData.age,
+        height: formData.height,
+        heightUnit: formData.heightUnit,
+        weight: formData.weight,
+        weightUnit: formData.weightUnit,
+        gender: formData.gender,
+        activityLevel: formData.activityLevel,
+        updatedAt: new Date().toISOString()
+      };
+
+      await setDoc(userRef, updatedProfileData, { merge: true });
+      
+      // Update local state
+      setUserProfileData(updatedProfileData);
+      
+      setSuccessMessage('Profile saved successfully!');
+      setShowSuccessPopup(true);
+      setTimeout(() => setShowSuccessPopup(false), 3000);
+      
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      setErrorPopupMessage('Failed to update profile. Please try again.');
+      setShowErrorPopup(true);
+      setTimeout(() => setShowErrorPopup(false), 5000);
+    }
+  };
+
+  // Handler for generating default prompt only
+  const handleGeneratePrompt = async (formData) => {
+    console.log('DEBUG: handleGeneratePrompt called with:', formData);
+    try {
+      // Validate all form data before generating prompt
+      const validationErrors = validateProfileDataForSave(formData);
+      if (validationErrors.length > 0) {
+        // Don't show popup error - let the individual field validation errors show below inputs
+        return;
+      }
+
+      // Generate and paste the default prompt
+      const age = formData.age || '[age]';
+      const gender = formData.gender || '[gender]';
+      const height = formData.height || '[height]';
+      const heightUnit = formData.heightUnit || 'cm';
+      const weight = formData.weight || '[weight]';
+      const weightUnit = formData.weightUnit || 'kg';
+      const activityLevel = formData.activityLevel || '[activity level]';
+      const workoutDays = formData.workoutDays || '[number of workout days]';
+      const targetWeight = formData.targetWeight || '[target weight]';
+      const targetWeightUnit = formData.targetWeightUnit || 'kg';
+      const timeline = formData.targetTimeline || '[target timeline]';
+        const timelineUnit = 'months';
+
+      const activityLevelText = activityLevel 
+        ? `My activity level is ${activityLevel}.`
+        : `My activity level is ${activityLevel} (e.g., sedentary, lightly active, moderately active, very active).`;
+
+      const defaultPrompt = `I am a ${age}-year-old ${gender}, my height is ${height} ${heightUnit}, weight is ${weight} ${weightUnit}. ${activityLevelText} I want to workout ${workoutDays} days per week. My target weight is ${targetWeight} ${targetWeightUnit}, and I want to achieve this goal in ${timeline} ${timelineUnit}.`;
+
+      // Copy to clipboard
+      await navigator.clipboard.writeText(defaultPrompt);
+      
+      // Automatically paste into fitness goal input field
+      console.log('DEBUG: Attempting to set fitness goal with:', defaultPrompt);
+      setFitnessGoal(defaultPrompt);
+      
+      // Close popup
+      setShowMissingProfileFieldsPopup(false);
+      
+      setCopyButtonClicked(true);
+      setTimeout(() => setCopyButtonClicked(false), 2000);
+      
+      setSuccessMessage('Default prompt generated and copied to clipboard!');
+      setShowSuccessPopup(true);
+      setTimeout(() => setShowSuccessPopup(false), 3000);
+      
+    } catch (error) {
+      console.error('Error generating prompt:', error);
+      setErrorPopupMessage('Failed to generate prompt. Please try again.');
+      setShowErrorPopup(true);
+      setTimeout(() => setShowErrorPopup(false), 5000);
+    }
+  };
+
+  const handleMissingProfileFieldsCancel = () => {
+    setShowMissingProfileFieldsPopup(false);
+    setMissingProfileFieldsData({});
+  };
 
   // Debounced parsing to reduce UI updates
   const debouncedParseResponseLive = useRef(null);
@@ -1713,12 +3152,13 @@ const AIFitnessCoach = () => {
   
   const parseResponseLiveImmediate = (response, type = 'meal') => {
     if (type === 'meal') {
-      const mealPlanMatch = response.match(/MEAL_PLAN:([\s\S]*?)(?=WORKOUT_PLAN:|$)/i);
+      // More accurate regex to extract meal plan content
+      const mealPlanMatch = response.match(/MEAL_PLAN:([\s\S]*?)(?=WORKOUT_PLAN:|END-OF-PLAN[\s-]?SUGGESTION:|\*\*End-of-Plan Suggestion:\*\*|\*\*Recommendation:\*\*|$)/i);
       if (!mealPlanMatch) return;
       
       const mealPlanRaw = mealPlanMatch[1].trim();
       
-      // Parse available days incrementally
+      // Parse available days incrementally with improved regex
       const mealPlanLines = mealPlanRaw.split('\n').map(line => line.trim()).filter(Boolean);
       let currentDay = null;
       let currentMealType = null;
@@ -1760,10 +3200,17 @@ const AIFitnessCoach = () => {
         }
       
         mealPlanLines.forEach(line => {
-          // More flexible day matching patterns
-          const dayMatch = line.match(/Day\s*(\d+)[:\s-]/i) || line.match(/Day\s*(\d+)$/i);
+           // More flexible day matching patterns with better regex
+           const dayMatch = line.match(/Day\s*(\d+)(?:\s*[:-]\s*|\s+)(.*)/i) || line.match(/Day\s*(\d+)$/i);
           if (dayMatch) {
-            currentDay = parseInt(dayMatch[1]);
+             const dayNumber = parseInt(dayMatch[1]);
+             // Only process days 1-7
+             if (dayNumber >= 1 && dayNumber <= 7) {
+               currentDay = dayNumber;
+               console.log(`DEBUG: Found Day ${currentDay}`);
+             } else {
+               console.log(`DEBUG: Skipping Day ${dayNumber} (not in range 1-7)`);
+             }
             
             // Create day if it doesn't exist - show immediately when day is detected
             if (!updatedMealPlans.find(day => day.dayNumber === currentDay)) {
@@ -1784,28 +3231,39 @@ const AIFitnessCoach = () => {
             return;
           }
         
-          const mealTypeMatch = line.match(/(Breakfast|Lunch|Snack|Dinner)\s*(?:\((\d+)\s*(?:kcal|calories?)?\)|(?:\s*-\s*)?(\d+)\s*(?:kcal|calories?))?(?:\s*:|$)/i);
+           // Improved meal type matching with better calorie extraction
+           const mealTypeMatch = line.match(/(Breakfast|Lunch|Snack|Dinner)\s*\((\d+)\s*(?:kcal|calories?)?\)(?:\s*:|$)/i);
           if (mealTypeMatch && currentDay && currentDay <= 7) {
             currentMealType = mealTypeMatch[1];
-            const calories = parseInt(mealTypeMatch[2] || mealTypeMatch[3]) || 0;
+             const calories = parseInt(mealTypeMatch[2]) || 0;
+             console.log(`DEBUG: Found meal type: ${currentMealType} with ${calories} kcal for Day ${currentDay}`);
+             console.log(`DEBUG: Setting meal totalCalories to ${calories} for ${currentMealType}`);
             
             const dayData = updatedMealPlans.find(day => day.dayNumber === currentDay);
             if (dayData) {
               const mealIndex = dayData.meals.findIndex(m => m.type === currentMealType);
               if (mealIndex !== -1) {
                 dayData.meals[mealIndex].calories = calories;
+                // Add a totalCalories field to distinguish from calculated calories
+                dayData.meals[mealIndex].totalCalories = calories;
+                console.log(`DEBUG: Set ${currentMealType} totalCalories to ${calories} for Day ${currentDay}`);
                 hasChanges = true;
               }
             }
             return;
           }
         
-          // Parse meal items
-          const itemMatch = line.match(/^(?:\d+\.|[\-•●])\s*(.*?)\s*[-–—]\s*(.*?)\s*[-–—]\s*(\d+)\s*(?:kcal|calories?|cal)$/i);
+          // Parse meal items with improved regex to handle the exact format from backend
+          // Format: "  1. Oats (dry) — 60g — 234 kcal"
+          const itemMatch = line.match(/^\s*\d+\.\s*(.*?)\s*[-–—]\s*(.*?)\s*[-–—]\s*(\d+)\s*(?:kcal|calories?|cal)\s*$/i);
           if (itemMatch && currentDay && currentMealType && currentDay <= 7) {
             const itemName = itemMatch[1].trim();
             const itemQty = itemMatch[2].trim();
             const itemCalories = parseInt(itemMatch[3]) || 0;
+             
+             console.log('DEBUG: Parsed item:', itemName, itemQty, itemCalories, 'from line:', line);
+             console.log('DEBUG: Raw calories text:', itemMatch[3], 'Parsed calories:', itemCalories);
+             console.log('DEBUG: Current meal type:', currentMealType, 'Current day:', currentDay);
             const description = itemQty ? `${itemName} - ${itemQty}` : itemName;
             
             const dayData = updatedMealPlans.find(day => day.dayNumber === currentDay);
@@ -1826,13 +3284,20 @@ const AIFitnessCoach = () => {
               }
             }
           }
+          
+          // Handle Total Daily Calories line
+          const totalCaloriesMatch = line.match(/Total Daily Calories:\s*(\d+)\s*(?:kcal|calories?|cal)/i);
+          if (totalCaloriesMatch && currentDay && currentDay <= 7) {
+            // We don't need to do anything special here since we're already tracking meal calories
+            console.log(`Found total calories for day ${currentDay}: ${totalCaloriesMatch[1]}`);
+          }
         });
         
         return hasChanges ? updatedMealPlans : prevMealPlans;
       });
     } else if (type === 'workout') {
       // Enhanced regex pattern to properly extract workout plan and stop before recommendations/suggestions
-      const workoutPlanMatch = response.match(/WORKOUT_PLAN:([\s\S]*?)(?=END-OF-PLAN SUGGESTION:|END-OF-PLAN SUGG:|END-OF-PLAN:|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|Note:|Important:|Remember to|Make sure to|Don't forget to|It's important to|You should|Try to|Consider|Keep in mind|months to achieve|desired results|Follow this plan consistently|for.*months|achieve your desired|your goal and following|END-OF-PLAN SUGGESTIONS|END-OF-PLAN SUGGEST|$)/i);
+      const workoutPlanMatch = response.match(/WORKOUT_PLAN:([\s\S]*?)(?=END-OF-PLAN[\s-]?SUGGESTION:|END-OF-PLAN SUGG:|END-OF-PLAN:|END-OF|END OF|end-of|end of|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|SUGGESTION|SUGGEST|RECOMMENDATION|RECOMMEND|CLOSING|CLOSE|FINAL|FINAL NOTE|FINAL SUGGESTION|FINAL RECOMMENDATION|Note:|Important:|Remember to|Make sure to|Don't forget to|It's important to|You should|Try to|Consider|Keep in mind|months to achieve|desired results|Follow this plan consistently|for.*months|achieve your desired|your goal and following|END-OF-PLAN SUGGESTIONS|END-OF-PLAN SUGGEST|\*\*Recommendation:\*\*|$)/i);
       
       if (!workoutPlanMatch) return;
       
@@ -1904,6 +3369,12 @@ const AIFitnessCoach = () => {
       );
 
       filteredWorkoutLines.forEach(line => {
+        // Skip if this line is just "END-OF" or similar
+        if (line.trim().toUpperCase() === 'END-OF' || line.trim().toUpperCase() === 'END OF') {
+          console.log(`Skipping END-OF line: "${line}"`);
+          return;
+        }
+        
         // Preprocess line to fix common OCR issues
         line = line
           .replace(/(\d+)\s*x\s*(\d+)/g, '$1 × $2') // Only convert x to × when between numbers (multiplication)
@@ -2098,6 +3569,12 @@ const AIFitnessCoach = () => {
             // Check if this is a new exercise number (not seen before)
             const dayData = updatedWorkoutSections.find(day => day.dayNumber === currentWorkoutDay);
             if (dayData) {
+              // Skip if this is END-OF or recommendation content
+              if (isRecommendationContent(exerciseText) || exerciseText.trim().toUpperCase() === 'END-OF') {
+                console.log(`Skipping END-OF/recommendation content: "${exerciseText}"`);
+                return;
+              }
+              
               const existingExercise = dayData.exercises.find(ex => ex.number === exerciseNumber);
               
               // Only add if this is a new exercise number or if the text is more complete
@@ -2175,6 +3652,12 @@ const AIFitnessCoach = () => {
             // Add plain text exercise to the current day
              const dayData = updatedWorkoutSections.find(day => day.dayNumber === currentWorkoutDay);
           if (dayData) {
+              // Skip if this is END-OF or recommendation content
+              if (isRecommendationContent(exercise) || exercise.trim().toUpperCase() === 'END-OF') {
+                console.log(`Skipping END-OF/recommendation content: "${exercise}"`);
+                return;
+              }
+              
               // Check if this exercise already exists (avoid duplicates)
               const existingExercise = dayData.exercises.find(ex => 
                 ex.description.toLowerCase().trim() === exercise.toLowerCase().trim()
@@ -2199,13 +3682,150 @@ const AIFitnessCoach = () => {
   }
 };
 
+  // Parse original streaming response to get accurate calorie values
+  const parseOriginalResponse = (originalResponse) => {
+    if (!originalResponse) return;
+    
+    console.log('DEBUG: Parsing original response for accurate calories');
+    
+    // Extract meal plan from original response
+    const mealPlanMatch = originalResponse.match(/MEAL_PLAN:([\s\S]*?)(?=WORKOUT_PLAN:|$)/i);
+    if (!mealPlanMatch) return;
+    
+    const mealPlanRaw = mealPlanMatch[1].trim();
+    const mealPlanLines = mealPlanRaw.split('\n').map(line => line.trim()).filter(Boolean);
+    
+    let currentDay = null;
+    let currentMealType = null;
+    let currentMealItems = [];
+    let updatedMealPlans = [...mealPlansByDay];
+    
+    mealPlanLines.forEach((line, index) => {
+      // Check for day headers
+      const dayMatch = line.match(/Day\s+(\d+):/i);
+      if (dayMatch) {
+        const dayNumber = parseInt(dayMatch[1]);
+        // Only process days 1-7
+        if (dayNumber >= 1 && dayNumber <= 7) {
+          currentDay = dayNumber;
+          currentMealType = null;
+          currentMealItems = [];
+          
+          console.log(`DEBUG: Found Day ${currentDay} in original response`);
+          
+          // Ensure day exists in meal plans
+          if (!updatedMealPlans.find(day => day.dayNumber === currentDay)) {
+            updatedMealPlans.push({
+              dayNumber: currentDay,
+              meals: []
+            });
+          }
+        } else {
+          console.log(`DEBUG: Skipping Day ${dayNumber} (not in range 1-7) in original response`);
+        }
+        return;
+      }
+      
+      // Check for meal type headers
+      const mealTypeMatch = line.match(/(Breakfast|Lunch|Snack|Dinner)\s*\((\d+)\s*kcal\):/i);
+      if (mealTypeMatch && currentDay && currentDay <= 7) {
+        currentMealType = mealTypeMatch[1];
+        const mealCalories = parseInt(mealTypeMatch[2]);
+        
+        // Find or create the day
+        let dayData = updatedMealPlans.find(day => day.dayNumber === currentDay);
+        if (!dayData) {
+          dayData = { dayNumber: currentDay, meals: [] };
+          updatedMealPlans.push(dayData);
+        }
+        
+        // Find or create the meal
+        let mealData = dayData.meals.find(m => m.type === currentMealType);
+        if (!mealData) {
+          mealData = {
+            type: currentMealType,
+            items: [],
+            totalCalories: mealCalories // Use backend's exact stated meal total
+          };
+          dayData.meals.push(mealData);
+        } else {
+          mealData.totalCalories = mealCalories; // Use backend's exact stated meal total
+        }
+        
+        console.log(`DEBUG: Set ${currentMealType} total calories to ${mealCalories} for Day ${currentDay}`);
+        
+        currentMealItems = mealData.items;
+        return;
+      }
+      
+      // Parse meal items with original calorie values - handle complex patterns and malformed lines
+      const itemMatch = line.match(/^\d+\.\s*(.*?)\s*[-–—]\s*(.*?)\s*[-–—]\s*(.*?)(?:\s*kcal)?$/i);
+      if (itemMatch && currentDay && currentMealType && currentDay <= 7) {
+        const itemName = itemMatch[1].trim();
+        const itemQty = itemMatch[2].trim();
+        const caloriesText = itemMatch[3].trim();
+        
+        // Handle multiple calorie values (e.g., "87 + 68" or "216 + 11")
+        let itemCalories = 0;
+        if (caloriesText.includes('+')) {
+          // Sum multiple calorie values
+          const calorieParts = caloriesText.split('+').map(part => parseInt(part.trim()) || 0);
+          itemCalories = calorieParts.reduce((sum, cal) => sum + cal, 0);
+        } else {
+          // Single calorie value - extract number even if "kcal" is missing
+          const numberMatch = caloriesText.match(/(\d+)/);
+          itemCalories = numberMatch ? parseInt(numberMatch[1]) : 0;
+        }
+        
+        console.log('DEBUG: Original parse item:', itemName, itemQty, itemCalories, 'from line:', line);
+        
+        const description = itemQty ? `${itemName} - ${itemQty}` : itemName;
+        
+        const dayData = updatedMealPlans.find(day => day.dayNumber === currentDay);
+        if (dayData) {
+          const mealIndex = dayData.meals.findIndex(m => m.type === currentMealType);
+          if (mealIndex !== -1) {
+            // Check if item already exists to avoid duplicates
+            const existingItem = dayData.meals[mealIndex].items.find(item => 
+              item.description === description && item.calories === itemCalories
+            );
+             if (!existingItem) {
+               dayData.meals[mealIndex].items.push({
+                 description: description,
+                 calories: itemCalories
+               });
+               console.log(`DEBUG: Added item to ${currentMealType}:`, description, itemCalories, 'kcal');
+             } else {
+               console.log(`DEBUG: Item already exists in ${currentMealType}:`, description, itemCalories, 'kcal');
+             }
+          }
+        }
+      }
+    });
+    
+    // Update the meal plans with original calorie values
+    setMealPlansByDay(updatedMealPlans);
+    console.log('DEBUG: Updated meal plans with original calorie values');
+    console.log('DEBUG: Final meal plans:', updatedMealPlans);
+    
+    // Debug meal totals
+    updatedMealPlans.forEach(day => {
+      console.log(`DEBUG: Day ${day.dayNumber} meal totals:`);
+      day.meals.forEach(meal => {
+        console.log(`  ${meal.type}: ${meal.totalCalories} kcal (${meal.items.length} items)`);
+      });
+    });
+};
+
   const parseResponse = (response) => {
     let cleanedResponse = formatResponse(response);
     
     console.log('Cleaned response for parsing:', cleanedResponse);
 
     // Extract end-of-plan suggestion first, but don't remove it yet
-    let suggestionMatch = cleanedResponse.match(/END-OF-PLAN SUGGESTION:([\s\S]*)$/i);
+    let suggestionMatch = cleanedResponse.match(/END-OF-PLAN[\s-]?SUGGESTION:?\s*([\s\S]*)$/i) || 
+      cleanedResponse.match(/\*\*End-of-Plan Suggestion:\*\*\s*([\s\S]*)$/i) ||
+      cleanedResponse.match(/\*\*Recommendation:\*\*\s*([\s\S]*)$/i);
     if (!suggestionMatch) {
       // Try alternative formats
       suggestionMatch = cleanedResponse.match(/\*\*Closing Recommendation:\*\*([\s\S]*)$/i);
@@ -2221,25 +3841,31 @@ const AIFitnessCoach = () => {
     }
     
     if (suggestionMatch) {
-      setEndOfPlanSuggestion(suggestionMatch[1].trim());
+      const extractedSuggestion = suggestionMatch[1].trim();
+      console.log('DEBUG: Extracted suggestion from backend:', extractedSuggestion);
+      setEndOfPlanSuggestion(extractedSuggestion);
+      // Suggestions will be auto-opened by useEffect when first available
+      console.log('DEBUG: Set endOfPlanSuggestion from parseResponse and opened accordion');
+      console.log('DEBUG: Meal plan suggestion set to:', extractedSuggestion);
     } else {
+      console.log('DEBUG: No suggestion found, using fallback');
       setEndOfPlanSuggestion('Follow this plan consistently to achieve your desired results.');
     }
 
     const mealPlanMatch = cleanedResponse.match(/MEAL_PLAN:([\s\S]*?)(?=WORKOUT_PLAN:|$)/i);
     
     // Enhanced regex pattern to properly extract workout plan and stop before recommendations/suggestions
-    let workoutPlanMatch = cleanedResponse.match(/WORKOUT_PLAN:([\s\S]*?)(?=END-OF-PLAN SUGGESTION:|END-OF-PLAN SUGG:|END-OF-PLAN:|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|Note:|Important:|Remember to|Make sure to|Don't forget to|It's important to|You should|Try to|Consider|Keep in mind|months to achieve|desired results|Follow this plan consistently|for.*months|achieve your desired|your goal and following|END-OF-PLAN SUGGESTIONS|END-OF-PLAN SUGGEST|$)/i);
+    let workoutPlanMatch = cleanedResponse.match(/WORKOUT_PLAN:([\s\S]*?)(?=END-OF-PLAN[\s-]?SUGGESTION:|END-OF-PLAN SUGG:|END-OF-PLAN:|END-OF|END OF|end-of|end of|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|SUGGESTION|SUGGEST|RECOMMENDATION|RECOMMEND|CLOSING|CLOSE|FINAL|FINAL NOTE|FINAL SUGGESTION|FINAL RECOMMENDATION|Note:|Important:|Remember to|Make sure to|Don't forget to|It's important to|You should|Try to|Consider|Keep in mind|months to achieve|desired results|Follow this plan consistently|for.*months|achieve your desired|your goal and following|END-OF-PLAN SUGGESTIONS|END-OF-PLAN SUGGEST|\*\*Recommendation:\*\*|$)/i);
     
     if (!workoutPlanMatch) {
       console.log('Trying alternate workout plan pattern');
-      workoutPlanMatch = cleanedResponse.match(/(?:WORKOUT|EXERCISE)[\s_]*PLAN:?([\s\S]*?)(?=END-OF-PLAN SUGGESTION:|END-OF-PLAN SUGG:|END-OF-PLAN:|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|Note:|Important:|Remember to|Make sure to|Don't forget to|It's important to|You should|Try to|Consider|Keep in mind|months to achieve|desired results|Follow this plan consistently|for.*months|achieve your desired|your goal and following|END-OF-PLAN SUGGESTIONS|END-OF-PLAN SUGGEST|$)/i);
+      workoutPlanMatch = cleanedResponse.match(/(?:WORKOUT|EXERCISE)[\s_]*PLAN:?([\s\S]*?)(?=END-OF-PLAN[\s-]?SUGGESTION:|END-OF-PLAN SUGG:|END-OF-PLAN:|END-OF|END OF|end-of|end of|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|SUGGESTION|SUGGEST|RECOMMENDATION|RECOMMEND|CLOSING|CLOSE|FINAL|FINAL NOTE|FINAL SUGGESTION|FINAL RECOMMENDATION|Note:|Important:|Remember to|Make sure to|Don't forget to|It's important to|You should|Try to|Consider|Keep in mind|months to achieve|desired results|Follow this plan consistently|for.*months|achieve your desired|your goal and following|END-OF-PLAN SUGGESTIONS|END-OF-PLAN SUGGEST|\*\*Recommendation:\*\*|$)/i);
     }
     
     // Additional safeguard: if we still have issues, try to find the workout content by looking for day patterns
     if (!workoutPlanMatch) {
       console.log('Attempting to extract workout content by day patterns');
-      const workoutSectionMatch = cleanedResponse.match(/(WORKOUT_PLAN:|EXERCISE_PLAN:|###\s*Workout.*?)[\s\S]*?(?=END-OF-PLAN SUGGESTION:|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|Note:|Important:|$)/i);
+      const workoutSectionMatch = cleanedResponse.match(/(WORKOUT_PLAN:|EXERCISE_PLAN:|###\s*Workout.*?)[\s\S]*?(?=END-OF-PLAN[\s-]?SUGGESTION:|END-OF-PLAN SUGG:|END-OF-PLAN:|END-OF|END OF|end-of|end of|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|SUGGESTION|SUGGEST|RECOMMENDATION|RECOMMEND|CLOSING|CLOSE|FINAL|FINAL NOTE|FINAL SUGGESTION|FINAL RECOMMENDATION|Note:|Important:|\*\*Recommendation:\*\*|$)/i);
       if (workoutSectionMatch) {
         // Extract just the content after the header
         let content = workoutSectionMatch[0];
@@ -2375,17 +4001,23 @@ const AIFitnessCoach = () => {
             const mealIndex = mealPlansByDay[dayIndex].meals.findIndex(m => m.type === currentMealType);
             if (mealIndex !== -1) {
               mealPlansByDay[dayIndex].meals[mealIndex].calories = calories;
+              // Add totalCalories field to distinguish from calculated calories
+              mealPlansByDay[dayIndex].meals[mealIndex].totalCalories = calories;
             }
           }
         }
         return;
       }
 
-      const itemMatch = line.match(/^(?:\d+\.|[\-•●])\s*(.*?)\s*[-–—]\s*(.*?)\s*[-–—]\s*(\d+)\s*(?:kcal|calories?|cal)$/i);
+      // Parse meal items with improved regex to handle the exact format from backend
+      // Format: "  1. Oats (dry) — 60g — 234 kcal"
+      const itemMatch = line.match(/^\s*\d+\.\s*(.*?)\s*[-–—]\s*(.*?)\s*[-–—]\s*(\d+)\s*(?:kcal|calories?|cal)\s*$/i);
       if (itemMatch) {
         const itemName = cleanItemText(itemMatch[1]);
         const itemQty = itemMatch[2].trim();
         const itemCalories = parseInt(itemMatch[3]) || 0;
+        
+        console.log('DEBUG: Final parse item:', itemName, itemQty, itemCalories, 'from line:', line);
         const description = itemQty ? `${itemName} - ${itemQty}` : itemName;
         
         if (currentDay && currentMealType && currentDay <= 7) {
@@ -2415,21 +4047,7 @@ const AIFitnessCoach = () => {
     }
 
          // Fill missing meals for all 7 days to ensure complete meal plan
-     mealPlansByDay.forEach((dayPlan, index) => {
-       dayPlan.meals.forEach(meal => {
-         if (meal.items.length === 0 && meal.calories === 0) {
-           // Fill empty meals with balanced options
-           console.log(`Filling empty meal: Day ${dayPlan.dayNumber} ${meal.type}`);
-           const defaultCalories = meal.type === 'Breakfast' ? 300 : meal.type === 'Lunch' ? 400 : meal.type === 'Snack' ? 150 : 450;
-           meal.items = [
-             { description: `Balanced ${meal.type.toLowerCase()} - 1 serving`, calories: Math.floor(defaultCalories * 0.4) },
-             { description: `Healthy side - 1 portion`, calories: Math.floor(defaultCalories * 0.3) },
-             { description: `Nutritious option - 1 item`, calories: Math.floor(defaultCalories * 0.3) }
-           ];
-           meal.calories = meal.items.reduce((sum, item) => sum + item.calories, 0);
-         }
-       });
-     });
+     // No fallback meal generation - only use exact backend data
 
     // Process workout plan - always create all 7 days
     const workoutSections = [];
@@ -2451,11 +4069,17 @@ const AIFitnessCoach = () => {
       
       // Filter out any recommendation text that might have slipped through
       const filteredWorkoutLines = workoutPlanLines.filter(line => 
-        !line.match(/Follow this plan|consistently.*achieve|END-OF-PLAN SUGGESTION|Closing Recommendation|To achieve your goal|To effectively/i)
+        !line.match(/Follow this plan|consistently.*achieve|END-OF-PLAN[\s-]?SUGGESTION|END-OF-PLAN SUGG|END-OF-PLAN|END-OF|END OF|end-of|end of|Closing Recommendation|To achieve your goal|To effectively|SUGGESTION|SUGGEST|RECOMMENDATION|RECOMMEND|CLOSING|CLOSE|FINAL|FINAL NOTE|FINAL SUGGESTION|FINAL RECOMMENDATION/i)
       );
 
       filteredWorkoutLines.forEach((line, index) => {
         console.log(`Processing workout line ${index}: ${line}`);
+        
+        // Skip if this line is just "END-OF" or similar
+        if (line.trim().toUpperCase() === 'END-OF' || line.trim().toUpperCase() === 'END OF') {
+          console.log(`Skipping END-OF line: "${line}"`);
+          return;
+        }
         
         // Check for exclusion messages like "Day 5:, 6, and 7 are not included"
         const exclusionMatch = line.match(/Day\s*(\d+)[:,]\s*(\d+),\s*and\s*(\d+)\s*are\s*not\s*included/i);
@@ -2674,6 +4298,12 @@ const AIFitnessCoach = () => {
                 });
                 
                 if (!existingExercise && exercise.length > 0) {
+                  // Skip if this is END-OF or recommendation content
+                  if (isRecommendationContent(exercise) || exercise.trim().toUpperCase() === 'END-OF') {
+                    console.log(`Skipping END-OF/recommendation content: "${exercise}"`);
+                    return;
+                  }
+                  
                   section.exercises.push({
                     number: section.exercises.length + 1,
                     description: exercise
@@ -2931,8 +4561,11 @@ const AIFitnessCoach = () => {
       age: extractedData.age || '',
       gender: extractedData.gender || '',
       height: extractedData.height || '',
+      heightUnit: extractedData.heightUnit || 'cm',
       currentWeight: extractedData.weight || '',
+      currentWeightUnit: extractedData.weightUnit || 'kg',
       targetWeight: extractedData.targetWeight?.value || extractedData.weight || '',
+      targetWeightUnit: extractedData.targetWeightUnit || extractedData.weightUnit || 'kg',
       activityLevel: extractedData.activityLevel || 'moderate',
       targetTimeline: extractedData.timelineWeeks ? Math.floor(extractedData.timelineWeeks / 4) : '3',
       workoutDays: extractedData.frequency || '5',
@@ -2946,18 +4579,6 @@ const AIFitnessCoach = () => {
       const targetWeight = extractedData.targetWeight?.value || extractedData.weight;
       const weightValidation = validateWeightValues(currentWeight, targetWeight);
       
-      if (!weightValidation.isValid && weightValidation.showPopup) {
-        setWeightValidationData({
-          currentWeight: weightValidation.currentWeight,
-          targetWeight: weightValidation.targetWeight,
-          continueSubmission: async () => {
-            setIsLoading(true);
-            await submitNaturalLanguageData(extractedData, prompt);
-          }
-        });
-        setShowWeightValidationPopup(true);
-        return;
-      }
       
       // Calculate calories immediately
       setIsLoading(true);
@@ -3043,19 +4664,6 @@ const AIFitnessCoach = () => {
     }
 
     // Validate weight values - check if current weight equals target weight
-    const weightValidation = validateWeightValues(formData.currentWeight, formData.targetWeight);
-    if (!weightValidation.isValid && weightValidation.showPopup) {
-      setWeightValidationData({
-        currentWeight: weightValidation.currentWeight,
-        targetWeight: weightValidation.targetWeight,
-        continueSubmission: async () => {
-          setIsLoading(true);
-          await submitFormData();
-        }
-      });
-      setShowWeightValidationPopup(true);
-      return;
-    }
     
     // Calculate calories first - copy exact logic from handleNaturalLanguageInput
     setIsLoading(true);
@@ -3107,8 +4715,11 @@ const AIFitnessCoach = () => {
         age: formData.age,
         gender: formData.gender,
         height: formData.height,
+        heightUnit: formData.heightUnit || 'cm',
         currentWeight: formData.currentWeight,
+        currentWeightUnit: formData.currentWeightUnit || 'kg',
         targetWeight: formData.targetWeight,
+        targetWeightUnit: formData.targetWeightUnit || 'kg',
         activityLevel: formData.activityLevel,
         workoutDays: formData.workoutDays,
         targetTimeline: formData.timeframe,
@@ -3246,84 +4857,14 @@ const AIFitnessCoach = () => {
     }
   };
 
-  const estimateCalories = (mealItem) => {
-    const calorieEstimates = {
-      'oatmeal': 150,
-      'yogurt': 120,
-      'greek yogurt': 130,
-      'berries': 50,
-      'banana': 105,
-      'apple': 95,
-      'orange': 62,
-      'nuts': 160,
-      'almond': 165,
-      'peanut butter': 190,
-      'eggs': 140,
-      'egg': 70,
-      'toast': 75,
-      'bread': 80,
-      'whole grain': 90,
-      'chicken': 165,
-      'salmon': 208,
-      'fish': 180,
-      'tuna': 120,
-      'salad': 100,
-      'rice': 130,
-      'quinoa': 120,
-      'avocado': 234,
-      'protein': 120,
-      'smoothie': 150,
-      'vegetables': 50,
-      'veggies': 50,
-      'broccoli': 55,
-      'sweet potato': 103,
-      'potato': 160,
-      'hummus': 166,
-      'olive oil': 120,
-      'cheese': 113,
-      'milk': 103,
-      'protein bar': 200,
-      'granola': 120,
-      'honey': 64,
-      'fruit': 60,
-      'steak': 250,
-      'beef': 213,
-      'turkey': 165,
-      'tofu': 144,
-      'lentils': 230,
-      'beans': 132,
-      'soup': 170,
-      'wrap': 245,
-      'sandwich': 260,
-      'pasta': 200,
-      'noodles': 190,
-      'snack': 100,
-    };
+  // Removed estimateCalories function - only use exact backend values
 
-    const itemLower = mealItem.toLowerCase();
-    let totalCalories = 0;
-    let matched = false;
-
-    Object.entries(calorieEstimates).forEach(([keyword, calories]) => {
-      if (itemLower.includes(keyword)) {
-        totalCalories += calories;
-        matched = true;
-      }
-    });
-
-    return matched ? totalCalories : 100; // Default to 100 if no match
-  };
-
-  const calculateMealCalories = (items) => {
-    if (!items || items.length === 0) return 0;
-    return items.reduce((sum, item) => sum + (item.calories || estimateCalories(item.description)), 0);
-  };
-
+  // Simple function to sum meal totals (only for display when backend total is missing)
   const calculateDailyCalories = (meals) => {
     if (!meals || meals.length === 0) return 0;
     return meals.reduce((sum, meal) => {
-      const mealCalories = meal.calories || calculateMealCalories(meal.items);
-      return sum + mealCalories;
+      // Use backend's stated meal total, not calculated total
+      return sum + (meal.totalCalories || meal.calories || 0);
     }, 0);
   };
 
@@ -3636,7 +5177,7 @@ const AIFitnessCoach = () => {
                       <Text key={k} style={pdfStyles.mealItem}>- {item.description} ({item.calories} kcal)</Text>
                     ))}
                   </View>
-                  <Text style={{ ...pdfStyles.tableCell, ...pdfStyles.caloriesCell }}>{meal.calories}</Text>
+                  <Text style={{ ...pdfStyles.tableCell, ...pdfStyles.caloriesCell }}>{meal.totalCalories || meal.calories}</Text>
                 </View>
               ))}
             </View>
@@ -3740,6 +5281,20 @@ const AIFitnessCoach = () => {
       textarea.style.height = `${Math.max(scrollHeight, minHeight)}px`;
     }
   }, [fitnessGoal]);
+
+  // Auto-open suggestions accordion when suggestions are first available (but respect user's manual interaction)
+  useEffect(() => {
+    if (endOfPlanSuggestion && endOfPlanSuggestion.trim() !== '') {
+      // Only auto-open if the user hasn't manually interacted with the accordion
+      if (!userHasToggledAccordion) {
+        setOpenSuggestionsAccordion(true);
+        console.log('DEBUG: Auto-opening suggestions accordion for first time');
+      } else {
+        console.log('DEBUG: User has manually controlled accordion, not auto-opening');
+      }
+      console.log('DEBUG: Suggestions are available:', endOfPlanSuggestion.substring(0, 100) + '...');
+    }
+  }, [endOfPlanSuggestion, userHasToggledAccordion]);
 
   const animateLoadingIcons = () => {
     const icons = document.querySelectorAll('.loader-icon');
@@ -3849,10 +5404,10 @@ const AIFitnessCoach = () => {
           <button
             className={`copy-prompt-button ${copyButtonClicked ? 'clicked' : ''}`}
             onClick={handleCopyDefaultPrompt}
-            title="Copy default prompt template"
+            title="Copy Generate prompt template"
           >
             <i className={`fas ${copyButtonClicked ? 'fa-check' : 'fa-copy'}`}></i>
-            <span>{copyButtonClicked ? 'Copied!' : 'Copy Default Prompt'}</span>
+            <span>{copyButtonClicked ? 'Copied!' : 'Generate Prompt'}</span>
           </button>
         </div>
         
@@ -3976,7 +5531,7 @@ const AIFitnessCoach = () => {
                         id="currentWeight"
                         name="currentWeight"
                         min="30"
-                        max="200"
+                        max="650"
                         step="0.1"
                         required
                         value={formData.currentWeight}
@@ -3992,7 +5547,7 @@ const AIFitnessCoach = () => {
                         id="targetWeight"
                         name="targetWeight"
                         min="30"
-                        max="200"
+                        max="650"
                         step="0.1"
                         required
                         value={formData.targetWeight}
@@ -4170,7 +5725,7 @@ const AIFitnessCoach = () => {
                                     </div>
                                     <div className="meal-header-right">
                                       <span className="calories-info">
-                                        {meal.calories || calculateMealCalories(meal.items)} cal
+                                        {meal.totalCalories || meal.calories} cal
                                       </span>
                                       <i
                                         className="fas fa-chevron-right nested-accordion-arrow"
@@ -4207,7 +5762,13 @@ const AIFitnessCoach = () => {
                       <div className="generating-status">
                         <div className="generating-indicator">
                           <div className="generating-spinner"></div>
-                          <span className="generating-text">Generating Meal Plan...</span>
+                          <span className="generating-text">
+                 {currentMealDay === 0
+                   ? "Preparing meal plan..."
+                   : currentMealDay >= 7
+                   ? "Finalizing meal plan..."
+                   : `Generating Day ${currentMealDay + 1} of 7...`}
+                          </span>
                         </div>
                       </div>
                     )}
@@ -4262,7 +5823,7 @@ const AIFitnessCoach = () => {
                               </div>
                               <div className="meal-header-right">
                                 <span className="calories-info">
-                                  {meal.calories || calculateMealCalories(meal.items)} cal
+                                  {meal.totalCalories || meal.calories} cal
                                 </span>
                                 <i
                                   className="fas fa-chevron-right nested-accordion-arrow"
@@ -4541,22 +6102,53 @@ const AIFitnessCoach = () => {
           </div>
 
           {/* Suggestions Section - Only show when we have plans */}
-          {((mealPlansByDay && mealPlansByDay.length > 0) || (workoutSections && workoutSections.length > 0 && !noWorkoutPlan)) && (personalizedSuggestions || isLoadingSuggestions) && (
+          {(() => {
+            const hasPlans = (mealPlansByDay && mealPlansByDay.length > 0) || (workoutSections && workoutSections.length > 0 && !noWorkoutPlan);
+            const hasSuggestions = endOfPlanSuggestion || workoutPlanSuggestion || personalizedSuggestions || isLoadingSuggestions;
+            console.log('DEBUG: Suggestions section condition - hasPlans:', hasPlans, 'hasSuggestions:', hasSuggestions);
+            console.log('DEBUG: mealPlansByDay.length:', mealPlansByDay?.length, 'workoutSections.length:', workoutSections?.length, 'noWorkoutPlan:', noWorkoutPlan);
+            console.log('DEBUG: endOfPlanSuggestion length:', endOfPlanSuggestion?.length, 'workoutPlanSuggestion length:', workoutPlanSuggestion?.length, 'personalizedSuggestions length:', personalizedSuggestions?.length);
+            console.log('DEBUG: openSuggestionsAccordion:', openSuggestionsAccordion);
+            console.log('DEBUG: Will show suggestions section:', hasPlans && hasSuggestions);
+            console.log('DEBUG: endOfPlanSuggestion value:', endOfPlanSuggestion);
+            return hasPlans && hasSuggestions;
+          })() && (
             <div className="suggestions-section">
               <div 
                 className="suggestions-header accordion-header"
-                onClick={() => setOpenSuggestionsAccordion(!openSuggestionsAccordion)}
-                style={{ cursor: 'pointer' }}
+                onClick={() => {
+                  setOpenSuggestionsAccordion(!openSuggestionsAccordion);
+                  setUserHasToggledAccordion(true);
+                }}
+                style={{ 
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  padding: '12px 16px',
+                  backgroundColor: openSuggestionsAccordion ? '#f8f9fa' : '#ffffff',
+                  borderBottom: openSuggestionsAccordion ? '1px solid #e9ecef' : 'none',
+                  transition: 'all 0.3s ease'
+                }}
               >
                 <div className="suggestions-header-left">
-                  
-                  <h2>Personalized Suggestions</h2>
+                  <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>
+                    Personalized Suggestions
+                  </h2>
+                  <span style={{ 
+                    fontSize: '12px', 
+                    color: '#6c757d', 
+                    marginLeft: '8px',
+                    fontStyle: 'italic'
+                  }}>
+                    Click to {openSuggestionsAccordion ? 'hide' : 'show'}
+                  </span>
                 </div>
                 <i
                   className="fas fa-chevron-right accordion-arrow"
                   style={{
                     transform: openSuggestionsAccordion ? 'rotate(90deg)' : 'rotate(0deg)',
-                    transition: 'transform 0.3s ease'
+                    transition: 'transform 0.3s ease',
+                    fontSize: '14px',
+                    color: '#6c757d'
                   }}
                 ></i>
               </div>
@@ -4564,7 +6156,19 @@ const AIFitnessCoach = () => {
                 className="suggestions-content accordion-content"
                 style={{
                   display: openSuggestionsAccordion ? 'block' : 'none',
-                  animation: openSuggestionsAccordion ? 'slideDown 0.3s ease forwards' : 'none'
+                  maxHeight: openSuggestionsAccordion ? '1000px' : '0px',
+                  overflow: 'hidden',
+                  transition: 'max-height 0.3s ease, opacity 0.3s ease',
+                  opacity: openSuggestionsAccordion ? 1 : 0,
+                  padding: openSuggestionsAccordion ? '16px' : '0px'
+                }}
+                ref={(el) => {
+                  if (el) {
+                    console.log('DEBUG: Suggestions content element display style:', el.style.display);
+                    console.log('DEBUG: Suggestions content element computed display:', window.getComputedStyle(el).display);
+                    console.log('DEBUG: Suggestions content element height:', el.offsetHeight);
+                    console.log('DEBUG: Suggestions content element innerHTML length:', el.innerHTML.length);
+                  }
                 }}
               >
                 {isLoadingSuggestions ? (
@@ -4574,7 +6178,49 @@ const AIFitnessCoach = () => {
                   </div>
                 ) : (
                   <div className="suggestions-text">
-                    {personalizedSuggestions.split('\n').map((line, index) => {
+                    {(() => {
+                      // Show both meal and workout suggestions if both exist
+                      const hasMealSuggestion = endOfPlanSuggestion && endOfPlanSuggestion.trim() !== '';
+                      const hasWorkoutSuggestion = workoutPlanSuggestion && workoutPlanSuggestion.trim() !== '';
+                      
+                      console.log('DEBUG: Suggestions content rendering - hasMealSuggestion:', hasMealSuggestion, 'hasWorkoutSuggestion:', hasWorkoutSuggestion);
+                      console.log('DEBUG: Suggestions content rendering - endOfPlanSuggestion:', endOfPlanSuggestion);
+                      console.log('DEBUG: Suggestions content rendering - workoutPlanSuggestion:', workoutPlanSuggestion);
+                      console.log('DEBUG: Suggestions content rendering - personalizedSuggestions:', personalizedSuggestions);
+                      console.log('DEBUG: Suggestions content rendering - isLoadingSuggestions:', isLoadingSuggestions);
+                      
+                      const suggestions = [];
+                      
+                      // Add meal plan suggestion if it exists
+                      if (hasMealSuggestion) {
+                        suggestions.push(
+                          <div key="meal-suggestion" className="explanation-section meal-explanation">
+                            <div className="explanation-header">
+                              <i className="fas fa-utensils explanation-icon"></i>
+                              <h3>Meal Plan Focus</h3>
+                            </div>
+                            <p className="explanation-text">{endOfPlanSuggestion}</p>
+                          </div>
+                        );
+                      }
+                      
+                      // Add workout plan suggestion if it exists
+                      if (hasWorkoutSuggestion) {
+                        suggestions.push(
+                          <div key="workout-suggestion" className="explanation-section workout-explanation">
+                            <div className="explanation-header">
+                              <i className="fas fa-dumbbell explanation-icon"></i>
+                              <h3>Workout Plan Focus</h3>
+                            </div>
+                            <p className="explanation-text">{workoutPlanSuggestion}</p>
+                          </div>
+                        );
+                      }
+                      
+                      // Fallback to old logic if no specific suggestions
+                      if (suggestions.length === 0) {
+                        const suggestionsToShow = personalizedSuggestions || 'Follow this plan consistently to achieve your desired results.';
+                        const renderedContent = suggestionsToShow.split('\n').map((line, index) => {
                       const trimmedLine = line.trim();
                       
                       // Handle meal plan explanation - only show if meal plan exists
@@ -4639,8 +6285,43 @@ const AIFitnessCoach = () => {
                         );
                       }
                       
+                      // Handle regular text (fallback for any other content)
+                      if (trimmedLine && trimmedLine.length > 0) {
+                        // Check if this is a meal plan suggestion (no workout plan exists)
+                        const isMealPlanOnly = !workoutSections || workoutSections.length === 0 || noWorkoutPlan;
+                        
+                        if (isMealPlanOnly) {
+                          // Show as meal plan focus
+                          return (
+                            <div key={index} className="explanation-section meal-explanation">
+                              <div className="explanation-header">
+                                <i className="fas fa-utensils explanation-icon"></i>
+                                <h3>Meal Plan Focus</h3>
+                              </div>
+                              <p className="explanation-text">{trimmedLine}</p>
+                            </div>
+                          );
+                        } else {
+                          // Show as general suggestion
+                          return (
+                            <p key={index} className="suggestion-text">
+                              {trimmedLine}
+                            </p>
+                          );
+                        }
+                      }
+                      
                       return null;
-                    })}
+                    });
+                        console.log('DEBUG: Rendered content length:', renderedContent.length);
+                        console.log('DEBUG: Rendered content:', renderedContent);
+                        return renderedContent;
+                      }
+                      
+                      // Return the structured suggestions
+                      console.log('DEBUG: Returning structured suggestions:', suggestions.length);
+                      return suggestions;
+                    })()}
                   </div>
                 )}
               </div>
@@ -4843,6 +6524,61 @@ const AIFitnessCoach = () => {
         </div>
       )}
 
+      {/* Missing Profile Fields Popup */}
+      {showMissingProfileFieldsPopup && (
+        <div className="missing-profile-fields-popup" style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000
+        }}>
+          <div className="popup-content" style={{
+            backgroundColor: 'white',
+            padding: window.innerWidth < 768 ? '20px' : '40px',
+            borderRadius: '20px',
+            maxWidth: '600px',
+            width: window.innerWidth < 768 ? '95%' : '90%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)',
+            textAlign: 'center',
+            margin: '10px'
+          }}>
+            <h2 style={{ 
+              marginBottom: '20px', 
+              color: '#333',
+              fontSize: '24px',
+              fontWeight: '600'
+            }}>
+              Generate Default Prompt
+            </h2>
+            <p style={{ 
+              marginBottom: '25px', 
+              color: '#666',
+              fontSize: '16px',
+              lineHeight: '1.5'
+            }}>
+              Review and modify your information to generate a personalized default prompt.
+            </p>
+            
+            <MissingProfileFieldsForm 
+              missingFields={missingProfileFieldsData.missingFields || []}
+              currentProfileData={missingProfileFieldsData.currentProfileData || {}}
+              onSave={handleSaveProfile}
+              onGenerate={handleGeneratePrompt}
+              onCancel={handleMissingProfileFieldsCancel}
+            />
+          </div>
+        </div>
+      )}
+
+
       {/* Profile Form Popup */}
       {showProfileForm && (
         <div className="profile-form-popup" style={{
@@ -4859,15 +6595,16 @@ const AIFitnessCoach = () => {
         }}>
           <div className="popup-content" style={{
             backgroundColor: 'white',
-            padding: '32px',
+            padding: window.innerWidth < 768 ? '20px' : '32px',
             borderRadius: '16px',
-            maxWidth: '480px',
-            width: '85%',
+            maxWidth: '600px',
+            width: window.innerWidth < 768 ? '95%' : '90%',
             maxHeight: '85vh',
             overflowY: 'auto',
             boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
             textAlign: 'center',
-            position: 'relative'
+            position: 'relative',
+            margin: '10px'
           }}>
             <h2 style={{ marginBottom: '20px', color: '#333', fontSize: '24px', fontWeight: '600' }}>
               Complete Your Profile
@@ -4877,18 +6614,44 @@ const AIFitnessCoach = () => {
             </p>
             
             <form onSubmit={handleProfileFormSubmit} style={{ textAlign: 'left' }}>
-              <div className="form-row">
+              <div className="form-row" style={{ 
+                display: 'grid', 
+                gridTemplateColumns: window.innerWidth < 768 ? '1fr' : '1fr 1fr', 
+                gap: '16px', 
+                marginBottom: '20px' 
+              }}>
                 <div className="form-group">
                   <label htmlFor="profileAge">Age <span className="required-asterisk">*</span></label>
                   <input
                     type="number"
                     id="profileAge"
-                    min="16"
-                    max="100"
+                     min="13"
+                     max="120"
                     required
                     value={profileFormData.age}
-                    onChange={(e) => setProfileFormData({...profileFormData, age: e.target.value})}
-                  />
+                     onChange={(e) => {
+                       const newAge = e.target.value;
+                       const newFormData = {...profileFormData, age: newAge};
+                       setProfileFormData(newFormData);
+                       validateProfileAge(newAge);
+                     }}
+                     onBlur={(e) => {
+                       validateProfileAge(e.target.value);
+                     }}
+                     style={{
+                       border: profileAgeError ? '1px solid #ef4444' : '1px solid #d1d5db'
+                     }}
+                   />
+                   {profileAgeError && (
+                     <div style={{
+                       color: '#ef4444',
+                       fontSize: '12px',
+                       marginTop: '4px',
+                       fontWeight: '500'
+                     }}>
+                       {profileAgeError}
+                     </div>
+                   )}
                 </div>
                 <div className="form-group">
                   <label htmlFor="profileGender">Gender <span className="required-asterisk">*</span></label>
@@ -4906,47 +6669,252 @@ const AIFitnessCoach = () => {
                 </div>
               </div>
               
-              <div className="form-row">
+              <div className="form-row" style={{ 
+                display: 'grid', 
+                gridTemplateColumns: window.innerWidth < 768 ? '1fr' : '1fr 1fr', 
+                gap: '16px', 
+                marginBottom: '20px' 
+              }}>
                 <div className="form-group">
-                  <label htmlFor="profileHeight">Height (cm) <span className="required-asterisk">*</span></label>
+                  <label htmlFor="profileHeight">Height <span className="required-asterisk">*</span></label>
+                  <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
                   <input
                     type="number"
                     id="profileHeight"
-                    min="120"
-                    max="250"
+                     min={profileFormData.heightUnit === 'ft' ? '3' : '90'}
+                    max={profileFormData.heightUnit === 'ft' ? '8' : '250'}
+                    step={profileFormData.heightUnit === 'ft' ? '0.01' : '1'}
                     required
                     value={profileFormData.height}
-                    onChange={(e) => setProfileFormData({...profileFormData, height: e.target.value})}
+                    onChange={(e) => {
+                       const newHeight = e.target.value;
+                       const newFormData = {...profileFormData, height: newHeight};
+                       setProfileFormData(newFormData);
+                       validateProfileHeight(newHeight, newFormData.heightUnit);
+                     }}
+                     onBlur={(e) => {
+                       validateProfileHeight(e.target.value, profileFormData.heightUnit);
+                    }}
+                    placeholder="Enter height"
+                    style={{
+                       flex: '1 1 65%',
+                      padding: '12px 16px',
+                       border: profileHeightError ? '1px solid #ef4444' : '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      fontSize: '16px',
+                      color: '#374151',
+                      background: '#ffffff',
+                      transition: 'all 0.2s ease',
+                      boxSizing: 'border-box',
+                       width: '65%'
+                    }}
                   />
+                  <select
+                    value={profileFormData.heightUnit || 'cm'}
+                    onChange={(e) => {
+                      const newUnit = e.target.value;
+                      const newFormData = {...profileFormData, heightUnit: newUnit};
+                      setProfileFormData(newFormData);
+                      validateProfileHeight(newFormData.height, newUnit);
+                    }}
+                    style={{
+                      flex: '0 0 35%',
+                      padding: '12px 16px',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '8px',
+                      fontSize: '16px',
+                      color: '#374151',
+                      background: '#ffffff',
+                      transition: 'all 0.2s ease',
+                      boxSizing: 'border-box',
+                      width: '35%',
+                      fontWeight: '500',
+                      textAlign: 'left',
+                      minWidth: '60px'
+                    }}
+                  >
+                    <option value="cm">cm</option>
+                    <option value="ft">ft</option>
+                  </select>
+                </div>
+                {profileHeightError && (
+                  <div style={{
+                    color: '#ef4444',
+                    fontSize: '12px',
+                    marginTop: '4px',
+                    fontWeight: '500'
+                  }}>
+                    {profileHeightError}
+                  </div>
+                )}
                 </div>
                 <div className="form-group">
-                  <label htmlFor="profileCurrentWeight">Current Weight (kg) <span className="required-asterisk">*</span></label>
+                  <label htmlFor="profileCurrentWeight">Current Weight <span className="required-asterisk">*</span></label>
+                  <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
                   <input
                     type="number"
                     id="profileCurrentWeight"
                     min="30"
-                    max="200"
+                    max="650"
                     step="0.1"
                     required
                     value={profileFormData.currentWeight}
-                    onChange={(e) => setProfileFormData({...profileFormData, currentWeight: e.target.value})}
-                  />
+                      onChange={(e) => {
+                        const newWeight = e.target.value;
+                        const newFormData = {...profileFormData, currentWeight: newWeight};
+                        setProfileFormData(newFormData);
+                        validateProfileCurrentWeight(newWeight, newFormData.currentWeightUnit);
+                        validateProfileWeights(newWeight, newFormData.targetWeight, newFormData.currentWeightUnit, newFormData.targetWeightUnit);
+                      }}
+                      onBlur={(e) => {
+                        validateProfileCurrentWeight(e.target.value, profileFormData.currentWeightUnit);
+                        validateProfileWeights(e.target.value, profileFormData.targetWeight, profileFormData.currentWeightUnit, profileFormData.targetWeightUnit);
+                      }}
+                      placeholder="Enter current weight"
+                      style={{
+                        flex: '1 1 70%',
+                        padding: '12px 16px',
+                        border: profileCurrentWeightError ? '1px solid #ef4444' : '1px solid #d1d5db',
+                        borderRadius: '8px',
+                        fontSize: '16px',
+                        color: '#374151',
+                        background: '#ffffff',
+                        transition: 'all 0.2s ease',
+                        boxSizing: 'border-box'
+                      }}
+                    />
+                    <select
+                      value={profileFormData.currentWeightUnit || 'kg'}
+                      onChange={(e) => {
+                        const newUnit = e.target.value;
+                        const newFormData = {...profileFormData, currentWeightUnit: newUnit};
+                        setProfileFormData(newFormData);
+                        validateProfileCurrentWeight(newFormData.currentWeight, newUnit);
+                        validateProfileWeights(newFormData.currentWeight, newFormData.targetWeight, newUnit, newFormData.targetWeightUnit);
+                      }}
+                      style={{
+                        padding: '12px 16px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '8px',
+                        fontSize: '16px',
+                        color: '#374151',
+                        background: '#ffffff',
+                        transition: 'all 0.2s ease',
+                        boxSizing: 'border-box',
+                        width: '35%',
+                        fontWeight: '500',
+                        textAlign: 'left',
+                        minWidth: '60px'
+                      }}
+                    >
+                      <option value="kg">kg</option>
+                      <option value="lbs">lbs</option>
+                    </select>
+                  </div>
+                  {profileCurrentWeightError && (
+                    <div style={{
+                      color: '#ef4444',
+                      fontSize: '12px',
+                      marginTop: '4px',
+                      fontWeight: '500'
+                    }}>
+                      {profileCurrentWeightError}
+                    </div>
+                  )}
                 </div>
               </div>
               
-                             <div className="form-row">
+                             <div className="form-row" style={{ 
+                display: 'grid', 
+                gridTemplateColumns: window.innerWidth < 768 ? '1fr' : '1fr 1fr', 
+                gap: '16px', 
+                marginBottom: '20px' 
+              }}>
                  <div className="form-group">
-                   <label htmlFor="profileTargetWeight">Target Weight (kg) <span className="required-asterisk">*</span></label>
+                   <label htmlFor="profileTargetWeight">Target Weight <span className="required-asterisk">*</span></label>
+                   <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
                    <input
                      type="number"
                      id="profileTargetWeight"
                      min="30"
-                     max="200"
+                     max="650"
                      step="0.1"
                      required
                      value={profileFormData.targetWeight}
-                     onChange={(e) => setProfileFormData({...profileFormData, targetWeight: e.target.value})}
+                     onChange={(e) => {
+                       const newWeight = e.target.value;
+                       const newFormData = {...profileFormData, targetWeight: newWeight};
+                       setProfileFormData(newFormData);
+                       validateProfileTargetWeight(newWeight, newFormData.targetWeightUnit);
+                       validateProfileWeights(newFormData.currentWeight, newWeight, newFormData.currentWeightUnit, newFormData.targetWeightUnit);
+                     }}
+                     onBlur={(e) => {
+                       validateProfileTargetWeight(e.target.value, profileFormData.targetWeightUnit);
+                       validateProfileWeights(profileFormData.currentWeight, e.target.value, profileFormData.currentWeightUnit, profileFormData.targetWeightUnit);
+                     }}
+                     placeholder="Enter target weight"
+                     style={{
+                       flex: '1 1 65%',
+                       padding: '12px 16px',
+                       border: profileTargetWeightError ? '1px solid #ef4444' : '1px solid #d1d5db',
+                       borderRadius: '8px',
+                       fontSize: '16px',
+                       color: '#374151',
+                       background: '#ffffff',
+                       transition: 'all 0.2s ease',
+                       boxSizing: 'border-box',
+                       width: '65%'
+                     }}
                    />
+                   <select
+                     value={profileFormData.targetWeightUnit || 'kg'}
+                     onChange={(e) => {
+                       const newUnit = e.target.value;
+                       const newFormData = {...profileFormData, targetWeightUnit: newUnit};
+                       setProfileFormData(newFormData);
+                       validateProfileTargetWeight(newFormData.targetWeight, newUnit);
+                       validateProfileWeights(newFormData.currentWeight, newFormData.targetWeight, newFormData.currentWeightUnit, newUnit);
+                     }}
+                     style={{
+                       flex: '0 0 35%',
+                       padding: '12px 16px',
+                       border: '1px solid #d1d5db',
+                       borderRadius: '8px',
+                       fontSize: '16px',
+                       color: '#374151',
+                       background: '#ffffff',
+                       transition: 'all 0.2s ease',
+                       boxSizing: 'border-box',
+                       width: '35%',
+                       fontWeight: '500',
+                       textAlign: 'left',
+                       minWidth: '60px'
+                     }}
+                   >
+                     <option value="kg">kg</option>
+                     <option value="lbs">lbs</option>
+                   </select>
+                 </div>
+                   {profileTargetWeightError && (
+                     <div style={{
+                       color: '#ef4444',
+                       fontSize: '12px',
+                       marginTop: '4px',
+                       fontWeight: '500'
+                     }}>
+                       {profileTargetWeightError}
+                     </div>
+                   )}
+                   {profileWeightError && (
+                     <div style={{
+                       color: '#ef4444',
+                       fontSize: '14px',
+                       marginTop: '8px',
+                       fontWeight: '500'
+                     }}>
+                       {profileWeightError}
+                     </div>
+                   )}
                  </div>
                  <div className="form-group">
                    <label htmlFor="profileActivityLevel">Activity Level <span className="required-asterisk">*</span></label>
@@ -4961,7 +6929,7 @@ const AIFitnessCoach = () => {
                      <option value="light">Lightly active (light exercise 1-3 days/week)</option>
                      <option value="moderate">Moderately active (moderate exercise 3-5 days/week)</option>
                      <option value="active">Very active (hard exercise 6-7 days/week)</option>
-                     <option value="very active">Extra active (very hard exercise & physical job)</option>
+                     <option value="very-active">Extra active (very hard exercise & physical job)</option>
                    </select>
                  </div>
                </div>
@@ -4991,11 +6959,31 @@ const AIFitnessCoach = () => {
                      id="profileTimeline"
                      min="1"
                      max="12"
+                     step="1"
                      required
                      value={profileFormData.targetTimeline}
                      onChange={(e) => setProfileFormData({...profileFormData, targetTimeline: e.target.value})}
+                     style={{
+                       width: '100%',
+                       padding: '8px 0',
+                       background: 'transparent',
+                       outline: 'none',
+                       marginBottom: '8px'
+                     }}
                    />
-                   <div className="range-value">{profileFormData.targetTimeline} months</div>
+                   <div style={{
+                     fontSize: '14px',
+                     color: '#6b7280',
+                     fontWeight: '500',
+                     textAlign: 'center',
+                     padding: '4px 8px',
+                     background: '#f3f4f6',
+                     borderRadius: '6px',
+                     border: '1px solid #e5e7eb',
+                     marginTop: '8px'
+                   }}>
+                     {profileFormData.targetTimeline} months
+                   </div>
                  </div>
                </div>
               
@@ -5208,7 +7196,7 @@ const AIFitnessCoach = () => {
             backgroundColor: 'white',
             padding: '40px',
             borderRadius: '20px',
-            maxWidth: '500px',
+            maxWidth: '600px',
             width: '90%',
             boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)',
             textAlign: 'center'
@@ -5337,99 +7325,6 @@ const AIFitnessCoach = () => {
         </div>
       )}
 
-      {/* Weight Validation Popup */}
-      {showWeightValidationPopup && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 10002
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            padding: '32px',
-            borderRadius: '16px',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-            maxWidth: '500px',
-            width: '90%',
-            textAlign: 'center'
-          }}>
-            <div style={{
-              fontSize: '48px',
-              color: '#f59e0b',
-              marginBottom: '16px'
-            }}>
-              <i className="fas fa-exclamation-triangle"></i>
-            </div>
-            <h3 style={{
-              fontSize: '24px',
-              fontWeight: '600',
-              color: '#1f2937',
-              marginBottom: '16px'
-            }}>
-              Weight Values Are Equal
-            </h3>
-            <p style={{
-              fontSize: '16px',
-              color: '#6b7280',
-              marginBottom: '24px',
-              lineHeight: '1.5'
-            }}>
-              Your current weight ({weightValidationData?.currentWeight} kg) and target weight ({weightValidationData?.targetWeight} kg) are the same.
-              <br /><br />
-              Do you want to proceed with generating your fitness plan anyway?
-            </p>
-            <div style={{
-              display: 'flex',
-              gap: '12px',
-              justifyContent: 'center'
-            }}>
-              <button
-                onClick={handleWeightValidationCancel}
-                style={{
-                  padding: '12px 24px',
-                  backgroundColor: '#6b7280',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseOver={(e) => e.target.style.backgroundColor = '#4b5563'}
-                onMouseOut={(e) => e.target.style.backgroundColor = '#6b7280'}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleWeightValidationConfirm}
-                style={{
-                  padding: '12px 24px',
-                  backgroundColor: '#10b981',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.2s'
-                }}
-                onMouseOver={(e) => e.target.style.backgroundColor = '#059669'}
-                onMouseOut={(e) => e.target.style.backgroundColor = '#10b981'}
-              >
-                Yes, Proceed
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* CSS Styles for Meal Generation Animation */}
       <style>{`

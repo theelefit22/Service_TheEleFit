@@ -12,9 +12,12 @@ export class PromptParser {
         /(\d{1,3})[-–~]?year[-–~]old/gi,
         /age\s*[:=]?\s*(\d{1,3})/gi,
         
-        // "I am X" patterns
-        /i\s+(?:am|'m)\s+(\d{1,3})(?:\s|$|\.|,|;)/gi,
-        /i'm\s+(\d{1,3})(?:\s|$|\.|,|;)/gi,
+        // "I am X" patterns - enhanced for natural language
+        /i\s+(?:am|'m)\s+(\d{1,3})(?:\s|$|\.|,|;|\s+[mf]\b)/gi,
+        /i'm\s+(\d{1,3})(?:\s|$|\.|,|;|\s+[mf]\b)/gi,
+        
+        // "I am X m/f" patterns (age followed by gender)
+        /i\s+(?:am|'m)\s+(\d{1,3})\s+([mf])\b/gi,
         
         // Standalone age at beginning or after punctuation
         /(?:^|[.!?,]\s*)(\d{1,3})(?:\s*,|\s+(?:years?|yrs?|y\.?o\.?))/gi,
@@ -30,27 +33,33 @@ export class PromptParser {
         // Standard gender patterns
         /\b(male|female|man|woman|boy|girl)\b/gi,
         
-        // Single letter M/F
-        /\b([mf])\b(?!t\b|eet\b)/gi, // Avoid matching "ft" or "feet"
+        // Single letter M/F - enhanced to catch "I am 35 m"
+        /\b([mf])\b(?!t\b|eet\b|onths?\b)/gi, // Avoid matching "ft", "feet", "months"
         
         // Gender with colon/equals
         /gender\s*[:=]?\s*(male|female|m|f)/gi,
         
         // "I am a" patterns
-        /i\s+(?:am|'m)\s+(?:a\s+)?(man|woman|boy|girl|male|female)/gi
+        /i\s+(?:am|'m)\s+(?:a\s+)?(man|woman|boy|girl|male|female)/gi,
+        
+        // "I am X m/f" patterns (age followed by gender)
+        /i\s+(?:am|'m)\s+\d{1,3}\s+([mf])\b/gi
       ],
       height: [
         // Imperial patterns - feet and inches with various quote styles
-        /(\d+)\s*['’`]\s*(\d+)\s*["”]?/gi, // 5'9" or 5'9 or 5’9” format
-        /(\d+)\s*['’`]\s*(\d+)\s*(?:inches?|in)?/gi, // 5'9in or 5'9 inches
+        /(\d+)\s*[''`]\s*(\d+)\s*[""]?/gi, // 5'9" or 5'9 or 5'9" format
+        /(\d+)\s*[''`]\s*(\d+)\s*(?:inches?|in)?/gi, // 5'9in or 5'9 inches
         /(\d+)\s*(?:ft|feet|foot)\s*(\d+)\s*(?:inches?|in)?/gi, // 5 ft 9 in
         
-        // Decimal feet patterns
+        // Decimal feet patterns - enhanced for "having weight 5.5ft"
         /(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)/gi, // 5.4 ft
         /(\d+)\.(\d+)\s*(?:ft|feet|foot)?/gi, // 5.10 (treated as 5'10")
         
+        // "having weight" patterns that might be height (context-dependent)
+        /having\s*weight\s*(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)/gi,
+        
         // Apostrophe only patterns (feet only)
-        /(\d+)\s*['’`](?:\s*|$)/gi, // 5' format
+        /(\d+)\s*[''`](?:\s*|$)/gi, // 5' format
         
         // Metric patterns
         /(\d{3})\s*(?:cm|centimeters?)?/gi, // 170 cm or just 170 (3 digits likely cm)
@@ -67,9 +76,10 @@ export class PromptParser {
         // Shorthand without space: "165lb", "80kg"
         /(\d+)(?:kg|lbs?)\b/gi,
         
-        // Weight with label
+        // Weight with label - enhanced for "having weight"
         /weight\s*[:=]?\s*(\d+(?:\.\d+)?)\s*(?:kg|lbs?)?/gi,
         /my\s*weight\s*is\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)?/gi,
+        /having\s*weight\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)?/gi,
         
         // "weighing" patterns - enhanced
         /weighing\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)?/gi,
@@ -109,7 +119,16 @@ export class PromptParser {
         /\b(moderately\s*active|moderate\s*activity|fairly\s*active|regularly\s*active|generally\s*active|moderate)\b/gi,
         /\b(very\s*active|highly\s*active|extremely\s*active|very\s*fit|very)\b/gi,
         /\b(extra\s*active|super\s*active|athlete|athletic|extra)\b/gi,
-        /\b(activity\s*level\s*[:=]?\s*(sedentary|lightly\s*active|moderately\s*active|very\s*active|extra\s*active|light|moderate|very|extra))\b/gi
+        /\b(activity\s*level\s*[:=]?\s*(sedentary|lightly\s*active|moderately\s*active|very\s*active|extra\s*active|light|moderate|very|extra))\b/gi,
+        // Enhanced patterns for "I do prefer activity moderate"
+        /i\s+do\s+prefer\s+activity\s+(sedentary|light|moderate|very|extra)\b/gi,
+        /prefer\s+activity\s+(sedentary|light|moderate|very|extra)\b/gi,
+        /activity\s+(sedentary|light|moderate|very|extra)\b/gi,
+        // Enhanced patterns for abbreviated activity levels - "I do moderately"
+        /i\s+do\s+(sedentary|light|moderate|moderately|very|extra)\b/gi,
+        /do\s+(sedentary|light|moderate|moderately|very|extra)\b/gi,
+        // Standalone activity level words
+        /\b(sedentary|light|moderate|moderately|very|extra)\b(?!\s+(?:active|activity|workout|exercise))/gi
       ],
       frequency: [
         /(\d+)\s*(?:times|x)\s*(?:per|a)\s*(?:week|wk)/gi,
@@ -127,12 +146,14 @@ export class PromptParser {
         /i\s*usually\s*work\s*out\s*(\d+)\s*(?:times|x|days?)\s*(?:per|a)\s*(?:week|wk)/gi,
         /work\s*out\s*(\d+)\s*(?:times|x|days?)\s*(?:per|a)\s*(?:week|wk)\s*(?:usually|typically|normally)/gi,
         /(\d+)\s*(?:times|x|days?)\s*(?:per|a)\s*(?:week|wk)\s*(?:workout|exercise|training|gym|work\s*out)/gi,
-        // New patterns for "for X days" format
+        // New patterns for "for X days" format - enhanced for "give me a plan for 5 days"
         /give.*?workout.*?plan.*?for\s+(\d+)\s+days/gi,
         /workout.*?plan.*?for\s+(\d+)\s+days/gi,
         /for\s+(\d+)\s+days.*?(?:workout|plan)/gi,
         /(\d+)\s+days?\s+plan/gi,
-        /(\d+)\s+days?\s+workout/gi
+        /(\d+)\s+days?\s+workout/gi,
+        /give\s+me\s+a\s+plan\s+for\s+(\d+)\s+days/gi,
+        /plan\s+for\s+(\d+)\s+days/gi
       ],
       targetWeight: [
         /my\s*target\s*weight\s*is\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)/gi,
@@ -162,7 +183,10 @@ export class PromptParser {
         /(?:want\s*to\s*|need\s*to\s*|trying\s*to\s*)?(?:gain|increase)\s+(\d+(?:\.\d+)?)(?:\s*kg|\s*kilos?|\s*pounds?|\s*lbs?)?/gi,
         // More flexible patterns that handle spacing and word boundaries
         /(?:lose|loose|losse)\s+weight\s+(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?)?/gi,
-        /(?:gain|increase)\s+weight\s+(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?)?/gi
+        /(?:gain|increase)\s+weight\s+(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?)?/gi,
+        // Enhanced patterns for "I want to lose weight 10 kgs"
+        /i\s+want\s+to\s+(?:lose|loose|losse)\s+weight\s+(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)?/gi,
+        /want\s+to\s+(?:lose|loose|losse)\s+weight\s+(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)?/gi
       ],
       timeline: [
         /in\s*(\d+)\s*(?:months?|mo|month)/gi,
@@ -175,7 +199,10 @@ export class PromptParser {
         /want\s*to\s*achieve.*?in\s*(\d+)\s*(?:months?|mo|month)/gi,
         /in\s*(\d+)\s*(?:weeks?|wk|week)/gi,
         /in\s*(\d+)\s*(?:years?|yr|y|year)/gi,
-        /(?:timeline|timeframe|time).*?(\d+)\s*(?:weeks?|months?|years?)/gi
+        /(?:timeline|timeframe|time).*?(\d+)\s*(?:weeks?|months?|years?)/gi,
+        // Enhanced patterns for "for 10 months"
+        /for\s+(\d+)\s+(?:months?|mo|month)/gi,
+        /plan\s+for\s+(\d+)\s+(?:months?|mo|month)/gi
       ]
     };
   }
@@ -318,9 +345,20 @@ export class PromptParser {
     const explicitCmMatches = [...text.matchAll(explicitCmPattern)];
     for (const match of explicitCmMatches) {
       const value = parseInt(match[1]);
-      if (value >= 140 && value <= 220) {
+      if (value >= 100 && value <= 250) {
         console.log('DEBUG: Found explicit height in cm:', value);
         return { value, unit: 'cm' };
+      }
+    }
+    
+    // Check for "having weight X ft" patterns that might actually be height
+    const havingWeightFeetPattern = /having\s*weight\s*(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)/gi;
+    const havingWeightFeetMatches = [...text.matchAll(havingWeightFeetPattern)];
+    for (const match of havingWeightFeetMatches) {
+      const value = parseFloat(match[1]);
+      if (value >= 4 && value <= 7) { // Reasonable height range in feet
+        console.log('DEBUG: Found height from "having weight" pattern:', value, 'ft');
+        return { value: this.feetToCm(value), unit: 'cm' };
       }
     }
     
@@ -381,24 +419,24 @@ export class PromptParser {
     matches = [...text.matchAll(cmPattern)];
     for (const match of matches) {
       const value = parseInt(match[1]);
-      if (value >= 140 && value <= 220) {
+      if (value >= 100 && value <= 250) {
         console.log('DEBUG: Found height in cm (fallback):', value);
         return { value, unit: 'cm' };
       }
     }
     
     // Check for standalone 3-digit numbers (likely cm)
-    const threeDigitPattern = /\b(1[4-9]\d|2[0-2]\d)\b(?!\s*(?:lbs?|pounds?|kg|kilos?))/gi;
+    const threeDigitPattern = /\b(1[0-9]\d|2[0-2]\d)\b(?!\s*(?:lbs?|pounds?|kg|kilos?))/gi;
     matches = [...text.matchAll(threeDigitPattern)];
     for (const match of matches) {
       const value = parseInt(match[1]);
-      if (value >= 140 && value <= 220) {
-        // Check it's not weight by looking at context
-        const beforeMatch = text.substring(Math.max(0, match.index - 10), match.index);
-        if (!/weight|weigh|kg|lbs?|pounds?/.test(beforeMatch)) {
-          return { value, unit: 'cm' };
+        if (value >= 100 && value <= 250) {
+          // Check it's not weight by looking at context
+          const beforeMatch = text.substring(Math.max(0, match.index - 10), match.index);
+          if (!/weight|weigh|kg|lbs?|pounds?/.test(beforeMatch)) {
+            return { value, unit: 'cm' };
+          }
         }
-      }
     }
     
     // Check for feet with apostrophe (like 5'3)
@@ -440,6 +478,12 @@ export class PromptParser {
           const fullMatch = match[0].toLowerCase();
           console.log('DEBUG: Full match text:', fullMatch);
           
+          // Skip if this looks like height (feet pattern with reasonable height range)
+          if (/ft|feet|foot/.test(fullMatch) && value >= 4 && value <= 7) {
+            console.log('DEBUG: Skipping weight match that looks like height:', fullMatch);
+            continue;
+          }
+          
           // Check for explicit units
           if (/lbs?|pounds?|lb/.test(fullMatch)) {
             console.log('DEBUG: Found weight in lbs, converting to kg:', value);
@@ -467,7 +511,7 @@ export class PromptParser {
       const value = parseFloat(match[1]);
       if (value) {
         // Skip if this number is likely height (already extracted)
-        if (value >= 140 && value <= 220) {
+        if (value >= 100 && value <= 250) {
           // Could be cm height, check context
           const beforeMatch = text.substring(Math.max(0, match.index - 10), match.index);
           const afterMatch = text.substring(match.index + match[0].length, Math.min(text.length, match.index + match[0].length + 10));
@@ -661,7 +705,7 @@ export class PromptParser {
           return 'sedentary';
         } else if (activityLevel.includes('lightly active') || activityLevel.includes('light activity') || activityLevel.includes('somewhat active') || activityLevel.includes('occasionally active') || activityLevel === 'light') {
           return 'lightly active';
-        } else if (activityLevel.includes('moderately active') || activityLevel.includes('moderate activity') || activityLevel.includes('fairly active') || activityLevel.includes('regularly active') || activityLevel.includes('generally active') || activityLevel === 'moderate') {
+        } else if (activityLevel.includes('moderately active') || activityLevel.includes('moderate activity') || activityLevel.includes('fairly active') || activityLevel.includes('regularly active') || activityLevel.includes('generally active') || activityLevel === 'moderate' || activityLevel === 'moderately') {
           return 'moderately active';
         } else if (activityLevel.includes('very active') || activityLevel.includes('highly active') || activityLevel.includes('extremely active') || activityLevel.includes('very fit') || activityLevel === 'very') {
           return 'very active';

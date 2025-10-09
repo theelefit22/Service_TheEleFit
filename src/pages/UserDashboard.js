@@ -36,13 +36,20 @@ const UserDashboard = () => {
     age: '',
     gender: '',
     height: '',
+    heightUnit: 'cm',
     weight: '',
+    weightUnit: 'kg',
     activityLevel: '',
+    targetWeight: '',
+    targetWeightUnit: 'kg',
+    targetTimeline: '',
+    targetTimelineUnit: 'weeks',
     healthGoals: '',
     dietaryRestrictions: '',
     allergies: ''
   });
   const [formErrors, setFormErrors] = useState({
+    age: '',
     height: '',
     weight: '',
     phone: ''
@@ -74,8 +81,14 @@ const UserDashboard = () => {
               age: data.age || '',
               gender: data.gender || '',
               height: data.height || '',
+              heightUnit: data.heightUnit || 'cm',
               weight: data.weight || '',
+              weightUnit: data.weightUnit || 'kg',
               activityLevel: data.activityLevel || '',
+              targetWeight: '',
+              targetWeightUnit: 'kg',
+              targetTimeline: '',
+              targetTimelineUnit: 'weeks',
               healthGoals: data.healthGoals || '',
               dietaryRestrictions: data.dietaryRestrictions || '',
               allergies: data.allergies || ''
@@ -169,8 +182,14 @@ const UserDashboard = () => {
           age: data.age || '',
           gender: data.gender || '',
           height: data.height || '',
+          heightUnit: data.heightUnit || 'cm',
           weight: data.weight || '',
+          weightUnit: data.weightUnit || 'kg',
           activityLevel: data.activityLevel || '',
+          targetWeight: '',
+          targetWeightUnit: 'kg',
+          targetTimeline: '',
+          targetTimelineUnit: 'weeks',
           healthGoals: data.healthGoals || '',
           dietaryRestrictions: data.dietaryRestrictions || '',
           allergies: data.allergies || ''
@@ -321,15 +340,125 @@ const UserDashboard = () => {
         age: userData.age || '',
         gender: userData.gender || '',
         height: userData.height || '',
+        heightUnit: userData.heightUnit || 'cm',
         weight: userData.weight || '',
+        weightUnit: userData.weightUnit || 'kg',
         activityLevel: userData.activityLevel || '',
+        targetWeight: '',
+        targetWeightUnit: 'kg',
+        targetTimeline: '',
+        targetTimelineUnit: 'weeks',
         healthGoals: userData.healthGoals || '',
         dietaryRestrictions: userData.dietaryRestrictions || '',
         allergies: userData.allergies || ''
       });
       // Clear errors
-      setFormErrors({ height: '', weight: '' });
+      setFormErrors({ age: '', height: '', weight: '', phone: '' });
     }
+  };
+
+  // Validation functions
+  const validateAge = (age) => {
+    const ageNum = parseFloat(age);
+    
+    if (!age || age === '') {
+      setFormErrors(prev => ({ ...prev, age: '' }));
+      return;
+    }
+    
+    if (isNaN(ageNum)) {
+      setFormErrors(prev => ({ ...prev, age: 'Please enter a valid age' }));
+      return;
+    }
+    
+    if (ageNum < 13) {
+      setFormErrors(prev => ({ ...prev, age: 'Age must be at least 13 years' }));
+      return;
+    }
+    
+    if (ageNum > 120) {
+      setFormErrors(prev => ({ ...prev, age: 'Age must be less than 120 years' }));
+      return;
+    }
+    
+    setFormErrors(prev => ({ ...prev, age: '' }));
+  };
+
+  const validateHeight = (height, unit) => {
+    const heightNum = parseFloat(height);
+    
+    if (!height || height === '') {
+      setFormErrors(prev => ({ ...prev, height: '' }));
+      return;
+    }
+    
+    if (isNaN(heightNum)) {
+      setFormErrors(prev => ({ ...prev, height: 'Please enter a valid height' }));
+      return;
+    }
+    
+    if (unit === 'cm') {
+      if (heightNum < 90) {
+        setFormErrors(prev => ({ ...prev, height: 'Height must be at least 90 cm' }));
+        return;
+      }
+      if (heightNum > 250) {
+        setFormErrors(prev => ({ ...prev, height: 'Height must be less than 250 cm' }));
+        return;
+      }
+    } else if (unit === 'ft') {
+      if (heightNum < 3) {
+        setFormErrors(prev => ({ ...prev, height: 'Height must be at least 3 ft' }));
+        return;
+      }
+      if (heightNum > 8) {
+        setFormErrors(prev => ({ ...prev, height: 'Height must be less than 8 ft' }));
+        return;
+      }
+    }
+    
+    setFormErrors(prev => ({ ...prev, height: '' }));
+  };
+
+  const validateWeight = (weight, unit) => {
+    const weightNum = parseFloat(weight);
+    
+    if (!weight || weight === '') {
+      setFormErrors(prev => ({ ...prev, weight: '' }));
+      return;
+    }
+    
+    if (isNaN(weightNum)) {
+      setFormErrors(prev => ({ ...prev, weight: 'Please enter a valid weight' }));
+      return;
+    }
+    
+    if (weightNum <= 0) {
+      setFormErrors(prev => ({ ...prev, weight: 'Weight must be greater than 0' }));
+      return;
+    }
+    
+    if (unit === 'kg') {
+      if (weightNum < 30) {
+        setFormErrors(prev => ({ ...prev, weight: 'Weight must be at least 30 kg' }));
+        return;
+      }
+      if (weightNum > 650) {
+        setFormErrors(prev => ({ ...prev, weight: 'Weight must be less than 650 kg' }));
+        return;
+      }
+    } else if (unit === 'lbs') {
+      if (weightNum < 66) {
+        setFormErrors(prev => ({ ...prev, weight: 'Weight must be at least 66 lbs' }));
+        return;
+      }
+      if (weightNum > 1433) {
+        setFormErrors(prev => ({ ...prev, weight: 'Weight must be less than 1433 lbs' }));
+        return;
+      }
+    }
+    
+    setFormErrors(prev => ({ ...prev, weight: '' }));
   };
 
   const handleInputChange = (e) => {
@@ -339,33 +468,23 @@ const UserDashboard = () => {
       [name]: value
     }));
 
-    // Validate height and weight
-    if (name === 'height') {
-      const heightValue = parseFloat(value);
-      if (value === '') {
-        setFormErrors(prev => ({ ...prev, height: '' }));
-      } else if (isNaN(heightValue) || heightValue < 100 || heightValue > 250) {
-        setFormErrors(prev => ({
-          ...prev,
-          height: 'Height must be between 100 and 250 cm'
-        }));
-      } else {
-        setFormErrors(prev => ({ ...prev, height: '' }));
-      }
+    // Validate age
+    if (name === 'age') {
+      validateAge(value);
     }
 
-    if (name === 'weight') {
-      const weightValue = parseFloat(value);
-      if (value === '') {
-        setFormErrors(prev => ({ ...prev, weight: '' }));
-      } else if (isNaN(weightValue) || weightValue < 20 || weightValue > 300) {
-        setFormErrors(prev => ({
-          ...prev,
-          weight: 'Weight must be between 20 and 300 kg'
-        }));
-      } else {
-        setFormErrors(prev => ({ ...prev, weight: '' }));
-      }
+    // Validate height with unit
+    if (name === 'height' || name === 'heightUnit') {
+      const height = name === 'height' ? value : formData.height;
+      const unit = name === 'heightUnit' ? value : formData.heightUnit;
+      validateHeight(height, unit);
+    }
+
+    // Validate weight with unit
+    if (name === 'weight' || name === 'weightUnit') {
+      const weight = name === 'weight' ? value : formData.weight;
+      const unit = name === 'weightUnit' ? value : formData.weightUnit;
+      validateWeight(weight, unit);
     }
   };
 
@@ -437,19 +556,13 @@ const UserDashboard = () => {
     setMessage({ text: '', type: '' });
   
     try {
-      if (formData.height && (formData.height < 50 || formData.height > 300)) {
-        setFormErrors(prev => ({ ...prev, height: 'Height must be between 50cm and 300cm' }));
-        setIsSaving(false);
-        return;
-      }
-  
-      if (formData.weight && (formData.weight < 20 || formData.weight > 500)) {
-        setFormErrors(prev => ({ ...prev, weight: 'Weight must be between 20kg and 500kg' }));
-        setIsSaving(false);
-        return;
-      }
+      // Validate all fields before saving
+      validateAge(formData.age);
+      validateHeight(formData.height, formData.heightUnit);
+      validateWeight(formData.weight, formData.weightUnit);
 
-      if (formData.phone && formErrors.phone) {
+      // Check if there are any validation errors
+      if (formErrors.age || formErrors.height || formErrors.weight || formErrors.phone) {
         setIsSaving(false);
         return;
       }
@@ -466,8 +579,10 @@ const UserDashboard = () => {
       }
 
       const userRef = doc(db, 'users', currentUser.uid);
+      // Exclude target weight, timeline, and workout days from being saved
+      const { targetWeight, targetWeightUnit, targetTimeline, targetTimelineUnit, workoutDays, ...dataToSave } = formData;
       await updateDoc(userRef, {
-        ...formData,
+        ...dataToSave,
         email: currentUser.email, // Always preserve the email from Firebase Auth
         phoneVerified: phoneVerificationStatus.isVerified,
         phoneVerificationResult: sanitizedVerificationResult,
@@ -477,7 +592,7 @@ const UserDashboard = () => {
       // ✅ Update userData in state
       setUserData({ 
         ...userData, 
-        ...formData,
+        ...dataToSave,
         email: currentUser.email, // Always preserve the email from Firebase Auth
         phoneVerified: phoneVerificationStatus.isVerified,
         phoneVerificationResult: sanitizedVerificationResult
@@ -507,7 +622,7 @@ const UserDashboard = () => {
       'light': 'Light',
       'moderate': 'Moderate',
       'active': 'Active',
-      'very-active': 'Very Active'
+      'very-active': 'Extra Active'
     };
     return activityLevels[level] || 'Not provided';
   };
@@ -622,11 +737,11 @@ const UserDashboard = () => {
                     <div className="info-grid">
                       <div className="info-item">
                         <label>Height:</label>
-                        <span>{userData?.height || 'Not provided'}</span>
+                        <span>{userData?.height ? `${userData.height} ${userData.heightUnit || 'cm'}` : 'Not provided'}</span>
                       </div>
                       <div className="info-item">
                         <label>Weight:</label>
-                        <span>{userData?.weight || 'Not provided'}</span>
+                        <span>{userData?.weight ? `${userData.weight} ${userData.weightUnit || 'kg'}` : 'Not provided'}</span>
                       </div>
                       <div className="info-item">
                         <label>Activity Level:</label>
@@ -708,9 +823,12 @@ const UserDashboard = () => {
                           name="age"
                           value={formData.age}
                           onChange={handleInputChange}
-                          min="1"
+                          onBlur={(e) => validateAge(e.target.value)}
+                          min="13"
                           max="120"
+                          className={formErrors.age ? 'input-error' : ''}
                         />
+                        {formErrors.age && <p className="error-message">{formErrors.age}</p>}
                       </div>
                       <div className="form-group">
                         <label>Gender</label>
@@ -731,27 +849,81 @@ const UserDashboard = () => {
                   <div className="form-grid">
                     <div className="form-row">
                       <div className="form-group">
-                        <label>Height (cm)</label>
-                        <input
-                          type="number"
-                          name="height"
-                          value={formData.height}
-                          onChange={handleInputChange}
-                          placeholder="Enter height in cm"
-                          className={formErrors.height ? 'input-error' : ''}
-                        />
+                        <label>Height</label>
+                        <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+                          <input
+                            type="number"
+                            name="height"
+                            value={formData.height}
+                            onChange={handleInputChange}
+                            onBlur={(e) => validateHeight(e.target.value, formData.heightUnit)}
+                            placeholder="Enter height"
+                            className={formErrors.height ? 'input-error' : ''}
+                            style={{
+                              flex: '1 1 70%',
+                              width: '70%'
+                            }}
+                          />
+                          <select
+                            name="heightUnit"
+                            value={formData.heightUnit || 'cm'}
+                            onChange={handleInputChange}
+                            onBlur={(e) => validateHeight(formData.height, e.target.value)}
+                            style={{
+                              flex: '0 0 30%',
+                              width: '30%',
+                              padding: '12px 8px',
+                              border: '1px solid #d1d5db',
+                              borderRadius: '8px',
+                              fontSize: '16px',
+                              color: '#374151',
+                              background: '#ffffff',
+                              boxSizing: 'border-box'
+                            }}
+                          >
+                            <option value="cm">cm</option>
+                            <option value="ft">ft</option>
+                          </select>
+                        </div>
                         {formErrors.height && <p className="error-message">{formErrors.height}</p>}
                       </div>
                       <div className="form-group">
-                        <label>Weight (kg)</label>
-                        <input
-                          type="number"
-                          name="weight"
-                          value={formData.weight}
-                          onChange={handleInputChange}
-                          placeholder="Enter weight in kg"
-                          className={formErrors.weight ? 'input-error' : ''}
-                        />
+                        <label>Weight</label>
+                        <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+                          <input
+                            type="number"
+                            name="weight"
+                            value={formData.weight}
+                            onChange={handleInputChange}
+                            onBlur={(e) => validateWeight(e.target.value, formData.weightUnit)}
+                            placeholder="Enter weight"
+                            className={formErrors.weight ? 'input-error' : ''}
+                            style={{
+                              flex: '1 1 70%',
+                              width: '70%'
+                            }}
+                          />
+                          <select
+                            name="weightUnit"
+                            value={formData.weightUnit || 'kg'}
+                            onChange={handleInputChange}
+                            onBlur={(e) => validateWeight(formData.weight, e.target.value)}
+                            style={{
+                              flex: '0 0 30%',
+                              width: '30%',
+                              padding: '12px 8px',
+                              border: '1px solid #d1d5db',
+                              borderRadius: '8px',
+                              fontSize: '16px',
+                              color: '#374151',
+                              background: '#ffffff',
+                              boxSizing: 'border-box'
+                            }}
+                          >
+                            <option value="kg">kg</option>
+                            <option value="lbs">lbs</option>
+                          </select>
+                        </div>
                         {formErrors.weight && <p className="error-message">{formErrors.weight}</p>}
                       </div>
                     </div>
@@ -765,13 +937,19 @@ const UserDashboard = () => {
                         >
                           <option value="">Select activity level</option>
                           <option value="sedentary">Sedentary</option>
-                          <option value="light">Light</option>
-                          <option value="moderate">Moderate</option>
-                          <option value="active">Active</option>
-                          <option value="very-active">Very Active</option>
+                          <option value="lightly active">Lightly Active</option>
+                          <option value="moderately active">Moderately Active</option>
+                          <option value="very active">Very Active</option>
+                          <option value="extra active">Extra Active</option>
                         </select>
                       </div>
                     </div>
+                  </div>
+                </div>
+
+                <div className="form-section">
+                  <h3>Additional Information</h3>
+                  <div className="form-grid">
                     <div className="form-group full-width">
                       <label>Health Goals</label>
                       <textarea
@@ -812,7 +990,7 @@ const UserDashboard = () => {
                   <button 
                     className="cancel-button " style={{backgroundColor: '#C8DA2B', color: 'black'}} 
                     onClick={handleSaveProfile}
-                    disabled={isSaving || formErrors.height || formErrors.weight}
+                    disabled={isSaving || formErrors.age || formErrors.height || formErrors.weight || formErrors.phone}
                   >
                     {isSaving ? 'Saving...' : 'Save Changes'}
                   </button>

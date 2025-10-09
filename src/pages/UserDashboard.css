@@ -1209,7 +1209,7 @@
   width: 100%;
   box-sizing: border-box;
   padding: 14px 16px;
-  border: 2px solid #e2e8f0;
+  border: 3px solid #e2e8f0;
   border-radius: 12px;
   font-size: 15px;
   background-color: white;
@@ -1221,7 +1221,7 @@
   background-color: #f7fafc;
   color: #718096;
   cursor: not-allowed;
-  border-color: #edf2f7;
+  border: 3px solid #edf2f7;
 }
 
 .form-group textarea {

@@ -114,25 +114,33 @@ def process_single_day(day_string):
                  })
 
     # Round item calories to the nearest 5
+    print("=== DEBUG: ROUNDING PROCESS ===")
     for meal_name, meal_data in meal_plan.items():
+        print(f"\n{meal_name}:")
         for item in meal_data['items']:
             original_item_calories = item['stated_calories']
             rounded_item_calories = round(original_item_calories / 5) * 5
+            print(f"  {item['item_name']}: {original_item_calories} kcal → {rounded_item_calories} kcal")
             item['stated_calories'] = rounded_item_calories
+    print("=== END ROUNDING DEBUG ===\n")
 
     # Calculate meal totals and update stated meal calories
+    print("=== DEBUG: MEAL TOTALS AFTER ROUNDING ===")
     for meal_name, meal_data in meal_plan.items():
         calculated_meal_total = sum(item['stated_calories'] for item in meal_data['items'])
+        print(f"{meal_name}: {calculated_meal_total} kcal")
         meal_data['stated_calories'] = calculated_meal_total # Update stated meal calories to the calculated total
+    print("=== END MEAL TOTALS DEBUG ===\n")
 
     # Calculate total daily calories and update stated total daily calories
     final_total_daily_calories = sum(meal_data['stated_calories'] for meal_name, meal_data in meal_plan.items())
+    print(f"=== DEBUG: FINAL DAILY TOTAL: {final_total_daily_calories} kcal ===\n")
 
     # Compare with stated total (sum of meal stated calories)
     stated_total = sum(int(kcal) for kcal in re.findall(r'Total Daily Calories: (\d+) kcal', day_string))
     if stated_total == 0:
         # fallback: sum meal headers
-        stated_total = sum(int(meal_kcal) for _, meal_kcal in re.findall(r'- .* \((\d+) kcal\):', day_string))
+        stated_total = sum(int(meal_kcal) for meal_kcal in re.findall(r'- .* \((\d+) kcal\):', day_string))
 
     discrepancy = abs(final_total_daily_calories - stated_total)
     if discrepancy > 100:
@@ -158,3 +166,4 @@ def process_single_day(day_string):
     output_string += f"\nTotal Daily Calories: {final_total_daily_calories} kcal\n" # Use calculated total daily calories
 
     return output_string
+

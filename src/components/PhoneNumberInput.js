@@ -36,6 +36,21 @@ const PhoneNumberInput = ({
     }
   }, [value, phoneNumber]);
 
+  // Handle country change and reset validation
+  useEffect(() => {
+    // When country changes, reset validation if phone number is empty or just country code
+    if (phoneNumber && phoneNumber.length <= 5) {
+      setIsValid(true);
+      setError('');
+      if (onValidationChange) {
+        onValidationChange({ 
+          isValid: true, 
+          error: null 
+        });
+      }
+    }
+  }, [phoneNumber, onValidationChange]);
+
   // Update verification status when prop changes
   useEffect(() => {
     setIsVerified(isAlreadyVerified);
@@ -85,20 +100,42 @@ const PhoneNumberInput = ({
       onChange(value || '');
     }
     
-    // Validate phone number
+    // Validate phone number with better logic
     let valid = true;
     let errorMsg = '';
     
-    if (value) {
+    if (value && value.trim()) {
+      // Only validate if there's actual content
+      const phoneDigits = value.replace(/\D/g, ''); // Remove all non-digits
+      
+      if (phoneDigits.length === 0) {
+        // No digits entered yet, don't show error
+        valid = true;
+        errorMsg = '';
+      } else if (phoneDigits.length < 4) {
+        // Too few digits, show helpful message
+        valid = false;
+        errorMsg = 'Phone number is too short';
+      } else {
+        // Enough digits, validate with library
       try {
         valid = isValidPhoneNumber(value);
         if (!valid) {
+            if (phoneDigits.length > 15) {
+              errorMsg = 'Phone number is too long';
+            } else {
           errorMsg = 'Please enter a valid phone number';
+            }
         }
       } catch (error) {
         valid = false;
         errorMsg = 'Please enter a valid phone number';
       }
+      }
+    } else {
+      // Empty value, no error
+      valid = true;
+      errorMsg = '';
     }
     
     setIsValid(valid);
@@ -262,9 +299,11 @@ const PhoneNumberInput = ({
             onChange={handlePhoneChange}
             placeholder={placeholder}
             disabled={disabled || (isVerified && !showChangeNumber)}
-            defaultCountry="IN"
+            defaultCountry="US"
             international
             countryCallingCodeEditable={false}
+            labels={{}}
+            addInternationalOption={false}
             className={`phone-input-component ${!isValid ? 'error' : ''} ${isVerified ? 'verified' : ''}`}
           />
         </div>
@@ -293,7 +332,7 @@ const PhoneNumberInput = ({
               <div className="verified-section">
                 <div className="verified-badge" title="Phone number verified">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1L13.5 2.5L16.17 5.17L10.5 10.84L6.91 7.25L5.5 8.66L10.5 13.66L21 3.16V9H21ZM7.91 10.25L6.5 11.66L10.5 15.66L21 5.16V9H21V7L15 1L13.5 2.5L16.17 5.17L10.5 10.84L7.91 10.25Z"/>
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                   </svg>
                   <span>Verified</span>
                 </div>
@@ -363,3 +402,4 @@ const PhoneNumberInput = ({
 };
 
 export default PhoneNumberInput;
+

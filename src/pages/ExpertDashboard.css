@@ -1403,7 +1403,7 @@ body {
 .readonly-field input {
   width: 100%;
   padding: 12px 15px;
-  border: 1px solid #eaeaea;
+  border: 3px solid #eaeaea;
   border-radius: 8px;
   background-color: #f9f9f9;
   color: var(--text-color);
@@ -1421,7 +1421,7 @@ body {
 .readonly-field textarea {
   width: 100%;
   padding: 12px 15px;
-  border: 1px solid #eaeaea;
+  border: 3px solid #eaeaea;
   border-radius: 8px;
   background-color: #f9f9f9;
   color: var(--text-color);
@@ -1642,7 +1642,7 @@ h3.no-dot {
 .readonly-field textarea {
   width: 100%;
   padding: 12px 15px;
-  border: 1px solid #eaeaea;
+  border: 3px solid #eaeaea;
   border-radius: 8px;
   background-color: #f9f9f9;
   color: var(--text-color);
