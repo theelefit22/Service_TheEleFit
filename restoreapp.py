@@ -17,7 +17,7 @@ from pdf2image import convert_from_path
 from werkzeug.utils import secure_filename
 from collections import defaultdict
 from datetime import datetime
-from utils import calculate_bmi, calculate_tdee, goal_config, classify_goal_from_text, process_single_day
+from restoreutils import calculate_bmi, calculate_tdee, goal_config, classify_goal_from_text, process_single_day
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import sys
 # Initialize Flask app

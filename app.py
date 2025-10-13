@@ -957,6 +957,10 @@ consider mentioning the target weight {target_weight} kg and timeline {timeline_
 
         print(full_text, flush=True)
 
+    print("Frontend send data:")
+    print("Response type: Streaming response (application/octet-stream)")
+    print("Content: Meal plan with 7 days of meals and calorie calculations")
+    
     return Response(stream_with_context(event_stream()), content_type="application/octet-stream")
 
 
