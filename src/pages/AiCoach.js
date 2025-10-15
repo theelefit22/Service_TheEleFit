@@ -998,6 +998,119 @@ const AIFitnessCoach = () => {
   const [profileCurrentWeightError, setProfileCurrentWeightError] = useState('');
   const [profileTargetWeightError, setProfileTargetWeightError] = useState('');
 
+  // Test function to display dummy meal and workout plans
+  const showTestPlans = () => {
+    // Dummy meal plans
+    const dummyMealPlans = [
+      {
+        dayNumber: 1,
+        meals: [
+          {
+            type: "Breakfast",
+            totalCalories: 450,
+            items: [
+              { description: "Oatmeal with berries and almonds", calories: 300 },
+              { description: "Green tea", calories: 0 }
+            ]
+          },
+          {
+            type: "Lunch",
+            totalCalories: 550,
+            items: [
+              { description: "Grilled chicken salad with mixed vegetables", calories: 350 },
+              { description: "Whole wheat roll", calories: 120 },
+              { description: "Apple", calories: 80 }
+            ]
+          },
+          {
+            type: "Dinner",
+            totalCalories: 600,
+            items: [
+              { description: "Baked salmon with quinoa and steamed broccoli", calories: 450 },
+              { description: "Side salad with olive oil dressing", calories: 150 }
+            ]
+          }
+        ]
+      },
+      {
+        dayNumber: 2,
+        meals: [
+          {
+            type: "Breakfast",
+            totalCalories: 420,
+            items: [
+              { description: "Greek yogurt with honey and granola", calories: 280 },
+              { description: "Banana", calories: 105 },
+              { description: "Coffee with almond milk", calories: 35 }
+            ]
+          },
+          {
+            type: "Lunch",
+            totalCalories: 580,
+            items: [
+              { description: "Turkey and avocado wrap with whole wheat tortilla", calories: 420 },
+              { description: "Carrot sticks with hummus", calories: 160 }
+            ]
+          },
+          {
+            type: "Dinner",
+            totalCalories: 620,
+            items: [
+              { description: "Lean beef stir-fry with brown rice and mixed vegetables", calories: 480 },
+              { description: "Miso soup", calories: 140 }
+            ]
+          }
+        ]
+      }
+    ];
+
+    // Dummy workout plans
+    const dummyWorkoutPlans = [
+      {
+        dayNumber: 1,
+        workoutType: "Upper Body",
+        exercises: [
+          { description: "Push-ups - 3 sets × 12 reps" },
+          { description: "Pull-ups - 3 sets × 8 reps" },
+          { description: "Dumbbell shoulder press - 3 sets × 10 reps" },
+          { description: "Bicep curls - 3 sets × 12 reps" },
+          { description: "Tricep dips - 3 sets × 10 reps" }
+        ]
+      },
+      {
+        dayNumber: 2,
+        workoutType: "Lower Body",
+        exercises: [
+          { description: "Squats - 4 sets × 12 reps" },
+          { description: "Lunges - 3 sets × 10 reps each leg" },
+          { description: "Deadlifts - 3 sets × 8 reps" },
+          { description: "Calf raises - 3 sets × 15 reps" },
+          { description: "Leg press - 3 sets × 12 reps" }
+        ]
+      },
+      {
+        dayNumber: 3,
+        workoutType: "Cardio & Core",
+        exercises: [
+          { description: "30-minute run at moderate pace" },
+          { description: "Plank - 3 sets × 45 seconds" },
+          { description: "Russian twists - 3 sets × 20 reps" },
+          { description: "Mountain climbers - 3 sets × 30 reps" },
+          { description: "Bicycle crunches - 3 sets × 20 reps each side" }
+        ]
+      }
+    ];
+
+    // Set the dummy data
+    setMealPlansByDay(dummyMealPlans);
+    setWorkoutSections(dummyWorkoutPlans);
+    setShowPlans(true);
+    setPlansComplete(true);
+    setIsStreamingMeal(false);
+    setWorkoutPlanChoice(true);
+    setNoWorkoutPlan(false);
+  };
+
   // Profile weight validation function
   const validateProfileWeights = (currentWeight, targetWeight, currentUnit, targetUnit) => {
     const current = parseFloat(currentWeight);
@@ -1395,7 +1508,7 @@ const AIFitnessCoach = () => {
   };
 
   const getApiUrl = (endpoint = 'chat') => {
-    return `https://yantraprise.com/${endpoint}`;
+    return `http://127.0.0.1:5002/${endpoint}`;
  
   };
 
@@ -5532,6 +5645,26 @@ const AIFitnessCoach = () => {
   return (
     <div className="ai-coach-container">
       <h1 className="ai-coach-title">Ask our EleFit AI Coach</h1>
+      {/* <button 
+        onClick={showTestPlans}
+        style={{
+          padding: '10px 20px',
+          backgroundColor: '#7c3aed',
+          color: 'white',
+          border: 'none',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          marginBottom: '20px',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+          transition: 'all 0.3s ease'
+        }}
+        onMouseOver={(e) => e.target.style.backgroundColor = '#6d28d9'}
+        onMouseOut={(e) => e.target.style.backgroundColor = '#7c3aed'}
+      >
+        Show Test Plans
+      </button> */}
       <div className="input-section">
         {isActuallyLoggedIn() && (
           <div className="welcome-message">
@@ -6597,7 +6730,7 @@ const AIFitnessCoach = () => {
             console.log('DEBUG: endOfPlanSuggestion value:', endOfPlanSuggestion);
             return hasPlans && hasSuggestions;
           })() && (
-            <div className="suggestions-section">
+            <div className="suggestions-section" >
               <div 
                 className="suggestions-header accordion-header"
                 onClick={() => {
@@ -6613,7 +6746,7 @@ const AIFitnessCoach = () => {
                   transition: 'all 0.3s ease'
                 }}
               >
-                <div className="suggestions-header-left">
+                <div className="suggestions-header-left" >
                   <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>
                     Personalized Suggestions
                   </h2>
