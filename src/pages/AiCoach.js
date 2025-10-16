@@ -6,7 +6,8 @@ import { ref, push, serverTimestamp, get } from 'firebase/database';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { database, db, auth } from '../services/firebase';
 import { signInWithCustomToken, signOut } from 'firebase/auth';
-import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { PDFDownloadLink, Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
+import { PDFDocument } from 'pdf-lib';
 import { parsePrompt } from '../utils/promptParser';
 import { cleanWorkoutContent, isRecommendationContent } from '../utils/test-parser';
 import { useAuth } from '../hooks/useAuth';
@@ -840,7 +841,7 @@ const MissingProfileFieldsForm = ({ missingFields, currentProfileData, onSave, o
             padding: '12px 24px',
             border: 'none',
             borderRadius: '8px',
-            backgroundColor: '#10b981',
+            backgroundColor: '#4E3580',
             color: 'white',
             fontSize: '14px',
             fontWeight: '500',
@@ -857,8 +858,8 @@ const MissingProfileFieldsForm = ({ missingFields, currentProfileData, onSave, o
             padding: '12px 24px',
             border: 'none',
             borderRadius: '8px',
-            backgroundColor: '#7c3aed',
-            color: 'white',
+            backgroundColor: '#CDD954',
+            color: 'black',
             fontSize: '14px',
             fontWeight: '500',
             cursor: 'pointer',
@@ -1508,7 +1509,7 @@ const AIFitnessCoach = () => {
   };
 
   const getApiUrl = (endpoint = 'chat') => {
-    return `http://127.0.0.1:5002/${endpoint}`;
+    return `https://yantraprise.com/${endpoint}`;
  
   };
 
@@ -3317,6 +3318,36 @@ const AIFitnessCoach = () => {
       const validationErrors = validateProfileDataForSave(formData);
       if (validationErrors.length > 0) {
         // Don't show popup error - let the individual field validation errors show below inputs
+        
+        // Focus on the first required field that has an error
+        setTimeout(() => {
+          if (!formData.age) {
+            const ageInput = document.getElementById('profileAge');
+            if (ageInput) ageInput.focus();
+          } else if (!formData.gender) {
+            const genderSelect = document.getElementById('profileGender');
+            if (genderSelect) genderSelect.focus();
+          } else if (!formData.height) {
+            const heightInput = document.getElementById('profileHeight');
+            if (heightInput) heightInput.focus();
+          } else if (!formData.currentWeight) {
+            const weightInput = document.getElementById('profileCurrentWeight');
+            if (weightInput) weightInput.focus();
+          } else if (!formData.targetWeight) {
+            const targetWeightInput = document.getElementById('profileTargetWeight');
+            if (targetWeightInput) targetWeightInput.focus();
+          } else if (!formData.activityLevel) {
+            const activitySelect = document.getElementById('profileActivityLevel');
+            if (activitySelect) activitySelect.focus();
+          } else if (!formData.workoutDays) {
+            const workoutDaysSelect = document.getElementById('profileWorkoutDays');
+            if (workoutDaysSelect) workoutDaysSelect.focus();
+          } else if (!formData.targetTimeline) {
+            const timelineInput = document.getElementById('profileTimeline');
+            if (timelineInput) timelineInput.focus();
+          }
+        }, 100);
+        
         return;
       }
 
@@ -4119,9 +4150,16 @@ const AIFitnessCoach = () => {
     console.log('Cleaned response for parsing:', cleanedResponse);
 
     // Extract end-of-plan suggestion first, but don't remove it yet
+    // Enhanced patterns to catch meal plan suggestions more comprehensively
     let suggestionMatch = cleanedResponse.match(/END-OF-PLAN[\s-]?SUGGESTION:?\s*([\s\S]*)$/i) || 
       cleanedResponse.match(/\*\*End-of-Plan Suggestion:\*\*\s*([\s\S]*)$/i) ||
-      cleanedResponse.match(/\*\*Recommendation:\*\*\s*([\s\S]*)$/i);
+      cleanedResponse.match(/\*\*Recommendation:\*\*\s*([\s\S]*)$/i) ||
+      cleanedResponse.match(/\*\*Meal Plan Recommendation:\*\*\s*([\s\S]*)$/i) ||
+      cleanedResponse.match(/MEAL[\s-]?PLAN[\s-]?SUGGESTION:?\s*([\s\S]*)$/i) ||
+      cleanedResponse.match(/MEAL[\s-]?PLAN[\s-]?RECOMMENDATION:?\s*([\s\S]*)$/i) ||
+      cleanedResponse.match(/DIET[\s-]?RECOMMENDATION:?\s*([\s\S]*)$/i) ||
+      cleanedResponse.match(/NUTRITION[\s-]?ADVICE:?\s*([\s\S]*)$/i) ||
+      cleanedResponse.match(/FOOD[\s-]?GUIDANCE:?\s*([\s\S]*)$/i);
     if (!suggestionMatch) {
       // Try alternative formats
       suggestionMatch = cleanedResponse.match(/\*\*Closing Recommendation:\*\*([\s\S]*)$/i);
@@ -4134,6 +4172,14 @@ const AIFitnessCoach = () => {
     }
     if (!suggestionMatch) {
       suggestionMatch = cleanedResponse.match(/To effectively([\s\S]*)$/i);
+    }
+    if (!suggestionMatch) {
+      // Additional patterns for meal plan specific suggestions
+      suggestionMatch = cleanedResponse.match(/For[\s-]?your[\s-]?meal[\s-]?plan([\s\S]*)$/i) ||
+        cleanedResponse.match(/Based[\s-]?on[\s-]?your[\s-]?profile([\s\S]*)$/i) ||
+        cleanedResponse.match(/Your[\s-]?nutrition[\s-]?plan([\s\S]*)$/i) ||
+        cleanedResponse.match(/Dietary[\s-]?Guidance([\s\S]*)$/i) ||
+        cleanedResponse.match(/Nutritional[\s-]?Advice([\s\S]*)$/i);
     }
     
     if (suggestionMatch) {
@@ -4345,15 +4391,11 @@ const AIFitnessCoach = () => {
          // Fill missing meals for all 7 days to ensure complete meal plan
      // No fallback meal generation - only use exact backend data
 
-    // Process workout plan - always create all 7 days
+    // Process workout plan - create only days with actual workouts
     const workoutSections = [];
-    for (let i = 1; i <= 7; i++) {
-      workoutSections.push({
-        dayNumber: i,
-        workoutType: 'Rest Day', // Default to Rest Day, will be overridden by backend response
-        exercises: []
-      });
-    }
+    
+    // We'll populate workout sections as we parse them, rather than pre-creating all 7 days
+    // This prevents unnecessary rest days from being added
 
     let currentWorkoutDay = null;
     let currentWorkoutType = null;
@@ -4387,9 +4429,18 @@ const AIFitnessCoach = () => {
           // Set these days as Rest Day
           [day1, day2, day3].forEach(dayNum => {
             if (dayNum >= 1 && dayNum <= 7) {
-              const dayIndex = dayNum - 1;
-              workoutSections[dayIndex].workoutType = 'Rest Day';
-              workoutSections[dayIndex].exercises = [];
+              let section = workoutSections.find(s => s.dayNumber === dayNum);
+              if (!section) {
+                section = {
+                  dayNumber: dayNum,
+                  workoutType: 'Rest Day',
+                  exercises: []
+                };
+                workoutSections.push(section);
+              } else {
+                section.workoutType = 'Rest Day';
+                section.exercises = [];
+              }
               console.log(`Set Day ${dayNum} as Rest Day due to exclusion message`);
             }
           });
@@ -4401,9 +4452,18 @@ const AIFitnessCoach = () => {
         if (singleExclusionMatch) {
           const dayNum = parseInt(singleExclusionMatch[1]);
           if (dayNum >= 1 && dayNum <= 7) {
-            const dayIndex = dayNum - 1;
-            workoutSections[dayIndex].workoutType = 'Rest Day';
-            workoutSections[dayIndex].exercises = [];
+            let section = workoutSections.find(s => s.dayNumber === dayNum);
+            if (!section) {
+              section = {
+                dayNumber: dayNum,
+                workoutType: 'Rest Day',
+                exercises: []
+              };
+              workoutSections.push(section);
+            } else {
+              section.workoutType = 'Rest Day';
+              section.exercises = [];
+            }
             console.log(`Set Day ${dayNum} as Rest Day due to single exclusion message`);
           }
           return;
@@ -4424,10 +4484,10 @@ const AIFitnessCoach = () => {
         
         if (dayMatch) {
           if (currentWorkoutDay && currentExercises.length > 0) {
-            const dayIndex = currentWorkoutDay - 1;
-            if (dayIndex >= 0 && dayIndex < workoutSections.length) {
-              workoutSections[dayIndex].exercises = currentExercises;
-              workoutSections[dayIndex].workoutType = currentWorkoutType;
+            const section = workoutSections.find(s => s.dayNumber === currentWorkoutDay);
+            if (section) {
+              section.exercises = currentExercises;
+              section.workoutType = currentWorkoutType;
             }
           }
           currentWorkoutDay = parseInt(dayMatch[1]);
@@ -4453,8 +4513,17 @@ const AIFitnessCoach = () => {
           console.log(`Found workout day: ${currentWorkoutDay}, type: ${currentWorkoutType}`);
           
           if (currentWorkoutDay > 0 && currentWorkoutDay <= 7) {
-            const dayIndex = currentWorkoutDay - 1;
-            workoutSections[dayIndex].workoutType = currentWorkoutType;
+            let section = workoutSections.find(s => s.dayNumber === currentWorkoutDay);
+            if (!section) {
+              section = {
+                dayNumber: currentWorkoutDay,
+                workoutType: currentWorkoutType,
+                exercises: []
+              };
+              workoutSections.push(section);
+            } else {
+              section.workoutType = currentWorkoutType;
+            }
           } else {
             console.warn(`Workout day ${currentWorkoutDay} is invalid`);
           }
@@ -4630,15 +4699,22 @@ const AIFitnessCoach = () => {
 
       // Save exercises for the last workout day
       if (currentWorkoutDay && currentExercises.length > 0 && currentWorkoutDay <= 7) {
-        const dayIndex = currentWorkoutDay - 1;
-        if (dayIndex >= 0 && dayIndex < workoutSections.length) {
-          workoutSections[dayIndex].exercises = currentExercises;
-          workoutSections[dayIndex].workoutType = currentWorkoutType;
+        let section = workoutSections.find(s => s.dayNumber === currentWorkoutDay);
+        if (!section) {
+          section = {
+            dayNumber: currentWorkoutDay,
+            workoutType: currentWorkoutType || 'Training Day',
+            exercises: currentExercises
+          };
+          workoutSections.push(section);
+        } else {
+          section.exercises = currentExercises;
+          section.workoutType = currentWorkoutType;
         }
       }
     }
 
-    // Ensure rest days are properly handled
+    // Ensure rest days are properly handled and remove empty rest days
     workoutSections.forEach(section => {
       if (section.workoutType.toLowerCase().includes('rest') || 
           section.workoutType.toLowerCase().includes('recovery') ||
@@ -4646,9 +4722,9 @@ const AIFitnessCoach = () => {
         section.exercises = [];
         section.workoutType = 'Rest Day';
       } else if (section.exercises.length === 0) {
-        // If no exercises are scheduled, it's a rest day
-        section.workoutType = 'Rest Day';
-        section.exercises = [];
+        // If no exercises are scheduled and it's not explicitly a rest day, 
+        // we should remove this section rather than mark it as a rest day
+        section.shouldRemove = true;
       } else {
         section.exercises.forEach((exercise, idx) => {
           exercise.number = idx + 1;
@@ -4656,8 +4732,17 @@ const AIFitnessCoach = () => {
       }
     });
 
+    // Remove sections marked for removal
+    const filteredWorkoutSections = workoutSections.filter(section => !section.shouldRemove);
+    
+    // Only add rest days if specifically requested or if there are gaps in the workout schedule
+    // For now, we'll just use the filtered sections without adding extra rest days
+
     console.log('Processed meal plans:', mealPlansByDay);
-    console.log('Processed workouts:', workoutSections);
+    console.log('Processed workouts:', filteredWorkoutSections);
+
+    // Update state with filtered workout sections
+    setWorkoutSections(filteredWorkoutSections);
 
     // Merge with existing data instead of overwriting
     setMealPlansByDay(prevMealPlans => {
@@ -4691,29 +4776,6 @@ const AIFitnessCoach = () => {
         return mergedPlans;
       }
       return mealPlansByDay;
-    });
-
-    setWorkoutSections(prevWorkouts => {
-      // If we have existing workout data from streaming, merge it
-      if (prevWorkouts.length > 0) {
-        const mergedWorkouts = [...prevWorkouts];
-        workoutSections.forEach(newWorkout => {
-          const existingWorkoutIndex = mergedWorkouts.findIndex(workout => workout.dayNumber === newWorkout.dayNumber);
-          if (existingWorkoutIndex !== -1) {
-            // Merge workout data, keeping existing exercises if they exist
-            mergedWorkouts[existingWorkoutIndex] = {
-              ...mergedWorkouts[existingWorkoutIndex],
-              ...newWorkout,
-              exercises: mergedWorkouts[existingWorkoutIndex].exercises.length > 0 ? 
-                mergedWorkouts[existingWorkoutIndex].exercises : newWorkout.exercises
-            };
-          } else {
-            mergedWorkouts.push(newWorkout);
-          }
-        });
-        return mergedWorkouts;
-      }
-      return workoutSections;
     });
   };
 
@@ -4952,7 +5014,7 @@ const AIFitnessCoach = () => {
     
     if (!formData.age || !formData.gender || !formData.height || 
         !formData.currentWeight || !formData.targetWeight || 
-        !formData.activityLevel || !formData.workoutDays || !formData.timeframe) {
+        !formData.activityLevel || formData.activityLevel === '' || !formData.workoutDays || !formData.timeframe) {
       setSuccessMessage('Please fill in all required fields.');
       setShowSuccessPopup(true);
       setTimeout(() => setShowSuccessPopup(false), 3000);
@@ -5449,10 +5511,16 @@ const AIFitnessCoach = () => {
     }
   };
 
-  const PlanPDFDocument = ({ fitnessGoal, mealPlansByDay, workoutSections, endOfPlanSuggestion }) => (
+  const PlanPDFDocument = ({ fitnessGoal, mealPlansByDay, workoutSections, endOfPlanSuggestion, workoutPlanSuggestion }) => (
     <Document>
-      <Page style={pdfStyles.body}>
-        <Text style={pdfStyles.title}>AI Fitness Plan</Text>
+      <Page size={{ width: 600, height: 2000 }} style={pdfStyles.body}>
+        {/* EleFit Logo */}
+        <Image 
+          style={pdfStyles.logo}
+          src="/elefit.jpg"
+        />
+        {/* AI Fitness Plan Title */}
+        <Text style={pdfStyles.mainTitle}>AI Fitness Plan</Text>
         <Text style={pdfStyles.sectionTitle}>Goal:</Text>
         <Text style={pdfStyles.text}>{fitnessGoal}</Text>
         <Text style={pdfStyles.sectionTitle}>Meal Plan</Text>
@@ -5463,7 +5531,7 @@ const AIFitnessCoach = () => {
               <View style={pdfStyles.tableRowHeader}>
                 <Text style={{ ...pdfStyles.tableCell, ...pdfStyles.mealTypeHeader }}>Meal Type</Text>
                 <Text style={{ ...pdfStyles.tableCell, ...pdfStyles.mealItemsHeader }}>Items</Text>
-                <Text style={{ ...pdfStyles.tableCell, ...pdfStyles.caloriesHeader }}>Calories</Text>
+                <Text style={{ ...pdfStyles.tableCellLast, ...pdfStyles.caloriesHeader }}>Calories</Text>
               </View>
               {day.meals.map((meal, j) => (
                 <View key={j} style={[pdfStyles.tableRow, j % 2 === 0 ? pdfStyles.tableRowEven : pdfStyles.tableRowOdd]}> 
@@ -5473,65 +5541,382 @@ const AIFitnessCoach = () => {
                       <Text key={k} style={pdfStyles.mealItem}>- {item.description} ({item.calories} kcal)</Text>
                     ))}
                   </View>
-                  <Text style={{ ...pdfStyles.tableCell, ...pdfStyles.caloriesCell }}>{meal.totalCalories || meal.calories}</Text>
+                  <Text style={{ ...pdfStyles.tableCellLast, ...pdfStyles.caloriesCell }}>{meal.totalCalories || meal.calories}</Text>
                 </View>
               ))}
             </View>
           </View>
         ))}
-        <Text style={pdfStyles.sectionTitle}>Workout Plan</Text>
-        {workoutSections.map((section, i) => (
-          <View key={i} style={pdfStyles.daySection}>
-            <Text style={pdfStyles.dayTitle}>Day {section.dayNumber}: {section.workoutType}</Text>
-            {section.workoutType === 'Rest Day' ? (
-              <Text style={pdfStyles.text}>Rest Day - No exercises scheduled</Text>
-            ) : (
-              <View style={pdfStyles.table}>
-                <View style={pdfStyles.tableRowHeader}>
-                  <Text style={{ ...pdfStyles.tableCell, ...pdfStyles.exerciseHeader }}>#</Text>
-                  <Text style={{ ...pdfStyles.tableCell, ...pdfStyles.exerciseDescHeader }}>Exercise</Text>
-                </View>
-                {section.exercises.map((ex, j) => (
-                  <View key={j} style={[pdfStyles.tableRow, j % 2 === 0 ? pdfStyles.tableRowEven : pdfStyles.tableRowOdd]}> 
-                    <Text style={{ ...pdfStyles.tableCell, ...pdfStyles.exerciseNumCell }}>{j + 1}</Text>
-                    <Text style={{ ...pdfStyles.tableCell, ...pdfStyles.exerciseDescCell }}>{ex.description}</Text>
+        {/* Only show Workout Plan section if there are workout sections with exercises */}
+        {workoutSections && workoutSections.some(section => section.exercises && section.exercises.length > 0) && (
+          <>
+            <Text style={pdfStyles.sectionTitle}>Workout Plan</Text>
+            {workoutSections
+              .filter(section => section.workoutType !== 'Rest Day' || section.exercises.length > 0)
+              .map((section, i) => (
+              <View key={i} style={pdfStyles.daySection}>
+                <Text style={pdfStyles.dayTitle}>Day {section.dayNumber}: {section.workoutType}</Text>
+                {section.workoutType === 'Rest Day' && section.exercises.length === 0 ? (
+                  <Text style={pdfStyles.text}>Rest Day - No exercises scheduled</Text>
+                ) : (
+                  <View>
+                    {section.exercises.map((ex, j) => (
+                      <Text key={j} style={pdfStyles.text}>{j + 1}. {ex.description}</Text>
+                    ))}
                   </View>
-                ))}
+                )}
               </View>
+            ))}
+          </>
+        )}
+        {/* Show Personalized Suggestions section with both Meal Plan Focus and Workout Plan Focus */}
+        {(mealPlansByDay && mealPlansByDay.length > 0 && endOfPlanSuggestion && endOfPlanSuggestion.trim() !== '') || 
+         (workoutSections && workoutSections.some(section => section.exercises && section.exercises.length > 0) && workoutPlanSuggestion && workoutPlanSuggestion.trim() !== '') ? (
+          <>
+            <Text style={pdfStyles.sectionTitle}>Personalized Suggestions</Text>
+            {/* Show Meal Plan Focus section if meal plan exists */}
+            {mealPlansByDay && mealPlansByDay.length > 0 && endOfPlanSuggestion && endOfPlanSuggestion.trim() !== '' && (
+              <>
+                <Text style={pdfStyles.subSectionTitle}>Meal Plan Focus</Text>
+                <Text style={pdfStyles.text}>{endOfPlanSuggestion}</Text>
+              </>
             )}
-          </View>
-        ))}
-        <Text style={pdfStyles.sectionTitle}>Recommendation</Text>
-        <Text style={pdfStyles.text}>{endOfPlanSuggestion}</Text>
+            {/* Show Workout Plan Focus section if workout plan exists */}
+            {workoutSections && workoutSections.some(section => section.exercises && section.exercises.length > 0) && workoutPlanSuggestion && workoutPlanSuggestion.trim() !== '' && (
+              <>
+                <Text style={pdfStyles.subSectionTitle}>Workout Plan Focus</Text>
+                <Text style={pdfStyles.text}>{workoutPlanSuggestion}</Text>
+              </>
+            )}
+          </>
+        ) : (
+          /* Fallback to generic Recommendation section if no specific suggestions */
+          (endOfPlanSuggestion || workoutPlanSuggestion) && (
+            <>
+              <Text style={pdfStyles.sectionTitle}>Recommendation</Text>
+              <Text style={pdfStyles.text}>{endOfPlanSuggestion || workoutPlanSuggestion}</Text>
+            </>
+          )
+        )}
       </Page>
     </Document>
   );
 
   const pdfStyles = StyleSheet.create({
-    body: { padding: 24, fontSize: 12, fontFamily: 'Helvetica' },
-    title: { fontSize: 20, marginBottom: 12, fontWeight: 'bold', textAlign: 'center', color: '#7c3aed' },
-    sectionTitle: { fontSize: 16, marginTop: 16, marginBottom: 6, fontWeight: 'bold', color: '#8b5cf6' },
-    daySection: { marginBottom: 18 },
-    dayTitle: { fontSize: 14, marginBottom: 6, fontWeight: 'bold', color: '#3498db' },
-    text: { marginBottom: 4 },
-    table: { display: 'table', width: 'auto', marginBottom: 8, borderStyle: 'solid', borderWidth: 1, borderColor: '#e5e7eb' },
-    tableRowHeader: { flexDirection: 'row', backgroundColor: '#8b5cf6', color: 'white', borderBottomWidth: 1, borderBottomColor: '#e5e7eb', borderBottomStyle: 'solid' },
-    tableRow: { flexDirection: 'row', minHeight: 18, alignItems: 'flex-start' },
-    tableRowEven: { backgroundColor: '#f3f4f6' },
-    tableRowOdd: { backgroundColor: '#fff' },
-    tableCell: { flex: 1, padding: 4, fontSize: 11, borderRightWidth: 1, borderRightColor: '#e5e7eb', borderRightStyle: 'solid' },
-    mealTypeHeader: { fontWeight: 'bold', backgroundColor: '#e74c3c', color: 'white' },
-    mealItemsHeader: { fontWeight: 'bold', backgroundColor: '#2ecc71', color: 'white' },
-    caloriesHeader: { fontWeight: 'bold', backgroundColor: '#f1c40f', color: 'white' },
-    mealTypeCell: { color: '#e74c3c', fontWeight: 'bold' },
-    mealItemsCell: { color: '#2ecc71' },
-    caloriesCell: { color: '#f1c40f', textAlign: 'center' },
-    mealItem: { fontSize: 10, marginBottom: 1 },
-    exerciseHeader: { fontWeight: 'bold', backgroundColor: '#6366f1', color: 'white', flex: 0.3 },
-    exerciseDescHeader: { fontWeight: 'bold', backgroundColor: '#6366f1', color: 'white', flex: 2 },
-    exerciseNumCell: { color: '#6366f1', textAlign: 'center', flex: 0.3 },
-    exerciseDescCell: { color: '#22223b', flex: 2 },
+    body: { 
+      padding: 24, 
+      fontSize: 12, 
+      fontFamily: 'Helvetica',
+      backgroundColor: '#FFFFFF', // White background
+      // Prevent page breaks by allowing content to flow
+    },
+    logo: {
+      width: 200,
+      height: 100,
+      marginBottom: 20,
+      alignSelf: 'center'
+    },
+    mainTitle: {
+      fontSize: 24,
+      marginBottom: 20,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      color: '#4E3580' // Purple
+    },
+    sectionTitle: { 
+      fontSize: 18, 
+      marginTop: 20, 
+      marginBottom: 12, 
+      fontWeight: 'bold', 
+      color: '#4E3580', // Purple
+      backgroundColor: 'rgba(78, 53, 128, 0.1)', // Light purple background
+      padding: 8,
+      borderRadius: 4
+    },
+    subSectionTitle: { 
+      fontSize: 16, 
+      marginTop: 15, 
+      marginBottom: 8, 
+      fontWeight: 'bold', 
+      color: '#4E3580', // Purple
+      fontStyle: 'italic'
+    },
+    daySection: { 
+      marginBottom: 18,
+      // Remove breakInside to allow content to flow
+    },
+    dayTitle: { 
+      fontSize: 16, 
+      marginBottom: 10, 
+      fontWeight: 'bold', 
+      color: '#4E3580' // Purple
+    },
+    text: { 
+      marginBottom: 8,
+      color: '#000000' // Black text
+    },
+    table: { 
+      display: 'table', 
+      width: '100%', 
+      marginBottom: 12, 
+      borderStyle: 'solid', 
+      borderWidth: 1, 
+      borderColor: '#4E3580', // Purple border
+      // Remove breakInside to allow content to flow
+      // Use fixed table layout for consistent column widths
+      tableLayout: 'fixed'
+    },
+    tableRow: { 
+      flexDirection: 'row' 
+    },
+    tableCol: { 
+      width: '50%', 
+      padding: 4, 
+      borderStyle: 'solid', 
+      borderWidth: 1, 
+      borderColor: '#4E3580' // Purple border
+    },
+    tableHeader: { 
+      backgroundColor: '#4E3580', // Purple background
+      color: '#FFFFFF' // White text
+    },
+    tableFooter: { 
+      backgroundColor: '#4E3580', // Purple background
+      color: '#FFFFFF' // White text
+    },
+    tableFooterText: { 
+      textAlign: 'right' 
+    },
+    signature: { 
+      marginTop: 20, 
+      marginBottom: 20, 
+      textAlign: 'center', 
+      color: '#4E3580' // Purple
+    },
+    signatureLine: { 
+      width: '100%', 
+      height: 1, 
+      backgroundColor: '#4E3580' // Purple
+    },
+    tableRowHeader: { 
+      flexDirection: 'row', 
+      backgroundColor: '#4E3580', // Purple header
+      color: 'white', 
+      borderBottomWidth: 1, 
+      borderBottomColor: '#C8DA2B', // Lime green border
+      borderBottomStyle: 'solid',
+      // Ensure consistent row header height
+      minHeight: 30,
+      // Remove right border for single column header
+      borderRightWidth: 0,
+      // Ensure consistent vertical alignment
+      alignItems: 'center'
+    },
+    tableRow: { 
+      flexDirection: 'row', 
+      minHeight: 25, 
+      alignItems: 'stretch', // Changed from flex-start to stretch for better alignment
+      // Ensure rows maintain consistent height
+      flexGrow: 0,
+      flexShrink: 0,
+      // Prevent wrapping
+      flexWrap: 'nowrap',
+      // Ensure consistent vertical alignment
+      justifyContent: 'flex-start'
+    },
+    tableRowEven: { 
+      backgroundColor: 'rgba(200, 218, 43, 0.1)' // Light lime green background
+    },
+    tableRowOdd: { 
+      backgroundColor: 'rgba(0, 0, 0, 0.05)' // Very light gray background
+    },
+    tableCell: { 
+      flex: 1, 
+      padding: 6, 
+      fontSize: 11, 
+      borderRightWidth: 1, 
+      borderRightColor: '#4E3580', // Purple border
+      borderRightStyle: 'solid',
+      borderBottomWidth: 1, // Add bottom border for consistent cell borders
+      borderBottomColor: '#4E3580', // Purple border
+      borderBottomStyle: 'solid',
+      color: '#000000', // Black text
+      textAlign: 'left', // Ensure consistent text alignment
+      // Fix for column line breaking - ensure consistent height
+      minHeight: 25,
+      // Ensure cells stretch to fill available height
+      flexGrow: 1,
+      flexShrink: 1,
+      // Prevent text wrapping issues
+      whiteSpace: 'nowrap',
+      // Ensure consistent vertical alignment
+      alignItems: 'flex-start'
+    },
+    // Remove the last border on the rightmost cell to prevent double borders
+    tableCellLast: { 
+      flex: 1, 
+      padding: 6, 
+      fontSize: 11, 
+      color: '#000000', // Black text
+      textAlign: 'left', // Ensure consistent text alignment
+      minHeight: 25,
+      borderBottomWidth: 1, // Add bottom border for consistent cell borders
+      borderBottomColor: '#4E3580', // Purple border
+      borderBottomStyle: 'solid',
+      // Remove right border for the last cell
+      borderRightWidth: 0,
+      // Ensure cells stretch to fill available height
+      flexGrow: 1,
+      flexShrink: 1,
+      // Prevent text wrapping issues
+      whiteSpace: 'nowrap',
+      // Ensure consistent vertical alignment
+      alignItems: 'flex-start'
+    },
+    mealTypeHeader: { 
+      fontWeight: 'bold', 
+      backgroundColor: '#C8DA2B', // Lime green
+      color: '#000000', // Black text
+      // Fixed width for consistent column alignment
+      width: '20%',
+      // Ensure consistent text alignment
+      textAlign: 'center'
+    },
+    mealItemsHeader: { 
+      fontWeight: 'bold', 
+      backgroundColor: '#4E3580', // Purple
+      color: '#FFFFFF', // White text
+      // Fixed width for consistent column alignment
+      width: '60%',
+      // Ensure consistent text alignment
+      textAlign: 'center'
+    },
+    caloriesHeader: { 
+      fontWeight: 'bold', 
+      backgroundColor: 'gray', // Gray
+      color: '#FFFFFF', // White text
+      // Fixed width for consistent column alignment
+      width: '20%',
+      // Remove right border for the last header cell
+      borderRightWidth: 0,
+      // Ensure consistent text alignment
+      textAlign: 'center'
+    },
+    mealTypeCell: { 
+      color: '#4E3580', // Purple
+      fontWeight: 'bold',
+      // Fixed width for consistent column alignment
+      width: '20%',
+      // Ensure consistent text alignment
+      textAlign: 'center'
+    },
+    mealItemsCell: { 
+      color: '#000000', // Black text
+      // Fixed width for consistent column alignment
+      width: '60%',
+      // Ensure consistent text alignment
+      textAlign: 'left'
+    },
+    caloriesCell: { 
+      color: '#000000', // Black text
+      textAlign: 'center',
+      // Fixed width for consistent column alignment
+      width: '20%'
+    },
+    mealItem: { 
+      fontSize: 10, 
+      marginBottom: 2,
+      color: '#000000', // Black text
+      // Allow text wrapping within meal items
+      whiteSpace: 'normal',
+      wordWrap: 'break-word'
+    },
   });
+
+  const mergePdfPagesVertically = async (pdfBytes) => {
+    try {
+      // Load the PDF document
+      const pdfDoc = await PDFDocument.load(pdfBytes);
+      
+      // Get the number of pages
+      const pageCount = pdfDoc.getPages().length;
+      
+      if (pageCount <= 1) {
+        // If there's only one page, return the original PDF
+        return pdfBytes;
+      }
+      
+      // Create a new PDF document
+      const newPdfDoc = await PDFDocument.create();
+      
+      // Set a standard width and calculate total height
+      const standardWidth = 600;
+      let totalHeight = 0;
+      const pageHeights = [];
+      
+      // First pass: calculate total height
+      for (let i = 0; i < pageCount; i++) {
+        const page = pdfDoc.getPages()[i];
+        const { width, height } = page.getSize();
+        const scaledHeight = (height * standardWidth) / width;
+        pageHeights.push(scaledHeight);
+        totalHeight += scaledHeight;
+      }
+      
+      // Create a new page with combined height
+      const newPage = newPdfDoc.addPage([standardWidth, totalHeight]);
+      
+      // Second pass: embed and draw pages
+      let currentY = totalHeight;
+      for (let i = 0; i < pageCount; i++) {
+        const page = pdfDoc.getPages()[i];
+        const embeddedPage = await newPdfDoc.embedPage(page);
+        const pageHeight = pageHeights[i];
+        currentY -= pageHeight;
+        
+        // Draw the page
+        newPage.drawPage(embeddedPage, {
+          x: 0,
+          y: currentY,
+          xScale: standardWidth / page.getWidth(),
+          yScale: standardWidth / page.getWidth(),
+        });
+      }
+      
+      // Save and return the new PDF
+      const mergedPdfBytes = await newPdfDoc.save();
+      return mergedPdfBytes;
+    } catch (error) {
+      console.error('Error merging PDF pages:', error);
+      // Return original PDF if merging fails
+      return pdfBytes;
+    }
+  };
+
+  // Function to trigger PDF download with single page
+  const downloadSinglePagePdf = async () => {
+    try {
+      // Create a Blob from the PDF document
+      const pdfBlob = await PlanPDFDocument(
+        fitnessGoal, 
+        mealPlansByDay, 
+        workoutSections, 
+        endOfPlanSuggestion
+      ).toBlob();
+      
+      // Create download link
+      const url = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'AI_Fitness_Plan_Single_Page.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error generating single page PDF:', error);
+    }
+  };
 
   useEffect(() => {
     if (isLoading) {
@@ -6267,7 +6652,7 @@ const AIFitnessCoach = () => {
           {plansComplete && (
           <div style={{ width: '100%', textAlign: 'right', marginBottom: 16 }}>
             <PDFDownloadLink
-              document={<PlanPDFDocument fitnessGoal={fitnessGoal} mealPlansByDay={mealPlansByDay} workoutSections={workoutSections} endOfPlanSuggestion={endOfPlanSuggestion} />}
+              document={<PlanPDFDocument fitnessGoal={fitnessGoal} mealPlansByDay={mealPlansByDay} workoutSections={workoutSections} endOfPlanSuggestion={endOfPlanSuggestion} workoutPlanSuggestion={workoutPlanSuggestion} />}
               fileName="AI_Fitness_Plan.pdf"
             >
               {({ loading }) => (
@@ -6283,7 +6668,7 @@ const AIFitnessCoach = () => {
             <div className={`plan-section meal-section ${ (isStreamingMeal || showWorkoutPlanChoice || showWorkoutDaysConfirmation || workoutPlanChoice !== true) ? '' : 'slide-left' }`}>
               <div className="plan-header">
                 <i className="fas fa-utensils plan-icon"></i>
-                <h2>Meal Plan</h2>
+                <h2 className="mealpan-header-text-h2">Meal Plan</h2>
               </div>
               
               <div className="accordion" id="mealAccordion" ref={mealAccordionRef}>
@@ -6975,7 +7360,11 @@ const AIFitnessCoach = () => {
               </button>
               <button 
                 className="popup-button save"
-                onClick={handleUpdateProfile}
+                onClick={handleUpdateProfile} 
+                style={{
+                  backgroundColor:'#BCCE32',
+                  color:'black',
+                }}
               >
                 {useExistingProfile ? 'Update Profile' : 'Save Profile'}
               </button>
@@ -7000,6 +7389,10 @@ const AIFitnessCoach = () => {
               <button 
                 className="popup-button save"
                 onClick={() => handleUseProfileChoice(true)}
+                style={{
+                  backgroundColor: '#C8DA2B',
+                  color: 'black'
+                }}
               >
                 Yes, Use My Profile
               </button>
@@ -7122,12 +7515,13 @@ const AIFitnessCoach = () => {
               </button>
               <button 
                 onClick={handleUpdateProfile}
+                className="popup-button save"
                 style={{
                   padding: '10px 24px',
                   border: 'none',
                   borderRadius: '8px',
-                  backgroundColor: '#7c3aed',
-                  color: 'white',
+                  backgroundColor: '#BCCE32',
+                  color: 'black',
                   fontSize: '14px',
                   fontWeight: '500',
                   cursor: 'pointer',
@@ -7778,10 +8172,10 @@ const AIFitnessCoach = () => {
                   padding: '10px 20px',
                   border: 'none',
                   borderRadius: '8px',
-                  backgroundColor: '#7c3aed',
-                  color: 'white',
+                  backgroundColor: '#C8DA2B',
+                  color: 'black',
                   fontSize: '14px',
-                  fontWeight: '500',
+                  fontWeight: '700',
                   cursor: 'pointer',
                   minWidth: '110px',
                   lineHeight: '1.2'
@@ -7881,10 +8275,10 @@ const AIFitnessCoach = () => {
                   padding: '10px 20px',
                   border: 'none',
                   borderRadius: '8px',
-                  backgroundColor: '#7c3aed',
-                  color: 'white',
+                  backgroundColor: '#C8DA2B',
+                  color: 'black',
                   fontSize: '14px',
-                  fontWeight: '500',
+                  fontWeight: '700',
                   cursor: 'pointer',
                   minWidth: '110px',
                   lineHeight: '1.2'
@@ -8286,5 +8680,7 @@ const AIFitnessCoach = () => {
 };
 
 export default AIFitnessCoach;
+
+
 
 

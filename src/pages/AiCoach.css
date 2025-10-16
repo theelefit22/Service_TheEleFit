@@ -1,18 +1,21 @@
-
 .ai-coach-container {
     display: flex;
-
     flex-direction: column;
     padding: 20px 16px;
-  min-height: 100vh;
     min-height: 100vh;
     align-items: center;
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box;
     position: relative;
-    background-color:white;
+  background-color: #10130A !important;
+    color: #F3F3E0 !important;
+    font-family: 'Poppins', sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     overflow: hidden;
+    line-height: 1.6;
+    text-rendering: optimizeLegibility;
   }
   
   /* Remove any potential decorative background elements */
@@ -23,19 +26,7 @@
   }
   
   /* Update base font styles */
-  body {
-    margin: 0;
-    padding: 0;
-    background-color: white;
-    color: #f8fafc;
-    font-family: 'Poppins', sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
-    width: 100% !important;
-    line-height: 1.6;
-    text-rendering: optimizeLegibility;
-  }
+  /* Removed global body styles to prevent affecting other pages */
   
   /* Container styles */
   .main-container .ai-coach-container {
@@ -53,6 +44,7 @@
     border-radius: 20px;
     border: none;
     box-shadow: none;
+    color: #F3F3E0 !important;
   }
   
   /* Beautiful heading style with animation */
@@ -60,7 +52,7 @@
     position: relative;
     
     z-index: 2;
-    color:#A2B522 !important;
+    color:#CDD954 !important;
     margin-bottom: 24px;
     text-align: center;
     font-size: 50px !important;
@@ -168,12 +160,27 @@
   /* Adjust input container for textarea */
   .input-container {
     display: flex;
-    gap: 24px;
+    gap: 16px;
     justify-content: center;
     width: 100%;
     margin-bottom: 8px;
     align-items: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+  }
+
+  /* Adjust copy prompt container when inside input-container */
+  .input-container .copy-prompt-container {
+    margin: 0;
+    width: auto;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Make copy prompt button smaller when inline */
+  .input-container .copy-prompt-button {
+    padding: 8px 12px;
+    font-size: 12px;
+    border-radius: 20px;
   }
   
   /* Locked input container styles */
@@ -233,8 +240,8 @@
     font-size: 16px;
     font-weight: 500;
     margin-bottom: 10px;
-    color: #ec4899;
-    text-shadow: 0 0 10px rgba(236, 72, 153, 0.3);
+    color: #C8DA2B;
+    text-shadow: 0 0 10px rgba(200, 218, 43, 0.3);
     animation: fadeIn 0.5s ease-in-out;
   }
   
@@ -243,8 +250,8 @@
     font-size: 18px;
     font-weight: 600;
     margin-bottom: 15px;
-    color: #4E3580;
-    text-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+    color: #C8DA2B;
+    text-shadow: 0 0 10px rgba(200, 218, 43, 0.3);
     animation: fadeIn 0.5s ease-in-out;
   }
   
@@ -254,12 +261,12 @@
     width: 45%;
     min-width: 200px;
     max-width: 450px;
-    border: 2px solid gray !important;
+    border: 2px solid #C8DA2B !important;
     border-radius: 14px;
     font-size: 16px;
     transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    background: white !important;
-    color: grey !important;
+    background: #121A16 !important;
+    color: #F3F3E0 !important;
     font-weight: 400;
     resize: none;
     overflow: hidden;
@@ -277,17 +284,18 @@
   
   .goal-input:focus, .goal-input:not(:placeholder-shown) {
     width: 65% !important;
-    border-color: #A2B522 !important;
-    box-shadow: 0 0 0 2px rgba(162, 181, 34, 0.3), 
-                0 8px 20px rgba(162, 181, 34, 0.3) !important;
-    background: white !important;
-    color: gray !important;
+    border-color: #C8DA2B !important;
+    box-shadow: 0 0 0 2px rgba(200, 218, 43, 0.3), 
+                0 8px 20px rgba(200, 218, 43, 0.3) !important;
+    background: #121A16 !important;
+    color: #F3F3E0 !important;
   }
   
   .goal-input:focus {
     outline: none !important;
     border-color: #A2B522 !important;
-    background: white !important;
+    background: #0A0F0D !important; /* Dark background for better contrast */
+    color: #F3F3E0 !important; /* Ensure text remains visible */
     transform: translateY(-3px) scale(1.01);
   }
   
@@ -305,7 +313,7 @@
   }
   
   .goal-input::placeholder {
-    color:#A2B522 !important;
+    color: #C8DA2B !important;
     transition: opacity 0.3s ease, transform 0.3s ease;
     line-height: 1.2;
     font-size: 15.2px;
@@ -339,8 +347,8 @@
   /* Vibrant button styles */
   .recommend-button {
     padding: 14.4px 28.8px;
-    /* background: #A2B522 !important; */
-    background: linear-gradient(#A2B522,gray) !important; 
+  background: radial-gradient(circle at 40% 40%, #CDD954 0%, #88922F 50%, #1B1F15 100%) !important;
+
     font-size: 14.4px;
     border-radius: 12px;
     color: white !important;
@@ -357,12 +365,16 @@
     flex-shrink: 0;
     font-family: 'Poppins', sans-serif;
     text-transform: uppercase;
+    box-shadow: 0px 0px 20px rgba(200,218,43,0.45) !important;
   }
   
   .recommend-button:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+    box-shadow: 0px 0px 30px rgba(200,218,43,0.5) !important;
     letter-spacing: 1px;
+    font-weight: 600;
+    color:black !important;
+    background: #CDD954 !important;
   }
 
   /* Disabled state for recommend button */
@@ -408,17 +420,17 @@
     opacity: 0;
     animation: smoothFadeIn 0.5s ease-out forwards;
   }
-  
+ 
   .plan-icon {
     font-size: 40px;
     color: #4E3580;
     text-shadow: 0 2px 10px rgba(139, 92, 246, 0.6);
     filter: drop-shadow(0 4px 6px rgba(139, 92, 246, 0.4));
   }
-  
+
   .plan-header h2 {
     margin: 0;
-    color: #f8fafc;
+    color: #f8fafc !important;
     font-size: 28px;
     font-weight: 600;
     text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -432,14 +444,14 @@
   
   /* Enhanced accordion styles with vibrant gradients */
   .accordion-item {
-    background: rgba(30, 41, 59, 0.9);
+    background: #121A16;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0px 6px 20px rgba(200,218,43,0.25);
     cursor: pointer;
     transition: all 0.3s ease;
     margin-bottom: 16px;
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    border: 1px solid #C8DA2B;
     width: 100%;
     box-sizing: border-box;
     opacity: 0;
@@ -449,21 +461,22 @@
   .accordion-item:hover {
     transform: translateY(-3px);
     box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
-    border-color: rgba(139, 92, 246, 0.4);
+    border-color: #C8DA2B;
   }
   
   /* Accordion header - vibrant gradient */
   .accordion-header {
     position: relative;
     padding: 16px;
-    background: #00B67A;
-    color: white;
-    border-radius: 12px;
-    margin-bottom: 10px;
+    background: #1B2420;
+    color: #C8DA2B;
+    border-radius: 12px 12px 0 0;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 12px;
+    border: 1px solid #C8DA2B;
+    border-bottom: none;
   }
   
   .accordion-header-content {
@@ -507,10 +520,12 @@
   
   /* Accordion content styling */
   .accordion-content {
-    background: rgba(15, 23, 42, 0.9);
+    background: #121A16;
     padding: 19.2px;
     width: 100%;
     box-sizing: border-box;
+    border: 1px solid #C8DA2B;
+    border-top: none;
   }
   
   .disclaimer-container {
@@ -618,20 +633,20 @@
     }
   }
 .suggestion-text{
-   color:blue;
+   color: #C8DA2B;
    background-attachment: fixed;
 
 }
 
 /* Container Styling */
 .end-of-plan-suggestion {
-  background: #f5f5f5; /* Simple light gray background */
+  background: #121A16; /* Dark theme background */
   border-radius: 8px;
   padding: 10px 16px;
   margin: 12px auto;
   max-width: 92%; /* Scales with screen */
   width: 100%; /* Full width within max-width */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* Very subtle shadow */
+  box-shadow: 0px 4px 12px rgba(200,218,43,0.15); /* LimeTech shadow */
   display: flex;
   align-items: center; /* Vertical centering */
   gap: 10px; /* Simple spacing */
@@ -646,7 +661,7 @@
 /* Info Icon Styling */
 .info-icon {
   font-size: 1.1rem;
-  color: #333; /* Dark gray for simplicity */
+  color: #C8DA2B; /* LimeTech primary color */
   opacity: 0;
   animation: fadeIn 0.3s ease-out forwards; /* Simple fade-in */
 }
@@ -660,7 +675,7 @@
 .plan-header {
   font-size: 1.2rem;
   font-weight: 500;
-  color: #333; /* Dark gray for contrast */
+  color: #F3F3E0; /* LimeTech text primary */
   margin-bottom: 2px;
   opacity: 0;
   animation: fadeIn 0.3s ease-out forwards 0.1s; /* Delayed fade-in */
@@ -669,7 +684,7 @@
 /* Suggestion Text Styling */
 .suggestion-text {
   font-size: 0.9rem;
-  color: #555; /* Medium gray for readability */
+  color: #D4DD7B; /* LimeTech text secondary */
   line-height: 1.4;
   opacity: 0;
   animation: fadeIn 0.3s ease-out forwards 0.2s; /* Delayed fade-in */
@@ -750,7 +765,7 @@ Fix background decorative elements
     max-width: 100% !important;
     box-sizing: border-box;
     position: relative;
-    background-color: #0f172a;
+    background-color: #0A0F0D;
     overflow: hidden;
   }
   
@@ -762,18 +777,7 @@ Fix background decorative elements
   }
   
   /* Update base font styles */
-  body {
-    margin: 0;
-    padding: 0;
-    background-color: white;
-    color: #f8fafc;
-    font-family: 'Poppins', sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
-    width: 100% !important;
-    line-height: 1.6;
-  }
+  /* Removed global body styles to prevent affecting other pages */
   
   /* Container styles */
   .main-container .ai-coach-container {
@@ -791,13 +795,14 @@ Fix background decorative elements
     border-radius: 20px;
     border: none;
     box-shadow: none;
+    color: #F3F3E0 !important;
   }
   
   /* Beautiful heading style with animation */
   .ai-coach-title {
     position: relative;
     z-index: 2;
-    color: #D4E63A;
+    color: #C8DA2B;
     margin-bottom: 24px;
     text-align: center;
     font-size: 50px !important;
@@ -840,7 +845,7 @@ Fix background decorative elements
     transform: translateX(-50%);
     width: 0%;
     height: 3px;
-    background: linear-gradient(90deg, #808080, #D4E63A, #000000);
+    background: linear-gradient(90deg, #C8DA2B, #E5F35A, #0A0F0D);
     background-size: 200% 100%;
     z-index: 1;
     border-radius: 3px;
@@ -907,12 +912,12 @@ Fix background decorative elements
   /* Adjust input container for textarea */
   .input-container {
     display: flex;
-    gap: 24px;
+    gap: 16px;
     justify-content: center;
     width: 100%;
     margin-bottom: 8px;
     align-items: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
   
   /* Locked input container styles */
@@ -921,10 +926,10 @@ Fix background decorative elements
     max-width: 450px;
     margin: 0 auto;
     padding: 12.8px 19.2px;
-    border: 2px solid rgba(212, 230, 58, 0.4);
+    border: 2px solid rgba(200, 218, 43, 0.4);
     border-radius: 14px;
-    background: rgba(212, 230, 58, 0.05);
-    box-shadow: 0 4px 15px rgba(212, 230, 58, 0.1);
+    background: rgba(200, 218, 43, 0.05);
+    box-shadow: 0 4px 15px rgba(200, 218, 43, 0.1);
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
@@ -933,9 +938,9 @@ Fix background decorative elements
   }
   
   .locked-input-container:hover {
-    background: rgba(212, 230, 58, 0.1);
-    border-color: rgba(212, 230, 58, 0.6);
-    box-shadow: 0 6px 20px rgba(212, 230, 58, 0.2);
+    background: rgba(200, 218, 43, 0.1);
+    border-color: rgba(200, 218, 43, 0.6);
+    box-shadow: 0 6px 20px rgba(200, 218, 43, 0.2);
     transform: translateY(-2px);
   }
   
@@ -943,18 +948,18 @@ Fix background decorative elements
     display: flex;
     align-items: center;
     gap: 12px;
-    color: rgba(212, 230, 58, 0.7);
+    color: rgba(200, 218, 43, 0.7);
   }
   
   .lock-icon {
     font-size: 18px;
-    color: rgba(212, 230, 58, 0.8);
+    color: rgba(200, 218, 43, 0.8);
     transition: all 0.3s ease;
   }
   
   .locked-text {
     font-size: 16px;
-    color: rgba(212, 230, 58, 0.7);
+    color: rgba(200, 218, 43, 0.7);
     font-weight: 400;
   }
   
@@ -972,8 +977,8 @@ Fix background decorative elements
     font-size: 16px;
     font-weight: 500;
     margin-bottom: 10px;
-    color: #ec4899;
-    text-shadow: 0 0 10px rgba(236, 72, 153, 0.3);
+    color: #C8DA2B;
+    text-shadow: 0 0 10px rgba(200, 218, 43, 0.3);
     animation: fadeIn 0.5s ease-in-out;
   }
   
@@ -982,8 +987,8 @@ Fix background decorative elements
     font-size: 18px;
     font-weight: 600;
     margin-bottom: 15px;
-    color: #4E3580;
-    text-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+    color: #C8DA2B;
+    text-shadow: 0 0 10px rgba(200, 218, 43, 0.3);
     animation: fadeIn 0.5s ease-in-out;
   }
   
@@ -993,14 +998,14 @@ Fix background decorative elements
     width: 45%;
     min-width: 200px;
     max-width: 450px;
-    border: 2px solid rgba(139, 92, 246, 0.4);
+    border: 2px solid #C8DA2B;
     border-radius: 14px;
     font-size: 16px;
     transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    background: rgba(124, 58, 237, 0.1);
-    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2), 
-                inset 0 2px 5px rgba(139, 92, 246, 0.1);
-    color: #4E3580 !important;
+    background: #121A16;
+    box-shadow: 0 0 0 2px rgba(200, 218, 43, 0.3), 
+                0 8px 20px rgba(200, 218, 43, 0.3);
+    color: #F3F3E0 !important;
     font-weight: 400;
     resize: none;
     overflow: hidden;
@@ -1013,44 +1018,41 @@ Fix background decorative elements
     vertical-align: middle;
     box-sizing: border-box;
     letter-spacing: 0.2px;
-    /* backdrop-filter: blur(8px); */
-    /* -webkit-backdrop-filter: blur(8px); */
     position: relative;
   }
   
   .goal-input:focus, .goal-input:not(:placeholder-shown) {
     width: 65%;
-    border-color: #4E3580;
-    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3), 
-                0 8px 20px rgba(139, 92, 246, 0.3),
-                inset 0 2px 5px rgba(139, 92, 246, 0.15);
-    background: rgba(124, 58, 237, 0.15);
-    color: #f1ebff;
+    border-color: #C8DA2B;
+    box-shadow: 0 0 0 2px rgba(200, 218, 43, 0.3), 
+                0 8px 20px rgba(200, 218, 43, 0.3);
+    background: #121A16;
+    color: #F3F3E0;
   }
   
   .goal-input:focus {
     outline: none;
-    border-color: #4E3580;
-    animation: borderPulse 1.5s infinite alternate;
-    background: rgba(124, 58, 237, 0.15);
+    border-color: #A2B522;
+    background: #0A0F0D; /* Dark background for better contrast */
+    color: #F3F3E0; /* Ensure text remains visible */
     transform: translateY(-3px) scale(1.01);
   }
   
   @keyframes borderPulse {
     0% {
-      border-color: #4E3580;
-      box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.3), 
-                  0 8px 20px rgba(139, 92, 246, 0.3);
+      border-color: #A2B522;
+      box-shadow: 0 0 0 2px rgba(162, 181, 34, 0.3), 
+                  0 8px 20px rgba(162, 181, 34, 0.3);
     }
     100% {
-      border-color: #d946ef;
-      box-shadow: 0 0 0 3px rgba(217, 70, 239, 0.3), 
-                  0 8px 20px rgba(217, 70, 239, 0.3);
+      border-color: #A2B522;
+      box-shadow: 0 0 0 3px rgba(162, 181, 34, 0.3), 
+                  0 8px 20px rgba(162, 181, 34, 0.3);
     }
   }
   
   .goal-input::placeholder {
-    color: rgba(139, 92, 246, 0.8); /* Changed from rgba(224, 214, 255, 0.7) to a more visible violet with higher opacity */
+    color: #C8DA2B;
     transition: opacity 0.3s ease, transform 0.3s ease;
     line-height: 1.2;
     font-size: 15.2px;
@@ -1063,7 +1065,7 @@ Fix background decorative elements
   
   /* Hover effect for input */
   .goal-input:hover:not(:focus) {
-    border-color: rgba(139, 92, 246, 0.5);
+    border-color: rgba(200, 218, 43, 0.5);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
     transform: translateY(-1px);
   }
@@ -1071,12 +1073,14 @@ Fix background decorative elements
   /* Vibrant button styles */
   .recommend-button {
     padding: 14.4px 28.8px;
-    background: linear-gradient(45deg, #6366f1, #4E3580, #ec4899);
+   background: linear-gradient(160deg, #1A1F14 0%, #2C341B 30%, #CDD954 80%, #E8F773 100%) !important;
+color: #FFFFFF !important;
+
     background-size: 200% 200%;
     animation: gradientMove 6s ease infinite;
     font-size: 14.4px;
     border-radius: 12px;
-    color: white;
+   
     border: none;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -1155,14 +1159,14 @@ Fix background decorative elements
   
   /* Enhanced accordion styles with vibrant gradients */
   .accordion-item {
-    background: rgba(30, 41, 59, 0.9);
+    background: #121A16;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    box-shadow: 0px 6px 20px rgba(200,218,43,0.25);
     cursor: pointer;
     transition: all 0.3s ease;
     margin-bottom: 16px;
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    border: 1px solid #C8DA2B;
     width: 100%;
     box-sizing: border-box;
     opacity: 0;
@@ -1171,8 +1175,8 @@ Fix background decorative elements
   
   .accordion-item:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
-    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0px 6px 20px rgba(200,218,43,0.25);
+    border-color: #C8DA2B;
   }
   
   /* Accordion header - vibrant gradient */
@@ -1181,14 +1185,12 @@ Fix background decorative elements
     align-items: center;
     justify-content: space-between;
     padding: 19.2px 22.4px;
-    background: linear-gradient(135deg, #6366f1, #4E3580, #ec4899);
-    background-size: 200% 200%;
-    animation: gradientMove 8s ease infinite;
+    background: #1B2420;
     font-weight: 600;
     font-size: 17.6px;
-    color: white;
+    color: #C8DA2B;
     border-radius: 12px 12px 0 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(200, 218, 43, 0.3);
     width: 100%;
     box-sizing: border-box;
     height: 75px;
@@ -1200,7 +1202,7 @@ Fix background decorative elements
   .accordion-icon {
     font-size: 24px;
     margin-right: 16px;
-    color: white;
+    color: #C8DA2B;
     min-width: 30px;
     text-align: center;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
@@ -1208,7 +1210,7 @@ Fix background decorative elements
   }
   
   .accordion-arrow {
-    color: white;
+    color: #C8DA2B;
     opacity: 0.9;
     transition: transform 0.3s ease;
     font-size: 19.2px;
@@ -1223,10 +1225,12 @@ Fix background decorative elements
   
   /* Accordion content styling */
   .accordion-content {
-    background: rgba(15, 23, 42, 0.9);
+    background: #121A16;
     padding: 19.2px;
     width: 100%;
     box-sizing: border-box;
+    border: 1px solid #C8DA2B;
+    border-top: none;
   }
   
   /* Simplified numbered list with automatic counters */
@@ -1243,12 +1247,12 @@ Fix background decorative elements
     margin-bottom: 10px;
     display: flex;
     align-items: center;
-    background: rgba(30, 41, 59, 0.8);
+    background: #1B2420;
     border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid #C8DA2B;
+    box-shadow: 0px 4px 12px rgba(200,218,43,0.15);
     font-size: 16px;
-    color: #f8fafc;
+    color: #F3F3E0;
     transition: all 0.2s ease;
     font-family: 'Poppins', sans-serif;
     font-weight: 400;
@@ -1274,7 +1278,20 @@ Fix background decorative elements
   }
   
   .accordion .ai-coach-numbered-item:hover {
-    background: rgba(99, 102, 241, 0.2);
+    background: rgba(200, 218, 43, 0.2);
+    color: #F3F3E0;
+    transform: translateX(4px) translateY(-2px);
+    border-color: #C8DA2B;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(200, 218, 43, 0.2);
+  }
+  
+  /* Reset previous counter styles */
+  .numbered-list .ai-coach-numbered-item::before {
+    content: none;
+  }
+  
+  .accordion .ai-coach-numbered-item:hover {
+    background: rgba(200, 218, 43, 0.2);
     color: #f8fafc;
     transform: translateX(4px) translateY(-2px);
     border-color: rgba(139, 92, 246, 0.5);
@@ -1282,9 +1299,9 @@ Fix background decorative elements
   }
   
   .accordion .numbered-list .ai-coach-numbered-item:hover::before {
-    color: #ec4899;
+    color: #C8DA2B;
     transform: scale(1.2);
-    text-shadow: 0 0 8px rgba(236, 72, 153, 0.7);
+    text-shadow: 0 0 8px rgba(200, 218, 43, 0.7);
   }
   
   /* Vibrant suggestion chips */
@@ -1534,6 +1551,11 @@ Fix background decorative elements
       width: 100% !important;
       max-width: 400px !important;
       font-size: 14.4px !important;
+    }
+    
+    .input-container .copy-prompt-container {
+      width: 100% !important;
+      max-width: 400px !important;
     }
   }
   
@@ -2011,8 +2033,8 @@ Fix background decorative elements
   }
   
   .popup-button.submit {
-    background: linear-gradient(135deg, #7c3aed, #6d28d9);
-    color: white;
+    background: #BCCE32 !important;
+    color: black !important;
     font-size: 14.4px !important;
     border: none;
     box-shadow: 0 4px 6px rgba(124, 58, 237, 0.2);
@@ -2255,17 +2277,18 @@ Fix background decorative elements
   }
   
   .nested-accordion-item {
-    background: #1e293b;
+    background: #121A16;
     border-radius: 10px;
     overflow: hidden;
     transition: all 0.3s ease;
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    border: 1px solid #C8DA2B;
     margin-bottom: 10px;
   }
   
   .nested-accordion-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: #C8DA2B;
   }
   
   .nested-accordion-header {
@@ -2283,24 +2306,12 @@ Fix background decorative elements
   }
   
   /* Meal types color themes - Enhanced with Vibrant Gradients */
-  .nested-accordion-header[data-meal-type="breakfast"] {
-    background: linear-gradient(135deg, #ff8605, #ffb648);
-    color: #ffffff;
-  }
-  
-  .nested-accordion-header[data-meal-type="lunch"] {
-    background: linear-gradient(135deg, #36d1dc, #5b86e5);
-    color: #ffffff;
-  }
-  
-  .nested-accordion-header[data-meal-type="snack"] {
-    background: linear-gradient(135deg, #11998e, #38ef7d);
-    color: #ffffff;
-  }
-  
+  .nested-accordion-header[data-meal-type="breakfast"],
+  .nested-accordion-header[data-meal-type="lunch"],
+  .nested-accordion-header[data-meal-type="snack"],
   .nested-accordion-header[data-meal-type="dinner"] {
-    background: linear-gradient(135deg, #834d9b, #d04ed6);
-    color: #ffffff;
+    background: linear-gradient(145deg, #1B1F15 0%, #3C4420 25%, #C8DA2B 80%, #E5F35A 100%);
+    color: white
   }
   
   /* Meal type icons - Enhanced */
@@ -2327,39 +2338,40 @@ Fix background decorative elements
   /* Enhanced calories display */
   /* Breakfast calories */
   .nested-accordion-header[data-meal-type="breakfast"] .calories-info {
-    background: linear-gradient(135deg, rgba(255, 134, 5, 0.3), rgba(255, 182, 72, 0.3));
-    color: #ffffff;
+    background: linear-gradient(145deg,black,gray);
+    color: white;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.3);
   }
   
   /* Lunch calories */
   .nested-accordion-header[data-meal-type="lunch"] .calories-info {
-    background: linear-gradient(135deg, rgba(54, 209, 220, 0.3), rgba(91, 134, 229, 0.3));
-    color: #ffffff;
+  background: linear-gradient(145deg,black,gray);
+    color: white;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.3);
   }
   
   /* Snack calories */
   .nested-accordion-header[data-meal-type="snack"] .calories-info {
-    background: linear-gradient(135deg, rgba(17, 153, 142, 0.3), rgba(56, 239, 125, 0.3));
-    color: #ffffff;
+   background: linear-gradient(145deg,black,gray);
+    color: white;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.3);
   }
   
   /* Dinner calories */
   .nested-accordion-header[data-meal-type="dinner"] .calories-info {
-    background: linear-gradient(135deg, rgba(131, 77, 155, 0.3), rgba(208, 78, 214, 0.3));
-    color: #ffffff;
+   background: linear-gradient(145deg,black,gray);
+    color: white;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.3);
   }
   
   /* Hover effect for calories */
   .nested-accordion-header:hover .calories-info {
-    background: rgba(255, 255, 255, 0.4);
+    background:#D4E63A;
+    color:black;
     transform: translateY(-1px);
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.5);
@@ -2572,10 +2584,7 @@ Fix background decorative elements
     font-weight: 700;
     font-size: 24px;
     letter-spacing: 0.5px;
-    background: linear-gradient(to right, #7c3aed, #ec4899);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #CDD954 !important;
     margin: 0;
     padding: 0 20px;
     text-align: center;
@@ -2711,28 +2720,31 @@ Fix background decorative elements
   
   /* Meal Plan Section Styling - Dark Black Glass Theme */
   .plan-section:first-child {
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.15) 100%);
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    background: #121A16;
+    border: 1px solid #C8DA2B;
+    box-shadow: 0px 6px 20px rgba(200,218,43,0.25);
   }
   
   .plan-section:first-child .plan-header i {
-    color: #6b7280;
+    color: white;
     text-shadow: 0 0 20px rgba(107, 114, 128, 0.4);
   }
   
   .plan-section:first-child .plan-header h2 {
-    background: linear-gradient(to right, #6b7280, #4b5563);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: white !important;
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    -webkit-text-fill-color: white !important;
+    background-clip: initial !important;
+    font-weight: 600;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   }
   
   /* Workout Plan Section Styling - Dark Black Glass Theme */
   .plan-section:last-child {
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.15) 100%);
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    background: #121A16;
+    border: 1px solid #C8DA2B;
+    box-shadow: 0px 6px 20px rgba(200,218,43,0.25);
   }
   
   .plan-section:last-child .plan-header i {
@@ -2750,16 +2762,18 @@ Fix background decorative elements
   
   /* Accordion content styling */
   .accordion-content {
-    background: rgba(15, 23, 42, 0.9);
+    background: black;
     padding: 19.2px;
     width: 100%;
     box-sizing: border-box;
+    border: 1px solid #C8DA2B;
+    border-top: none;
   }
   
   /* List items styling for both meal and workout plans */
   .numbered-list .ai-coach-numbered-item {
-    background: rgba(30, 41, 59, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #1B2420;
+    border: 1px solid #C8DA2B;
     transition: all 0.3s ease;
     padding: 12px 16px;
     margin-bottom: 10px;
@@ -2768,6 +2782,8 @@ Fix background decorative elements
     font-family: 'Poppins', sans-serif;
     font-weight: 400;
     letter-spacing: 0.2px;
+    color: #F3F3E0;
+    box-shadow: 0px 4px 12px rgba(200,218,43,0.15);
   }
   
   .plan-section:first-child .numbered-list .ai-coach-numbered-item:hover {
@@ -2793,73 +2809,90 @@ Fix background decorative elements
     background: rgba(188, 206, 50, 0.1);
   }
   
-  /* Meal Plan Accordion Styling */
+  /* Meal Plan Accordion Styling - Gray theme */
   .plan-section:first-child .accordion-item {
-    background: rgba(107, 114, 128, 0.05);
-    border: 1px solid rgba(107, 114, 128, 0.2);
+    background: #1B2420;
+    border: 1px solid #C8DA2B;
+    border-radius: 12px;
   }
   
   .plan-section:first-child .accordion-header {
-    background:linear-gradient(135deg, #6b7280, #4b5563);
-    /* background:linear-gradient(to right, black, white); */
+    background: linear-gradient(135deg, black,gray);
+    color: white;
+    border: 1px solid #C8DA2B;
+    border-bottom: none;
+    border-radius: 12px 12px 0 0;
   }
   
-  /* Workout Plan Accordion Styling - Enhanced */
+  /* Workout Plan Accordion Styling - LimeTech theme */
   .plan-section:last-child .accordion-item {
-    background: rgba(188, 206, 50, 0.05);
-    border: 1px solid rgba(188, 206, 50, 0.2);
-    box-shadow: 0 8px 20px rgba(188, 206, 50, 0.08);
+    background: #1B2420;
+    border: 1px solid #C8DA2B;
+    box-shadow: 0px 6px 20px rgba(200,218,43,0.25);
     transition: all 0.3s ease;
+    border-radius: 12px;
   }
   
   .plan-section:last-child .accordion-item:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 28px rgba(188, 206, 50, 0.15);
-    border: 1px solid rgba(188, 206, 50, 0.3);
+    border: 1px solid #C8DA2B;
   }
   
   .plan-section:last-child .accordion-header {
-    background: linear-gradient(135deg, #BCCE32, #9CAF1F);
-    /* background:linear-gradient(to right, black, white); */
+  background: linear-gradient(145deg, #1B1F15 0%, #3C4420 25%, #C8DA2B 80%, #E5F35A 100%);
+
+    color: white;
     padding: 20.8px 24px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid #C8DA2B;
+    border-bottom: none;
+    border-radius: 12px 12px 0 0;
   }
   
-  /* Workout days styling with vibrant lime green gradients */
+  /* Workout days styling with gray gradients */
   .accordion-item[data-day="1"] .accordion-header { 
-    background: linear-gradient(135deg, #9CAF1F, #BCCE32);
-    border-left: 5px solid #7A8A1A;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #C8DA2B;
+    border-left: 5px solid #C8DA2B;
   }
   .accordion-item[data-day="2"] .accordion-header { 
-    background: linear-gradient(135deg, #7A8A1A, #9CAF1F);
-    border-left: 5px solid #5C6A14;
+    background: linear-gradient(135deg, #34495e, #2c3e50);
+    color: #C8DA2B;
+    border-left: 5px solid #C8DA2B;
   }
   .accordion-item[data-day="3"] .accordion-header { 
-    background: linear-gradient(135deg, #5C6A14, #7A8A1A);
-    border-left: 5px solid #4A550F;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #C8DA2B;
+    border-left: 5px solid #C8DA2B;
   }
   .accordion-item[data-day="4"] .accordion-header { 
-    background: linear-gradient(135deg, #4A550F, #5C6A14);
-    border-left: 5px solid #3A420C;
+    background: linear-gradient(135deg, #34495e, #2c3e50);
+    color: #C8DA2B;
+    border-left: 5px solid #C8DA2B;
   }
   .accordion-item[data-day="5"] .accordion-header { 
-    background: linear-gradient(135deg, #BCCE32, #D4E63A);
-    border-left: 5px solid #9CAF1F;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #C8DA2B;
+    border-left: 5px solid #C8DA2B;
   }
   .accordion-item[data-day="6"] .accordion-header { 
-    background: linear-gradient(135deg, #9CAF1F, #BCCE32);
-    border-left: 5px solid #7A8A1A;
+    background: linear-gradient(135deg, #34495e, #2c3e50);
+    color: #C8DA2B;
+    border-left: 5px solid #C8DA2B;
   }
   .accordion-item[data-day="7"] .accordion-header { 
-    background: linear-gradient(135deg, #7A8A1A, #9CAF1F);
-    border-left: 5px solid #5C6A14;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #C8DA2B;
+    border-left: 5px solid #C8DA2B;
   }
   
   /* Workout list item styling */
   .plan-section:last-child .accordion-content {
-    background: rgba(15, 28, 20, 0.95);
+    background: #121A16;
     padding: 22.4px;
     border-radius: 0 0 12px 12px;
+    border: 1px solid #C8DA2B;
+    border-top: none;
   }
   
   .plan-section:last-child .numbered-list {
@@ -2876,12 +2909,12 @@ Fix background decorative elements
     position: relative;
     padding: 15px 16px 15px 52px;
     margin-bottom: 8px;
-    background: rgba(188, 206, 50, 0.15);
-    color: #f8fafc;
+    background: #1B2420;
+    color: #F3F3E0;
     border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0px 4px 12px rgba(200,218,43,0.15);
     font-weight: 500;
-    border-left: 3px solid #BCCE32;
+    border: 1px solid #C8DA2B;
     transition: all 0.3s ease;
   }
   
@@ -2894,15 +2927,15 @@ Fix background decorative elements
     transform: translateY(-50%);
     font-weight: 700;
     font-size: 8px;
-    background: linear-gradient(135deg, #BCCE32, #9CAF1F);
-    color: white;
+    background: linear-gradient(135deg, #C8DA2B, #E5F35A);
+    color: #0A0F0D;
     width: 16px;
     height: 16px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(188, 206, 50, 0.3);
+    box-shadow: 0 2px 8px rgba(200, 218, 43, 0.3);
   }
   
   .plan-section:last-child .numbered-list .ai-coach-numbered-item:hover {
@@ -2946,9 +2979,11 @@ Fix background decorative elements
   .nested-accordion-content {
     padding: 16px 20px;
     border-radius: 0 0 10px 10px;
-    background: #0f172a;
+    background: #121A16;
     width: 100%;
     box-sizing: border-box;
+    border: 1px solid #C8DA2B;
+    border-top: none;
   }
   
   /* Enhanced styling for the list items in accordions - matching dark theme shown in image */
@@ -2964,11 +2999,12 @@ Fix background decorative elements
     position: relative;
     padding: 14px 16px 14px 48px;
     margin-bottom: 12px;
-    background: #1e293b;
-    color: #f8fafc;
+    background: #1B2420;
+    color: #F3F3E0;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 4px 12px rgba(200,218,43,0.15);
     font-weight: 500;
+    border: 1px solid #C8DA2B;
   }
   
   .nested-accordion-content .numbered-list .ai-coach-numbered-item::before {
@@ -2978,26 +3014,7 @@ Fix background decorative elements
     left: 16px;
     font-weight: 700;
     font-size: 17.6px;
-  }
-  
-  /* Breakfast list item styling */
-  .nested-accordion-header[data-meal-type="breakfast"] + .nested-accordion-content .numbered-list .ai-coach-numbered-item::before {
-    color: #ffb648;
-  }
-  
-  /* Lunch list item styling */
-  .nested-accordion-header[data-meal-type="lunch"] + .nested-accordion-content .numbered-list .ai-coach-numbered-item::before {
-    color: #36d1dc;
-  }
-  
-  /* Snack list item styling */
-  .nested-accordion-header[data-meal-type="snack"] + .nested-accordion-content .numbered-list .ai-coach-numbered-item::before {
-    color: #38ef7d;
-  }
-  
-  /* Dinner list item styling */
-  .nested-accordion-header[data-meal-type="dinner"] + .nested-accordion-content .numbered-list .ai-coach-numbered-item ::before {
-    color: #d04ed6;
+    color: #C8DA2B;
   }
   /* Meal header with calories */
   .nested-accordion-header {
@@ -3364,10 +3381,8 @@ Fix background decorative elements
     font-weight: 600 !important;
     font-size: 19px !important;
     letter-spacing: 0.5px !important;
-    background: linear-gradient(to right, #7c3aed, #ec4899);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #CDD954 !important;
+    text-shadow: 0 0 8px rgba(200, 218, 43, 0.5);
   }
   
   /* Enhanced suggestion title */
@@ -5074,6 +5089,22 @@ Fix background decorative elements
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
 
+/* Error state for missing profile fields */
+.missing-profile-fields-popup .form-group.error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.missing-profile-fields-popup .form-group.error input,
+.missing-profile-fields-popup .form-group.error select {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.missing-profile-fields-popup .form-group.error label {
+  color: #ef4444;
+}
+
 .missing-profile-fields-popup .required-asterisk {
   color: #ef4444;
   font-weight: 600;
@@ -5203,12 +5234,24 @@ Fix background decorative elements
 }
 
 .popup-button.save {
-  background-color: #7c3aed;
-  color: white;
+  background-color: #BCCE32 !important;
+  color: black !important;
 }
 
 .popup-button.save:hover {
-  background-color: #6d28d9;
+  background-color: black !important;
+  color: white !important;
+}
+
+/* Specific styles for profile update popup button */
+.profile-update-popup .popup-button.save {
+  background-color: #BCCE32;
+  color: black;
+}
+
+.profile-update-popup .popup-button.save:hover {
+  background-color: black;
+  color: white;
 }
 
 /* Profile Choice Popup */
@@ -5265,6 +5308,15 @@ Fix background decorative elements
   animation: fadeInUp 0.6s ease-out;
 }
 
+/* Repositioned copy prompt button to be inline with input */
+.input-section .copy-prompt-container {
+  display: flex;
+  justify-content: center;
+  margin: 15px 0 0 0;
+  order: 3;
+  width: 100%;
+}
+
 .copy-prompt-button {
   display: flex;
   align-items: center;
@@ -5281,6 +5333,14 @@ Fix background decorative elements
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
   position: relative;
   overflow: hidden;
+}
+
+/* Make copy prompt button smaller and more compact when inline */
+.input-section .copy-prompt-button {
+  padding: 8px 12px;
+  font-size: 12px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
 .copy-prompt-button::before {
@@ -5409,7 +5469,8 @@ Fix background decorative elements
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-   background: #A2B522 !important; /* Added background to match section */
+   /* background: #A2B522 !important;  */
+    background: linear-gradient(145deg, #1B1F15 0%, #3C4420 25%, #C8DA2B 80%, #E5F35A 100%);
   margin-bottom: 0;
   position: relative;
   z-index: 1;
@@ -5465,7 +5526,7 @@ Fix background decorative elements
   margin-top: 0;
   overflow: hidden;
   transition: all 0.2s ease;
-  background: #5F4D72;
+  background: black !important;
   border-radius: 0 0 12px 12px;
   padding: 20px;
 }
@@ -5503,9 +5564,12 @@ Fix background decorative elements
 }
 
 .loading-text {
-  color: #000000;
-  font-size: 14px;
+  color: #CDD954;
+  font-size: 16px;
   font-weight: 500;
+  text-shadow: 0 0 8px rgba(200, 218, 43, 0.5);
+  margin-top: 15px;
+  margin-bottom: 5px;
 }
 
 .suggestions-text {
@@ -5597,7 +5661,7 @@ Fix background decorative elements
 .calorie-target-value {
   font-size: 56px;
   font-weight: bold;
-  color: #7c3aed;
+  color: #BCCE32;
   margin-bottom: 8px;
   line-height: 1;
 }
@@ -5674,8 +5738,8 @@ Fix background decorative elements
 }
 
 .calorie-popup-button.generate {
-  background-color: #7c3aed;
-  color: white;
+  background-color: #BCCE32;
+  color: black;
 }
 
 /* Responsive styles for calorie results popup */

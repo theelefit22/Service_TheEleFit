@@ -1,5 +1,5 @@
 .navbar {
-  background-color: transparent;
+  background-color: white;
   height: 80px;
   display: flex;
   justify-content: center;
@@ -16,7 +16,7 @@
 }
 
 .navbar.scrolled {
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: white;
   height: 70px;
   box-shadow: 0 4px 20px rgba(77, 77, 77, 0.15);
 }
