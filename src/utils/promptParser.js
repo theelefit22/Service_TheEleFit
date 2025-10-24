@@ -202,7 +202,30 @@ export class PromptParser {
         /(?:timeline|timeframe|time).*?(\d+)\s*(?:weeks?|months?|years?)/gi,
         // Enhanced patterns for "for 10 months"
         /for\s+(\d+)\s+(?:months?|mo|month)/gi,
-        /plan\s+for\s+(\d+)\s+(?:months?|mo|month)/gi
+        /plan\s+for\s+(\d+)\s+(?:months?|mo|month)/gi,
+        // Additional patterns for better months and weeks detection
+        /(\d+)\s*(?:months?|mo|month)\s*(?:plan|goal|target)/gi,
+        /(\d+)\s*(?:weeks?|wk|week)\s*(?:plan|goal|target)/gi,
+        /(\d+)\s*(?:months?|mo|month)\s*(?:duration|period)/gi,
+        /(\d+)\s*(?:weeks?|wk|week)\s*(?:duration|period)/gi,
+        // Patterns without spaces like "6months", "12weeks"
+        /(\d+)(?:months?|mo|month)/gi,
+        /(\d+)(?:weeks?|wk|week)/gi,
+        // Patterns with "to achieve my goal" context
+        /to\s*achieve.*?(\d+)\s*(?:months?|mo|month)/gi,
+        /to\s*achieve.*?(\d+)\s*(?:weeks?|wk|week)/gi,
+        // Patterns with "goal" context
+        /goal.*?(\d+)\s*(?:months?|mo|month)/gi,
+        /goal.*?(\d+)\s*(?:weeks?|wk|week)/gi,
+        // Patterns with "achieve" context
+        /achieve.*?(\d+)\s*(?:months?|mo|month)/gi,
+        /achieve.*?(\d+)\s*(?:weeks?|wk|week)/gi,
+        // Patterns for "X months to achieve", "X weeks to achieve"
+        /(\d+)\s*(?:months?|mo|month)\s*to\s*achieve/gi,
+        /(\d+)\s*(?:weeks?|wk|week)\s*to\s*achieve/gi,
+        // Patterns for "in X months timeframe", "in X weeks timeframe"
+        /in\s*(\d+)\s*(?:months?|mo|month)\s*timeframe/gi,
+        /in\s*(\d+)\s*(?:weeks?|wk|week)\s*timeframe/gi
       ]
     };
   }
@@ -837,7 +860,19 @@ export class PromptParser {
       console.log('DEBUG: Timeline pattern matches:', pattern, matches);
       for (const match of matches) {
         console.log('DEBUG: Processing timeline match:', match);
-        const value = parseInt(match[1]);
+        // For patterns without spaces like "6months", we need to extract the number correctly
+        let value;
+        if (match[1]) {
+          // Normal case where the number is in the first capture group
+          value = parseInt(match[1]);
+        } else {
+          // For patterns like "6months" where the number might be part of the full match
+          const numberMatch = match[0].match(/(\d+)/);
+          if (numberMatch) {
+            value = parseInt(numberMatch[1]);
+          }
+        }
+        
         if (value) {
           const fullMatch = match[0].toLowerCase();
           
@@ -898,7 +933,13 @@ export const testSpecificCases = () => {
     { input: "Woman 22, 5’3”, goal: gain weight.", expected: { age: 22, gender: "female", height: 160, goal: "weight_gain" } },
     { input: "29F, 5’5”, goal: slim.", expected: { age: 29, gender: "female", height: 165, goal: "weight_loss" } },
     { input: "Woman 22, 5'3\", goal: gain weight.", expected: { age: 22, gender: "female", height: 160, goal: "weight_gain" } },
-    { input: "29F, 5'5\", goal: slim.", expected: { age: 29, gender: "female", height: 165, goal: "weight_loss" } }
+    { input: "29F, 5'5\", goal: slim.", expected: { age: 29, gender: "female", height: 165, goal: "weight_loss" } },
+    // New test cases for timeline parsing
+    { input: "i am 36m,haign 5.5ft and having 60kg want to loose 5kgs weight .i do sedentary activty for 7days a week .give me a plan fro 6months to achgive my goal bt in the use ran meal andworupadn enditn showinf 12weeks ehci is wrong fix that", expected: { age: 36, gender: "male", height: 168, weight: 60, goal: "weight_loss", activityLevel: "sedentary", frequency: 7, timelineWeeks: 24 } },
+    { input: "give me a plan for 6 months", expected: { timelineWeeks: 24 } },
+    { input: "plan for 12 weeks", expected: { timelineWeeks: 12 } },
+    { input: "want a plan for 3months", expected: { timelineWeeks: 12 } },
+    { input: "need a 8weeks plan", expected: { timelineWeeks: 8 } }
   ];
 
   console.log("Testing specific failing cases...");

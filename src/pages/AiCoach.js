@@ -12,6 +12,8 @@ import { parsePrompt } from '../utils/promptParser';
 import { cleanWorkoutContent, isRecommendationContent } from '../utils/test-parser';
 import { useAuth } from '../hooks/useAuth';
 import { saveAiCoachData, fetchAiCoachHistory } from '../services/aicoachService';
+import { historySecure } from '../utils/Secure';
+
 
 // Missing Profile Fields Form Component
 const MissingProfileFieldsForm = ({ missingFields, currentProfileData, onSave, onGenerate, onCancel }) => {
@@ -36,6 +38,12 @@ const MissingProfileFieldsForm = ({ missingFields, currentProfileData, onSave, o
       targetTimelineUnit: 'months'
   });
 
+  // Refs for focusing on required fields
+  const ageRef = useRef(null);
+  const genderRef = useRef(null);
+  const activityLevelRef = useRef(null);
+  const workoutDaysRef = useRef(null);
+
   // Update form data when currentProfileData changes
   useEffect(() => {
     const newFormData = {
@@ -54,6 +62,68 @@ const MissingProfileFieldsForm = ({ missingFields, currentProfileData, onSave, o
     };
     setFormData(newFormData);
   }, [currentProfileData]);
+
+  // Function to focus on the first missing required field
+  const focusOnFirstMissingField = () => {
+    // Check required fields in order: age, gender, activityLevel
+    if (!formData.age) {
+      ageRef.current?.focus();
+      // Add temporary red border to highlight the missing field
+      if (ageRef.current) {
+        ageRef.current.style.border = '2px solid #ef4444';
+        ageRef.current.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.3)';
+        setTimeout(() => {
+          if (ageRef.current) {
+            ageRef.current.style.border = '1px solid #d1d5db';
+            ageRef.current.style.boxShadow = 'none';
+          }
+        }, 2000);
+      }
+      return;
+    }
+    
+    if (!formData.gender) {
+      genderRef.current?.focus();
+      // Add temporary red border to highlight the missing field
+      if (genderRef.current) {
+        genderRef.current.style.border = '2px solid #ef4444';
+        genderRef.current.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.3)';
+        setTimeout(() => {
+          if (genderRef.current) {
+            genderRef.current.style.border = '1px solid #d1d5db';
+            genderRef.current.style.boxShadow = 'none';
+          }
+        }, 2000);
+      }
+      return;
+    }
+    
+    if (!formData.activityLevel) {
+      activityLevelRef.current?.focus();
+      // Add temporary red border to highlight the missing field
+      if (activityLevelRef.current) {
+        activityLevelRef.current.style.border = '2px solid #ef4444';
+        activityLevelRef.current.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.3)';
+        setTimeout(() => {
+          if (activityLevelRef.current) {
+            activityLevelRef.current.style.border = '1px solid #d1d5db';
+            activityLevelRef.current.style.boxShadow = 'none';
+          }
+        }, 2000);
+      }
+      return;
+    }
+  };
+
+  // Call focus function when component mounts
+  useEffect(() => {
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      focusOnFirstMissingField();
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleInputChange = (field, value) => {
     setFormData(prev => {
@@ -313,6 +383,7 @@ const MissingProfileFieldsForm = ({ missingFields, currentProfileData, onSave, o
             {isFieldRequired('age') && <span style={{ color: '#ef4444', fontWeight: '600' }}> *</span>}
           </label>
           <input
+            ref={ageRef}
             type="number"
             value={formData.age || ''}
             onChange={(e) => {
@@ -538,6 +609,7 @@ const MissingProfileFieldsForm = ({ missingFields, currentProfileData, onSave, o
             {isFieldRequired('gender') && <span style={{ color: '#ef4444', fontWeight: '600' }}> *</span>}
           </label>
           <select
+            ref={genderRef}
             value={formData.gender || ''}
             onChange={(e) => handleInputChange('gender', e.target.value)}
             style={{
@@ -587,6 +659,7 @@ const MissingProfileFieldsForm = ({ missingFields, currentProfileData, onSave, o
             {isFieldRequired('activityLevel') && <span style={{ color: '#ef4444', fontWeight: '600' }}> *</span>}
           </label>
           <select
+            ref={activityLevelRef}
             value={formData.activityLevel || ''}
             onChange={(e) => handleInputChange('activityLevel', e.target.value)}
             style={{
@@ -631,6 +704,7 @@ const MissingProfileFieldsForm = ({ missingFields, currentProfileData, onSave, o
             {isFieldRequired('workoutDays') && <span style={{ color: '#ef4444', fontWeight: '600' }}> *</span>}
           </label>
           <select
+            ref={workoutDaysRef}
             value={formData.workoutDays || '5'}
             onChange={(e) => handleInputChange('workoutDays', e.target.value)}
             style={{
@@ -853,7 +927,56 @@ const MissingProfileFieldsForm = ({ missingFields, currentProfileData, onSave, o
         </button>
         <button 
           type="button"
-          onClick={() => onGenerate(formData)}
+          onClick={() => {
+            // Validate required fields before generating
+            if (!formData.age) {
+              ageRef.current?.focus();
+              // Add visual feedback for missing field
+              if (ageRef.current) {
+                ageRef.current.style.border = '2px solid #ef4444';
+                ageRef.current.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.3)';
+                setTimeout(() => {
+                  if (ageRef.current) {
+                    ageRef.current.style.border = ageError ? '1px solid #ef4444' : '1px solid #d1d5db';
+                    ageRef.current.style.boxShadow = 'none';
+                  }
+                }, 2000);
+              }
+              setAgeError('Age is required');
+              return;
+            }
+            if (!formData.gender) {
+              genderRef.current?.focus();
+              // Add visual feedback for missing field
+              if (genderRef.current) {
+                genderRef.current.style.border = '2px solid #ef4444';
+                genderRef.current.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.3)';
+                setTimeout(() => {
+                  if (genderRef.current) {
+                    genderRef.current.style.border = '1px solid #d1d5db';
+                    genderRef.current.style.boxShadow = 'none';
+                  }
+                }, 2000);
+              }
+              return;
+            }
+            if (!formData.activityLevel) {
+              activityLevelRef.current?.focus();
+              // Add visual feedback for missing field
+              if (activityLevelRef.current) {
+                activityLevelRef.current.style.border = '2px solid #ef4444';
+                activityLevelRef.current.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.3)';
+                setTimeout(() => {
+                  if (activityLevelRef.current) {
+                    activityLevelRef.current.style.border = '1px solid #d1d5db';
+                    activityLevelRef.current.style.boxShadow = 'none';
+                  }
+                }, 2000);
+              }
+              return;
+            }
+            onGenerate(formData);
+          }}
           style={{
             padding: '12px 24px',
             border: 'none',
@@ -943,6 +1066,15 @@ const AIFitnessCoach = () => {
   const [conversationHistory, setConversationHistory] = useState([]);
   const [showConversationHistory, setShowConversationHistory] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [selectedConversation, setSelectedConversation] = useState(null);
+  const [showConversationDetail, setShowConversationDetail] = useState(false);
+  const [combinedConversationData, setCombinedConversationData] = useState({
+    prompt: '',
+    mealPlanResponse: '',
+    workoutPlanResponse: '',
+    isMealPlanComplete: false,
+    isWorkoutPlanComplete: false
+  });
   const [userProfileData, setUserProfileData] = useState(null);
   const [changedProfileFields, setChangedProfileFields] = useState({});
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -1403,6 +1535,7 @@ const AIFitnessCoach = () => {
   // Load conversation history when user is authenticated
   useEffect(() => {
     if (user && isAuthenticated) {
+      console.log('Loading conversation history for user:', user.uid);
       loadConversationHistory();
     }
   }, [user, isAuthenticated]);
@@ -1509,8 +1642,7 @@ const AIFitnessCoach = () => {
   };
 
   const getApiUrl = (endpoint = 'chat') => {
-    return `https://yantraprise.com/${endpoint}`;
- 
+    return `http://127.0.0.1:5002/${endpoint}`;
   };
 
   const cleanItemText = (text) => {
@@ -1552,6 +1684,38 @@ const AIFitnessCoach = () => {
     return cleaned;
   };
 
+  // Helper function to format timestamp
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return 'Invalid Date';
+    
+    let date;
+    
+    // Handle different timestamp formats
+    if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+      // Firebase Timestamp object
+      date = timestamp.toDate();
+    } else if (timestamp instanceof Date) {
+      // JavaScript Date object
+      date = timestamp;
+    } else if (typeof timestamp === 'string') {
+      // ISO string
+      date = new Date(timestamp);
+    } else if (typeof timestamp === 'number') {
+      // Unix timestamp (milliseconds)
+      date = new Date(timestamp);
+    } else {
+      // Try to parse as Date
+      date = new Date(timestamp);
+    }
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return 'Invalid Date';
+    }
+    
+    return date.toLocaleString();
+  };
+
   // Load conversation history from Firebase
   const loadConversationHistory = async () => {
     if (!user) {
@@ -1564,8 +1728,11 @@ const AIFitnessCoach = () => {
       setIsLoadingHistory(true);
       const history = await fetchAiCoachHistory(user.uid);
       console.log('Raw history from Firebase:', history);
-      setConversationHistory(history);
-      console.log('Loaded conversation history:', history.length, 'conversations');
+      
+      // Ensure history is always an array
+      const validHistory = Array.isArray(history) ? history : [];
+      setConversationHistory(validHistory);
+      console.log('Loaded conversation history:', validHistory.length, 'conversations');
     } catch (error) {
       console.error('Error loading conversation history:', error);
       // Set empty array on error to prevent UI issues
@@ -1577,6 +1744,8 @@ const AIFitnessCoach = () => {
 
   // Save conversation data to Firebase with structured details
   const saveConversationData = async (prompt, response, requestParams = {}, metadata = {}) => {
+    console.log('saveConversationData called with:', { prompt, response, requestParams, metadata });
+    
     if (!user) {
       console.log('No user found, skipping conversation save');
       return;
@@ -1595,51 +1764,62 @@ const AIFitnessCoach = () => {
       const userName = user.displayName || userProfileData?.firstName + ' ' + userProfileData?.lastName || 'Anonymous';
       const userEmail = user.email || userProfileData?.email || '';
       
-      // Determine if profile was used
-      const usedProfile = useExistingProfile || (userProfileData && userProfileData.age && userProfileData.gender && userProfileData.height && userProfileData.weight);
+      // Determine if profile was used - use explicit user choice
+      const usedProfile = useExistingProfile === true;
       
-      // Structure the data properly
+      console.log('Profile usage details:', { 
+        useExistingProfile, 
+        userProfileData, 
+        usedProfile
+      });
+      
+      // Structure the data properly according to requirements
       const conversationMetadata = {
-        // User identification
-        userName: userName,
+        // Required fields: timestamp, user email, user name
+        timestamp: new Date().toISOString(),
         userEmail: userEmail,
-        userType: userType,
+        userName: userName,
         
         // Profile usage tracking
-        usedProfile: usedProfile,
-        profileOption: usedProfile ? 'yes' : 'no',
+        profileOption: usedProfile === true ? 'yes' : 'no',
         
-        // Form details (what was sent to frontend)
-        formDetails: {
-          fitnessGoal: fitnessGoal,
-          formData: formData,
-          profileFormData: profileFormData,
-          extractedProfileData: extractedProfileData,
-          userProfileData: userProfileData,
-          calculatedCalories: calculatedCalories
-        },
+        // Store only necessary data based on profile usage
+        ...(usedProfile 
+          ? {
+              // If profile was used, store profile details
+              profileDetails: {
+                age: userProfileData?.age,
+                gender: userProfileData?.gender,
+                height: userProfileData?.height,
+                weight: userProfileData?.weight,
+                activityLevel: userProfileData?.activityLevel,
+                targetWeight: userProfileData?.targetWeight,
+                timeline: userProfileData?.targetTimeline
+              }
+            }
+          : {
+              // If profile was not used, store the free style prompt
+              freeStylePrompt: prompt
+            }
+        ),
         
-        // Parameters sent to backend (if no profile used)
-        backendParameters: usedProfile ? null : requestParams,
-        
-        // Response data (meal plan, workout plan data sent to frontend)
-        responseData: {
-          type: metadata.type || 'conversation',
+        // Store only meal and workout plan data (no extra data)
+        planData: {
           hasMealPlan: response.includes('MEAL_PLAN:'),
           hasWorkoutPlan: response.includes('WORKOUT_PLAN:'),
-          mealPlansByDay: mealPlansByDay,
-          workoutSections: workoutSections,
-          endOfPlanSuggestion: endOfPlanSuggestion,
-          streaming: metadata.streaming || false,
-          completedDays: metadata.completedDays || 0
+          mealPlanContent: response.includes('MEAL_PLAN:') ? extractPlanContent(response, 'MEAL_PLAN:') : null,
+          workoutPlanContent: response.includes('WORKOUT_PLAN:') ? extractPlanContent(response, 'WORKOUT_PLAN:') : null,
+          // Add structured workout plan data from component state
+          structuredWorkoutPlan: workoutSections && workoutSections.length > 0 ? workoutSections : null
         },
         
         // Additional metadata
-        timestamp: new Date().toISOString(),
         promptLength: prompt.length,
         responseLength: response.length,
         ...metadata
       };
+      
+      console.log('Final conversation metadata to be saved:', conversationMetadata);
       
       const conversationId = await saveAiCoachData(user.uid, prompt, response, conversationMetadata);
       console.log('Structured conversation data saved successfully with ID:', conversationId);
@@ -1650,6 +1830,36 @@ const AIFitnessCoach = () => {
     } catch (error) {
       console.error('Error saving conversation data:', error);
     }
+  };
+
+  // Helper function to extract plan content
+  const extractPlanContent = (response, planType) => {
+    // Find the start of the plan
+    const startIndex = response.indexOf(planType);
+    if (startIndex === -1) return null;
+    
+    // For workout plan, look for more specific end markers
+    if (planType === 'WORKOUT_PLAN:') {
+      // Look for the end of the workout plan (END-OF-PLAN marker, next MEAL_PLAN, or end of string)
+      const endIndexMarkers = [
+        response.indexOf('END-OF-PLAN', startIndex),
+        response.indexOf('MEAL_PLAN:', startIndex + planType.length),
+        response.indexOf('\n\n\n', startIndex), // Triple newline as section separator
+        response.length
+      ].filter(index => index !== -1); // Remove -1 values
+      
+      const endIndex = Math.min(...endIndexMarkers);
+      const planContent = response.substring(startIndex, endIndex).trim();
+      return planContent || null;
+    }
+    
+    // For meal plan, look for the next plan type or end of string
+    const nextPlanStart = response.indexOf('WORKOUT_PLAN:', startIndex + planType.length);
+    const endIndex = nextPlanStart !== -1 ? nextPlanStart : response.length;
+    
+    // Extract and return the plan content
+    const planContent = response.substring(startIndex, endIndex).trim();
+    return planContent || null;
   };
 
   // Enhanced profile data extraction using new prompt parser
@@ -1841,6 +2051,68 @@ const AIFitnessCoach = () => {
     }
   };
 
+  // Save combined conversation when both plans are complete
+  useEffect(() => {
+    const saveCombinedConversation = async () => {
+      if (combinedConversationData.isMealPlanComplete && combinedConversationData.isWorkoutPlanComplete) {
+        // Combine both responses
+        const combinedResponse = `${combinedConversationData.mealPlanResponse}\n\n${combinedConversationData.workoutPlanResponse}`;
+        
+        // Create combined metadata
+        const combinedMetadata = {
+          type: 'complete_plan',
+          hasMealPlan: true,
+          hasWorkoutPlan: true,
+          responseLength: combinedResponse.length
+        };
+        
+        // Save the combined conversation
+        await saveConversationData(
+          combinedConversationData.prompt, 
+          combinedResponse, 
+          {}, 
+          combinedMetadata
+        );
+        
+        // Reset the combined conversation data
+        setCombinedConversationData({
+          prompt: '',
+          mealPlanResponse: '',
+          workoutPlanResponse: '',
+          isMealPlanComplete: false,
+          isWorkoutPlanComplete: false
+        });
+      } else if (combinedConversationData.isMealPlanComplete && !combinedConversationData.isWorkoutPlanComplete) {
+        // If only meal plan is complete and user chose not to generate workout plan
+        // Save just the meal plan
+        const mealPlanMetadata = {
+          type: 'meal_plan_only',
+          hasMealPlan: true,
+          hasWorkoutPlan: false,
+          responseLength: combinedConversationData.mealPlanResponse.length
+        };
+        
+        await saveConversationData(
+          combinedConversationData.prompt, 
+          combinedConversationData.mealPlanResponse, 
+          {}, 
+          mealPlanMetadata
+        );
+        
+        // Reset the combined conversation data
+        setCombinedConversationData({
+          prompt: '',
+          mealPlanResponse: '',
+          workoutPlanResponse: '',
+          isMealPlanComplete: false,
+          isWorkoutPlanComplete: false
+        });
+      }
+    };
+    
+    saveCombinedConversation();
+  }, [combinedConversationData]);
+
   // Save profile data to Firebase
   const saveProfileData = async (data) => {
     try {
@@ -1870,9 +2142,11 @@ const AIFitnessCoach = () => {
     try {
       // If not using existing profile, validate that we have some essential data
       if (!useProfile) {
+        // Validate extracted data and show specific error messages for missing fields
         const validation = validateProfileData(extractedData, fitnessGoal);
         if (!validation.isValid) {
           setValidationError(validation.message);
+          setIsLoading(false);
           return;
         }
       }
@@ -2103,9 +2377,7 @@ const AIFitnessCoach = () => {
       // Validate extracted data and show specific error messages for missing fields
       const validation = validateProfileData(extractedData, fitnessGoal);
       if (!validation.isValid) {
-        setErrorPopupMessage(validation.message);
-        setShowErrorPopup(true);
-        setTimeout(() => setShowErrorPopup(false), 5000);
+        setValidationError(validation.message);
         setIsLoading(false);
         return;
       }
@@ -2217,9 +2489,7 @@ const AIFitnessCoach = () => {
       } else {
         // Not enough data, show detailed error with specific missing fields
         const validation = validateProfileData(extractedData, fitnessGoal);
-        setErrorPopupMessage(validation.message);
-        setShowErrorPopup(true);
-        setTimeout(() => setShowErrorPopup(false), 5000);
+        setValidationError(validation.message);
       }
     }
   };
@@ -2428,8 +2698,8 @@ const AIFitnessCoach = () => {
           allergies: [], // Empty array is fine now - backend handles it properly
           healthGoals: extractedProfileData?.healthGoals || profileFormData?.goal,
           targetWeight: extractedProfileData?.targetWeight?.value || profileFormData?.targetWeight,
-          timelineWeeks: parseInt(extractedProfileData?.targetTimeline || profileFormData?.targetTimeline || 12),
-          prompt: `Generate meal plan for ${extractedProfileData?.goal || profileFormData.goal || 'fitness'} goal`
+          timelineWeeks: parseInt(extractedProfileData?.timelineWeeks || profileFormData?.targetTimeline * 4 || 12),
+          prompt: fitnessGoal || `Generate meal plan for ${extractedProfileData?.goal || profileFormData.goal || 'fitness'} goal`
         })
       });
 
@@ -2644,17 +2914,27 @@ const AIFitnessCoach = () => {
         allergies: [], // Empty array is fine now - backend handles it properly
         healthGoals: extractedProfileData?.healthGoals || profileFormData?.goal,
         targetWeight: extractedProfileData?.targetWeight?.value || profileFormData?.targetWeight,
-        timelineWeeks: parseInt(extractedProfileData?.targetTimeline || profileFormData?.targetTimeline || 12),
+        timelineWeeks: parseInt(extractedProfileData?.timelineWeeks || profileFormData?.targetTimeline * 4 || 12),
         prompt: `Generate meal plan for ${extractedProfileData?.goal || profileFormData.goal || 'fitness'} goal`,
         endpoint: 'mealplan'
       };
       
+      /*
       await saveConversationData(fitnessGoal, finalResponse, mealPlanRequestParams, {
         type: 'meal_plan',
         streaming: true,
         completedDays: completedDays,
         responseLength: finalResponse.length
       });
+      */
+
+      setCombinedConversationData(prev => ({
+        ...prev,
+        prompt: fitnessGoal,
+        mealPlanResponse: finalResponse,
+        isMealPlanComplete: true
+      }));
+
       console.log(`DEBUG: Final completion - currentMealDay set to ${completedDays}, will show "Finalizing meal plan..." and "${completedDays} of 7 days completed"`);
       setShowWorkoutPlanChoice(true);
       
@@ -2783,12 +3063,8 @@ const AIFitnessCoach = () => {
        console.log('extractedProfileData:', extractedProfileData);
        console.log('profileFormData:', profileFormData);
        
-       // Create prompt with the selected number of days
-       if (extractedProfileData?.goal || profileFormData.goal) {
-         workoutPrompt = `Generate workout plan for ${extractedProfileData?.goal || profileFormData.goal || 'fitness'} goal, I prefer to workout ${workoutDays} days per week`;
-       } else {
-         workoutPrompt = `${fitnessGoal}. Generate workout plan for ${workoutDays} days per week`;
-       }
+       // Use the full user prompt for better context
+       workoutPrompt = fitnessGoal || `Generate workout plan for ${extractedProfileData?.goal || profileFormData.goal || 'fitness'} goal, I prefer to workout ${workoutDays} days per week`;
        
        console.log('Final workout prompt:', workoutPrompt);
        console.log('Sending to backend:', {
@@ -2808,7 +3084,7 @@ const AIFitnessCoach = () => {
            workout_focus: calculatedCalories.WorkoutFocus || 'Mixed Cardio and Strength',
            workout_days: workoutDays,
            targetWeight: extractedProfileData?.targetWeight?.value || profileFormData?.targetWeight,
-           timelineWeeks: parseInt(extractedProfileData?.targetTimeline || profileFormData?.targetTimeline || 12),
+           timelineWeeks: parseInt(extractedProfileData?.timelineWeeks || profileFormData?.targetTimeline * 4 || 12),
            prompt: workoutPrompt
          })
        });
@@ -2913,16 +3189,25 @@ const AIFitnessCoach = () => {
         workout_focus: calculatedCalories.WorkoutFocus || 'Mixed Cardio and Strength',
         workout_days: workoutDays,
         targetWeight: extractedProfileData?.targetWeight?.value || profileFormData?.targetWeight,
-        timelineWeeks: parseInt(extractedProfileData?.targetTimeline || profileFormData?.targetTimeline || 12),
+        timelineWeeks: parseInt(extractedProfileData?.timelineWeeks || profileFormData?.targetTimeline * 4 || 12),
         endpoint: 'workoutplan'
       };
       
+      /*
       await saveConversationData(fitnessGoal, finalResponse, workoutPlanRequestParams, {
         type: 'workout_plan',
         streaming: true,
         responseLength: finalResponse.length
       });
-      
+      */
+
+      setCombinedConversationData(prev => ({
+        ...prev,
+        prompt: fitnessGoal,
+        workoutPlanResponse: finalResponse,
+        isWorkoutPlanComplete: true
+      }));
+
       // Extract workout plan suggestion (only if this is a workout plan response)
       const workoutSuggestionMatch = accumulatedText.match(/END-OF-PLAN[\s-]?SUGGESTION:?\s*(.*)/i) || 
         accumulatedText.match(/\*\*End-of-Plan Suggestion:\*\*\s*(.*)/i) ||
@@ -3102,7 +3387,73 @@ const AIFitnessCoach = () => {
     return `${explanations.join('\n\n')}\n\nPERSONALIZED SUGGESTIONS:\n${suggestions.map(s => `• ${s.replace(/^• /, '')}`).join('\n')}`;
   };
 
-  // Check for profile updates after plan generation
+  // Save combined conversation when both plans are complete
+  useEffect(() => {
+    const saveCombinedConversation = async () => {
+      if (combinedConversationData.isMealPlanComplete && combinedConversationData.isWorkoutPlanComplete) {
+        // Combine both responses
+        const combinedResponse = `${combinedConversationData.mealPlanResponse}\n\n${combinedConversationData.workoutPlanResponse}`;
+        
+        // Create combined metadata
+        const combinedMetadata = {
+          type: 'complete_plan',
+          hasMealPlan: true,
+          hasWorkoutPlan: true,
+          responseLength: combinedResponse.length
+        };
+        
+        // Save the combined conversation
+        await saveConversationData(
+          combinedConversationData.prompt, 
+          combinedResponse, 
+          {}, 
+          combinedMetadata
+        );
+        
+        // Reset the combined conversation data
+        setCombinedConversationData({
+          prompt: '',
+          mealPlanResponse: '',
+          workoutPlanResponse: '',
+          isMealPlanComplete: false,
+          isWorkoutPlanComplete: false
+        });
+      } else if (combinedConversationData.isMealPlanComplete && !combinedConversationData.isWorkoutPlanComplete) {
+        // If only meal plan is complete and user chose not to generate workout plan
+        // Save just the meal plan
+        const mealPlanMetadata = {
+          type: 'meal_plan_only',
+          hasMealPlan: true,
+          hasWorkoutPlan: false,
+          responseLength: combinedConversationData.mealPlanResponse.length
+        };
+        
+        await saveConversationData(
+          combinedConversationData.prompt, 
+          combinedConversationData.mealPlanResponse, 
+          {}, 
+          mealPlanMetadata
+        );
+        
+        // Reset the combined conversation data
+        setCombinedConversationData({
+          prompt: '',
+          mealPlanResponse: '',
+          workoutPlanResponse: '',
+          isMealPlanComplete: false,
+          isWorkoutPlanComplete: false
+        });
+      }
+    };
+    
+    saveCombinedConversation();
+  }, [combinedConversationData]);
+
+// Remove the duplicate useEffect hook
+// The useEffect hook below is a duplicate and causes conflicts
+// It has been removed to prevent double saving of conversation data
+
+// Check for profile updates after plan generation
   const checkForProfileUpdates = async () => {
     try {
       if (!user) return;
@@ -4944,9 +5295,7 @@ const AIFitnessCoach = () => {
     } else {
       // Not enough data, show detailed error with specific missing fields
       const validation = validateProfileData(extractedData, fitnessGoal);
-      setErrorPopupMessage(validation.message);
-      setShowErrorPopup(true);
-      setTimeout(() => setShowErrorPopup(false), 5000);
+      setValidationError(validation.message);
     }
   };
 
@@ -5612,8 +5961,7 @@ const AIFitnessCoach = () => {
     },
     logo: {
       width: 200,
-      height: 100,
-      marginBottom: 20,
+      height: 130,
       alignSelf: 'center'
     },
     mainTitle: {
@@ -5728,7 +6076,7 @@ const AIFitnessCoach = () => {
       backgroundColor: 'rgba(200, 218, 43, 0.1)' // Light lime green background
     },
     tableRowOdd: { 
-      backgroundColor: 'rgba(0, 0, 0, 0.05)' // Very light gray background
+      backgroundColor: 'rgba(78, 53, 128, 0.05)' // Very light purple background
     },
     tableCell: { 
       flex: 1, 
@@ -5793,8 +6141,8 @@ const AIFitnessCoach = () => {
     },
     caloriesHeader: { 
       fontWeight: 'bold', 
-      backgroundColor: 'gray', // Gray
-      color: '#FFFFFF', // White text
+      backgroundColor: '#C8DA2B', // Lime green (consistent with brand)
+      color: '#000000', // Black text
       // Fixed width for consistent column alignment
       width: '20%',
       // Remove right border for the last header cell
@@ -5818,7 +6166,8 @@ const AIFitnessCoach = () => {
       textAlign: 'left'
     },
     caloriesCell: { 
-      color: '#000000', // Black text
+      color: '#4E3580', // Purple (consistent with meal type)
+      fontWeight: 'bold',
       textAlign: 'center',
       // Fixed width for consistent column alignment
       width: '20%'
@@ -6052,29 +6401,31 @@ const AIFitnessCoach = () => {
       </button> */}
       <div className="input-section">
         {isActuallyLoggedIn() && (
-          <div className="welcome-message">
-            {(() => {
-              const customerName = getCustomerName();
-              return customerName ? `Welcome back, ${customerName}!` : null;
-            })()}
-            {/* History button hidden
-            <button 
-              className="conversation-history-btn"
-              onClick={() => setShowConversationHistory(!showConversationHistory)}
-              style={{
-                marginLeft: '20px',
-                padding: '8px 16px',
-                backgroundColor: '#6366f1',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '14px'
-              }}
-            >
-              {showConversationHistory ? 'Hide' : 'Show'} History ({conversationHistory.length})
-            </button>
-            */}
+          <div className="welcome-message" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+            <div>
+              {(() => {
+                const customerName = getCustomerName();
+                return customerName ? `Welcome back, ${customerName}!` : null;
+              })()}
+            </div>
+            {historySecure && (
+              <button 
+                className="conversation-history-btn"
+                onClick={() => setShowConversationHistory(!showConversationHistory)}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#CDD954',
+                  color: 'black',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  marginLeft: 'auto'
+                }}
+              >
+                {showConversationHistory ? 'Hide' : 'Show'} History ({conversationHistory.length})
+              </button>
+            )}
           </div>
         )}
         <div className="input-container">
@@ -6133,6 +6484,12 @@ const AIFitnessCoach = () => {
         {inputError && (
           <div className="input-error-message">
             <i className="fas fa-exclamation-circle"></i> Please enter your fitness goal first
+          </div>
+        )}
+        
+        {validationError && (
+          <div className="input-error-message">
+            <i className="fas fa-exclamation-circle"></i> {validationError}
           </div>
         )}
        
@@ -6366,89 +6723,56 @@ const AIFitnessCoach = () => {
       )}
 
       {/* Conversation History */}
-      {showConversationHistory && (
+      {historySecure && showConversationHistory && (
         <div className="conversation-history" style={{
           margin: '20px 0',
           padding: '20px',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: '#4a4a4a',
           borderRadius: '8px',
-          border: '1px solid #e9ecef'
+          border: '1px solid #666666',
+          color: 'white'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
-            <h3 style={{ margin: 0, color: '#495057' }}>
-              <i className="fas fa-history" style={{ marginRight: '8px' }}></i>
-              Conversation History
-            </h3>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button 
-                onClick={loadConversationHistory}
-                disabled={isLoadingHistory}
-                style={{
-                  padding: '6px 12px',
-                  backgroundColor: '#6366f1',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: isLoadingHistory ? 'not-allowed' : 'pointer',
-                  fontSize: '12px',
-                  opacity: isLoadingHistory ? 0.6 : 1
-                }}
-              >
-                <i className={`fas ${isLoadingHistory ? 'fa-spinner fa-spin' : 'fa-sync-alt'}`} style={{ marginRight: '4px' }}></i>
-                Refresh
-              </button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'right', marginBottom: '15px' }}>
+            
+            <button 
+              onClick={loadConversationHistory}
+              disabled={isLoadingHistory}
+              style={{
+                padding: '6px 12px',
+                backgroundColor: 'black',
+                color: '#CDD954',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: isLoadingHistory ? 'not-allowed' : 'pointer',
+                fontSize: '12px',
+                opacity: isLoadingHistory ? 0.6 : 1
+              }}
+            >
+              <i className={`fas ${isLoadingHistory ? 'fa-spinner fa-spin' : 'fa-sync-alt'}`} style={{ marginRight: '4px' }}></i>
+              Refresh
+            </button>
+          </div>
+          {isLoadingHistory ? (
+            <div style={{ textAlign: 'center', padding: '20px', color: 'white' }}>
+              <i className="fas fa-spinner fa-spin" style={{ fontSize: '20px', color: '#6366f1' }}></i>
+              <p style={{ marginTop: '10px', color: 'white' }}>Loading conversation history...</p>
+            </div>
+          ) : conversationHistory.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '20px', color: 'white' }}>
+              <i className="fas fa-comments" style={{ fontSize: '24px', marginBottom: '10px', color: 'white' }}></i>
+              <p style={{ color: 'white' }}>No conversation history yet. Start chatting with the AI Coach!</p>
+              <div style={{ marginTop: '10px', fontSize: '12px', color: 'white' }}>
+                Debug: User ID: {user?.uid || 'No user'}, History count: {conversationHistory.length}
+              </div>
               <button 
                 onClick={async () => {
-                  console.log('Testing Firebase connection with structured data...');
-                  try {
-                    const testRequestParams = {
-                      prompt: 'Test prompt for structured data storage',
-                      userDetails: {
-                        age: 25,
-                        weight: 70,
-                        height: 170,
-                        gender: 'male',
-                        activityLevel: 'moderate',
-                        goal: 'weight_loss',
-                        targetWeight: 65,
-                        timeline: 3
-                      },
-                      endpoint: 'test_structured'
-                    };
-                    
-                    const testMetadata = {
-                      userName: 'Test User',
-                      userEmail: 'test@example.com',
-                      userType: 'user',
-                      usedProfile: false,
-                      profileOption: 'no',
-                      formDetails: {
-                        fitnessGoal: 'Test fitness goal',
-                        formData: { age: 25, weight: 70 },
-                        extractedProfileData: { age: 25, weight: 70, goal: 'weight_loss' },
-                        calculatedCalories: { targetCalories: 1500, BMR: 1800 }
-                      },
-                      backendParameters: testRequestParams,
-                      responseData: {
-                        type: 'test_structured',
-                        hasMealPlan: true,
-                        hasWorkoutPlan: true,
-                        streaming: false,
-                        completedDays: 0
-                      },
-                      testData: true
-                    };
-                    
-                    await saveAiCoachData(user.uid, 'Test prompt for structured data storage', 'Test response with structured data stored', testMetadata);
-                    console.log('Structured test save successful');
-                    await loadConversationHistory();
-                  } catch (error) {
-                    console.error('Test save failed:', error);
-                  }
+                  console.log('Manually refreshing conversation history...');
+                  await loadConversationHistory();
                 }}
                 style={{
+                  marginTop: '10px',
                   padding: '6px 12px',
-                  backgroundColor: '#28a745',
+                  backgroundColor: '#6366f1',
                   color: 'white',
                   border: 'none',
                   borderRadius: '4px',
@@ -6456,194 +6780,260 @@ const AIFitnessCoach = () => {
                   fontSize: '12px'
                 }}
               >
-                <i className="fas fa-vial" style={{ marginRight: '4px' }}></i>
-                Test
+                <i className="fas fa-sync-alt" style={{ marginRight: '4px' }}></i>
+                Refresh History
               </button>
             </div>
-          </div>
-          {isLoadingHistory ? (
-            <div style={{ textAlign: 'center', padding: '20px' }}>
-              <i className="fas fa-spinner fa-spin" style={{ fontSize: '20px', color: '#6366f1' }}></i>
-              <p style={{ marginTop: '10px', color: '#6c757d' }}>Loading conversation history...</p>
-            </div>
-          ) : conversationHistory.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '20px', color: '#6c757d' }}>
-              <i className="fas fa-comments" style={{ fontSize: '24px', marginBottom: '10px' }}></i>
-              <p>No conversation history yet. Start chatting with the AI Coach!</p>
-              <div style={{ marginTop: '10px', fontSize: '12px', color: '#999' }}>
-                Debug: User ID: {user?.uid || 'No user'}, History count: {conversationHistory.length}
+          ) : (
+            <div>
+              {/* History table header */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '2fr 1fr 1fr 1fr',
+                gap: '10px',
+                padding: '10px',
+                backgroundColor: 'black',
+                borderRadius: '4px',
+                fontWeight: 'bold',
+                marginBottom: '10px',
+                color: 'black'
+              }}>
+                <div style={{ color: '#CDD954' }}>Timestamp</div>
+                <div style={{ color: '#CDD954' }}>Profile Used</div>
+                <div style={{ color: '#CDD954' }}>Meal Plan</div>
+                <div style={{ color: '#CDD954' }}>Workout Plan</div>
+              </div>
+              
+              {/* History items in table format */}
+              <div style={{ 
+                maxHeight: '400px', 
+                overflowY: 'auto',
+                scrollbarWidth: 'thin',
+                scrollbarColor: '#888888 #5a5a5a'
+              }}>
+                <style jsx>{`
+                  div::-webkit-scrollbar {
+                    width: 6px;
+                  }
+                  div::-webkit-scrollbar-track {
+                    background: #5a5a5a;
+                  }
+                  div::-webkit-scrollbar-thumb {
+                    background: #888888;
+                    border-radius: 3px;
+                  }
+                  div::-webkit-scrollbar-thumb:hover {
+                    background: #aaaaaa;
+                  }
+                `}</style>
+                {conversationHistory.map((conversation, index) => (
+                  <div 
+                    key={conversation.id}
+                    onClick={() => {
+                      // Show detailed view when clicking on a history item
+                      setSelectedConversation(conversation);
+                      setShowConversationDetail(true);
+                    }}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '2fr 1fr 1fr 1fr',
+                      gap: '10px',
+                      padding: '12px 10px',
+                      backgroundColor: '#5a5a5a',
+                      borderRadius: '4px',
+                      border: '1px solid #777777',
+                      marginBottom: '8px',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s',
+                      color: 'white'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#6a6a6a'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#5a5a5a'}
+                  >
+                    <div style={{ color: 'white' }}>
+                      {formatTimestamp(conversation.timestamp)}
+                    </div>
+                    <div style={{ color: 'white' ,textAlign:'center'}}>
+                      {conversation.metadata?.profileOption === 'yes' ? 'Yes' : 'No'}
+                    </div>
+                    <div style={{ color: 'white' ,textAlign:'center'}}>
+                      {conversation.metadata?.planData?.hasMealPlan ? 'Yes' : 'No'}
+                    </div>
+                    <div style={{ color: 'white',textAlign:'center' }}>
+                      {(conversation.metadata?.planData?.hasWorkoutPlan || conversation.metadata?.planData?.structuredWorkoutPlan) ? 'Yes' : 'No'}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          ) : (
-            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-              {conversationHistory.map((conversation, index) => (
-                <div key={conversation.id} style={{
-                  marginBottom: '15px',
-                  padding: '15px',
-                  backgroundColor: 'white',
-                  borderRadius: '6px',
-                  border: '1px solid #dee2e6'
-                }}>
-                  <div style={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center',
-                    marginBottom: '10px',
-                    fontSize: '12px',
-                    color: '#6c757d'
-                  }}>
-                    <div>
-                      <div>
-                        <i className="fas fa-clock" style={{ marginRight: '4px' }}></i>
-                        {new Date(conversation.timestamp).toLocaleString()}
-                      </div>
-                      <div style={{ marginTop: '2px' }}>
-                        <i className="fas fa-user" style={{ marginRight: '4px' }}></i>
-                        {conversation.metadata?.userName || 'Anonymous'} ({conversation.metadata?.userEmail || 'No email'})
-                      </div>
-                      <div style={{ marginTop: '2px' }}>
-                        <i className="fas fa-user-check" style={{ marginRight: '4px' }}></i>
-                        Profile Used: {conversation.metadata?.profileOption || 'unknown'}
-                      </div>
-                    </div>
-                    <span style={{
-                      padding: '2px 8px',
-                      backgroundColor: '#e3f2fd',
-                      color: '#1976d2',
-                      borderRadius: '12px',
-                      fontSize: '11px'
-                    }}>
-                      {conversation.metadata?.responseData?.type || conversation.metadata?.type || 'conversation'}
-                    </span>
-                  </div>
-                  
-                  <div style={{ marginBottom: '8px' }}>
-                    <strong style={{ color: '#495057', fontSize: '13px' }}>You:</strong>
-                    <p style={{ 
-                      margin: '4px 0', 
-                      padding: '8px',
-                      backgroundColor: '#f8f9fa',
-                      borderRadius: '4px',
-                      fontSize: '14px',
-                      lineHeight: '1.4'
-                    }}>
-                      {conversation.prompt.length > 200 
-                        ? conversation.prompt.substring(0, 200) + '...' 
-                        : conversation.prompt}
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <strong style={{ color: '#495057', fontSize: '13px' }}>AI Coach:</strong>
-                    <p style={{ 
-                      margin: '4px 0', 
-                      padding: '8px',
-                      backgroundColor: '#e8f5e8',
-                      borderRadius: '4px',
-                      fontSize: '14px',
-                      lineHeight: '1.4'
-                    }}>
-                      {conversation.response.length > 300 
-                        ? conversation.response.substring(0, 300) + '...' 
-                        : conversation.response}
-                    </p>
-                  </div>
-                  
-                  {/* Show form details and backend parameters */}
-                  <div style={{ marginTop: '8px' }}>
-                    {/* Form Details */}
-                    {conversation.metadata?.formDetails && (
-                      <div style={{ marginBottom: '8px' }}>
-                        <strong style={{ color: '#495057', fontSize: '12px' }}>Form Details (Sent to Frontend):</strong>
-                        <div style={{ 
-                          margin: '4px 0', 
-                          padding: '6px',
-                          backgroundColor: '#f0f8ff',
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          fontFamily: 'monospace',
-                          maxHeight: '120px',
-                          overflowY: 'auto'
-                        }}>
-                          {conversation.metadata.formDetails.fitnessGoal && (
-                            <div><strong>Fitness Goal:</strong> {conversation.metadata.formDetails.fitnessGoal.substring(0, 100)}...</div>
-                          )}
-                          {conversation.metadata.formDetails.extractedProfileData && (
-                            <div><strong>Extracted Data:</strong> {JSON.stringify(conversation.metadata.formDetails.extractedProfileData, null, 2)}</div>
-                          )}
-                          {conversation.metadata.formDetails.calculatedCalories && (
-                            <div><strong>Calculated Calories:</strong> {JSON.stringify(conversation.metadata.formDetails.calculatedCalories, null, 2)}</div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Backend Parameters (if no profile used) */}
-                    {conversation.metadata?.backendParameters && (
-                      <div style={{ marginBottom: '8px' }}>
-                        <strong style={{ color: '#495057', fontSize: '12px' }}>Backend Parameters (No Profile Used):</strong>
-                        <div style={{ 
-                          margin: '4px 0', 
-                          padding: '6px',
-                          backgroundColor: '#fff3cd',
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          fontFamily: 'monospace',
-                          maxHeight: '120px',
-                          overflowY: 'auto'
-                        }}>
-                          <div><strong>Endpoint:</strong> {conversation.metadata.backendParameters.endpoint}</div>
-                          {conversation.metadata.backendParameters.userDetails && (
-                            <div><strong>User Details:</strong> {JSON.stringify(conversation.metadata.backendParameters.userDetails, null, 2)}</div>
-                          )}
-                          {conversation.metadata.backendParameters.targetCalories && (
-                            <div><strong>Target Calories:</strong> {conversation.metadata.backendParameters.targetCalories}</div>
-                          )}
-                          {conversation.metadata.backendParameters.workout_days && (
-                            <div><strong>Workout Days:</strong> {conversation.metadata.backendParameters.workout_days}</div>
-                          )}
-                          {conversation.metadata.backendParameters.goal && (
-                            <div><strong>Goal:</strong> {conversation.metadata.backendParameters.goal}</div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {/* Response Data */}
-                    {conversation.metadata?.responseData && (
-                      <div>
-                        <strong style={{ color: '#495057', fontSize: '12px' }}>Response Data (Sent to Frontend):</strong>
-                        <div style={{ 
-                          margin: '4px 0', 
-                          padding: '6px',
-                          backgroundColor: '#d4edda',
-                          borderRadius: '4px',
-                          fontSize: '12px',
-                          fontFamily: 'monospace',
-                          maxHeight: '120px',
-                          overflowY: 'auto'
-                        }}>
-                          <div><strong>Type:</strong> {conversation.metadata.responseData.type}</div>
-                          <div><strong>Has Meal Plan:</strong> {conversation.metadata.responseData.hasMealPlan ? 'Yes' : 'No'}</div>
-                          <div><strong>Has Workout Plan:</strong> {conversation.metadata.responseData.hasWorkoutPlan ? 'Yes' : 'No'}</div>
-                          <div><strong>Streaming:</strong> {conversation.metadata.responseData.streaming ? 'Yes' : 'No'}</div>
-                          {conversation.metadata.responseData.completedDays > 0 && (
-                            <div><strong>Completed Days:</strong> {conversation.metadata.responseData.completedDays}</div>
-                          )}
-                          {conversation.metadata.responseData.mealPlansByDay && conversation.metadata.responseData.mealPlansByDay.length > 0 && (
-                            <div><strong>Meal Plans Count:</strong> {conversation.metadata.responseData.mealPlansByDay.length}</div>
-                          )}
-                          {conversation.metadata.responseData.workoutSections && conversation.metadata.responseData.workoutSections.length > 0 && (
-                            <div><strong>Workout Sections Count:</strong> {conversation.metadata.responseData.workoutSections.length}</div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
           )}
+        </div>
+      )}
+
+      {/* Conversation Detail Modal */}
+      {showConversationDetail && selectedConversation && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            padding: '20px',
+            maxWidth: '800px',
+            width: '90%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            color: 'black'
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '15px',
+              paddingBottom: '10px',
+              borderBottom: '1px solid #eee'
+            }}>
+              <h3 style={{ color: 'black' }}>Conversation Details</h3>
+              <button 
+                onClick={() => setShowConversationDetail(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '20px',
+                  cursor: 'pointer',
+                  color: '#666'
+                }}
+              >
+                &times;
+              </button>
+            </div>
+            
+            <div style={{ marginBottom: '15px', color: 'black' }}>
+              <strong style={{ color: 'black' }}>Timestamp:</strong> {formatTimestamp(selectedConversation.timestamp)}
+            </div>
+            
+            <div style={{ marginBottom: '15px', color: 'black' }}>
+              <strong style={{ color: 'black' }}>Profile Used:</strong> {selectedConversation.metadata?.profileOption === 'yes' ? 'Yes' : 'No'}
+            </div>
+            
+            {selectedConversation.metadata?.profileOption === 'yes' && selectedConversation.metadata?.profileDetails && (
+              <div style={{ marginBottom: '15px' }}>
+                <strong style={{ color: 'black' }}>Profile Details:</strong>
+                <div style={{ 
+                  marginTop: '5px',
+                  padding: '10px',
+                  backgroundColor: '#f8f9fa',
+                  borderRadius: '4px',
+                  color: 'black'
+                }}>
+                  <div style={{ color: 'black' }}>Age: {selectedConversation.metadata.profileDetails.age}</div>
+                  <div style={{ color: 'black' }}>Gender: {selectedConversation.metadata.profileDetails.gender}</div>
+                  <div style={{ color: 'black' }}>Height: {selectedConversation.metadata.profileDetails.height} cm</div>
+                  <div style={{ color: 'black' }}>Weight: {selectedConversation.metadata.profileDetails.weight} kg</div>
+                  <div style={{ color: 'black' }}>Activity Level: {selectedConversation.metadata.profileDetails.activityLevel}</div>
+                  <div style={{ color: 'black' }}>Target Weight: {selectedConversation.metadata.profileDetails.targetWeight} kg</div>
+                  <div style={{ color: 'black' }}>Timeline: {selectedConversation.metadata.profileDetails.timeline} months</div>
+                </div>
+              </div>
+            )}
+            
+            {selectedConversation.metadata?.profileOption !== 'yes' && selectedConversation.metadata?.freeStylePrompt && (
+              <div style={{ marginBottom: '15px' }}>
+                <strong style={{ color: 'black' }}>Free Style Prompt:</strong>
+                <div style={{ 
+                  marginTop: '5px',
+                  padding: '10px',
+                  backgroundColor: '#f8f9fa',
+                  borderRadius: '4px',
+                  color: 'black'
+                }}>
+                  <div style={{ color: 'black' }}>{selectedConversation.metadata.freeStylePrompt}</div>
+                </div>
+              </div>
+            )}
+            
+            {selectedConversation.metadata?.planData?.mealPlanContent && (
+              <div style={{ marginBottom: '15px' }}>
+                <strong style={{ color: 'black' }}>Meal Plan:</strong>
+                <div style={{ 
+                  marginTop: '5px',
+                  padding: '10px',
+                  backgroundColor: '#f8f9fa',
+                  borderRadius: '4px',
+                  whiteSpace: 'pre-wrap',
+                  color: 'black'
+                }}>
+                  {selectedConversation.metadata.planData.mealPlanContent}
+                </div>
+              </div>
+            )}
+            
+            {selectedConversation.metadata?.planData?.workoutPlanContent && (
+              <div style={{ marginBottom: '15px' }}>
+                <strong style={{ color: 'black' }}>Workout Plan:</strong>
+                <div style={{ 
+                  marginTop: '5px',
+                  padding: '10px',
+                  backgroundColor: '#f8f9fa',
+                  borderRadius: '4px',
+                  whiteSpace: 'pre-wrap',
+                  color: 'black'
+                }}>
+                  {selectedConversation.metadata.planData.workoutPlanContent}
+                </div>
+              </div>
+            )}
+            
+            {/* Display structured workout plan data if available */}
+            {selectedConversation.metadata?.planData?.structuredWorkoutPlan && (
+              <div style={{ marginBottom: '15px' }}>
+                <strong style={{ color: 'black' }}>Structured Workout Plan:</strong>
+                <div style={{ 
+                  marginTop: '5px',
+                  padding: '10px',
+                  backgroundColor: '#f8f9fa',
+                  borderRadius: '4px',
+                  color: 'black'
+                }}>
+                  {selectedConversation.metadata.planData.structuredWorkoutPlan.map((day, index) => (
+                    <div key={index} style={{ marginBottom: '10px' }}>
+                      <h4 style={{ color: 'black', marginBottom: '5px' }}>Day {day.dayNumber}: {day.workoutType}</h4>
+                      <ul style={{ paddingLeft: '20px', margin: 0 }}>
+                        {day.exercises.map((exercise, exIndex) => (
+                          <li key={exIndex} style={{ color: 'black', marginBottom: '3px' }}>
+                            {exercise.description}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            <button 
+              onClick={() => setShowConversationDetail(false)}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#6366f1',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Close
+            </button>
+          </div>
         </div>
       )}
 
@@ -8292,13 +8682,13 @@ const AIFitnessCoach = () => {
         </div>
       )}
 
-      {/* Success Popup */}
-      {showSuccessPopup && (
+      {/* Success Popup - REMOVED as per user request */}
+      {/* {showSuccessPopup && (
         <div style={{
           position: 'fixed',
           top: '20px',
           right: '20px',
-          backgroundColor: '#10b981',
+          backgroundColor: '#6b7280',
           color: 'white',
           padding: '16px 24px',
           borderRadius: '12px',
@@ -8312,20 +8702,20 @@ const AIFitnessCoach = () => {
           <i className="fas fa-check-circle" style={{ fontSize: '20px' }}></i>
           <span style={{ fontSize: '16px', fontWeight: '500' }}>{successMessage}</span>
         </div>
-      )}
+      )} */}
 
       {/* Error Popup */}
       {showErrorPopup && (
         <div style={{
           position: 'fixed',
-          top: '20px',
+          top: '100px', // Moved down below the navbar (navbar height is 80px, adding 20px spacing)
           right: '20px',
           backgroundColor: '#dc2626',
           color: 'white',
           padding: '16px 24px',
           borderRadius: '12px',
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-          zIndex: 10001,
+          zIndex: 10001, // Kept high z-index but should be above navbar z-index of 999
           display: 'flex',
           alignItems: 'center',
           gap: '12px',
@@ -8680,6 +9070,7 @@ const AIFitnessCoach = () => {
 };
 
 export default AIFitnessCoach;
+
 
 
 

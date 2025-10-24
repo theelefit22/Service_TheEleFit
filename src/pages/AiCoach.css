@@ -16,6 +16,9 @@
     overflow: hidden;
     line-height: 1.6;
     text-rendering: optimizeLegibility;
+    scroll-margin-top: var(--navbar-height);
+    z-index: 1;
+    margin-top: 0;
   }
   
   /* Remove any potential decorative background elements */
@@ -52,7 +55,7 @@
     position: relative;
     
     z-index: 2;
-    color:#CDD954 !important;
+    color:white !important;
     margin-bottom: 24px;
     text-align: center;
     font-size: 50px !important;
@@ -95,7 +98,7 @@
     transform: translateX(-50%);
     width: 0%;
     height: 3px;
-    background: gray !important;
+    background: #BCCE32 !important;
     z-index: 1;
     border-radius: 3px;
     /* Modified animation that doesn't cause layout shifts */
@@ -247,6 +250,7 @@
   
   .welcome-message {
     text-align: center;
+    float: right !important;
     font-size: 18px;
     font-weight: 600;
     margin-bottom: 15px;
@@ -261,7 +265,8 @@
     width: 45%;
     min-width: 200px;
     max-width: 450px;
-    border: 2px solid #C8DA2B !important;
+    box-shadow: none !important;
+    border: 2px solid white !important;
     border-radius: 14px;
     font-size: 16px;
     transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
@@ -284,16 +289,14 @@
   
   .goal-input:focus, .goal-input:not(:placeholder-shown) {
     width: 65% !important;
-    border-color: #C8DA2B !important;
-    box-shadow: 0 0 0 2px rgba(200, 218, 43, 0.3), 
-                0 8px 20px rgba(200, 218, 43, 0.3) !important;
+    border-color: white !important;
     background: #121A16 !important;
     color: #F3F3E0 !important;
   }
   
   .goal-input:focus {
     outline: none !important;
-    border-color: #A2B522 !important;
+    border-color: white !important;
     background: #0A0F0D !important; /* Dark background for better contrast */
     color: #F3F3E0 !important; /* Ensure text remains visible */
     transform: translateY(-3px) scale(1.01);
@@ -507,7 +510,7 @@
   
   .accordion-arrow {
     position: absolute;
-    right: 1px;
+    right: -10px;
     top: 50%;
     transform: translateY(-50%);
     font-size: 20px;
@@ -983,7 +986,10 @@ Fix background decorative elements
   }
   
   .welcome-message {
-    text-align: center;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-size: 18px;
     font-weight: 600;
     margin-bottom: 15px;
@@ -3958,6 +3964,57 @@ color: #FFFFFF !important;
   
   /* Existing styles continue below */
   
+  /* Add conversation history button styles */
+  .conversation-history-btn {
+    background-color: #333 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.3s ease !important;
+    float: right !important;
+    padding: 8px 16px !important;
+    margin-left: 20px !important;
+  }
+
+  .conversation-history-btn:hover {
+    background-color: #555 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* Update refresh button styles in conversation history */
+  .conversation-history-refresh-btn {
+    background-color: #333 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 4px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+  }
+
+  .conversation-history-refresh-btn:hover {
+    background-color: #555 !important;
+    transform: translateY(-1px) !important;
+  }
+
+  .conversation-history-refresh-btn:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+  }
+
+  .conversation-history .fa-spinner,
+  .fa-spinner {
+    color: #333 !important;
+  }
+  
+  .conversation-history .fa-spinner {
+    color: #333 !important;
+  }
+
   /* Add these new styles for the goal details section */
   .selected-goal {
     background-color: #3498db !important;

@@ -25,57 +25,36 @@ Each document in the `aicoach` collection represents a single conversation betwe
   timestamp: Timestamp,     // Firestore server timestamp
   createdAt: Date,          // JavaScript Date object
   metadata: {
-    // User identification
-    userName: string,               // User's display name
+    // Required fields
+    timestamp: string,              // ISO timestamp string
     userEmail: string,              // User's email address
-    userType: string,               // User type (e.g., 'user', 'expert')
+    userName: string,               // User's display name
     
     // Profile usage tracking
-    usedProfile: boolean,           // Whether user profile was used
     profileOption: string,          // 'yes' or 'no' - profile usage option
     
-    // Form details (what was sent to frontend)
-    formDetails: {
-      fitnessGoal: string,          // User's fitness goal prompt
-      formData: object,             // Form data from UI
-      profileFormData: object,      // Profile form data
-      extractedProfileData: object, // Data extracted from prompt
-      userProfileData: object,      // Complete user profile data
-      calculatedCalories: object,   // Calculated calorie data
-    },
+    // Conditional data based on profile usage
+    profileDetails: {               // Only present when profileOption is 'yes'
+      age: number,
+      gender: string,
+      height: number,
+      weight: number,
+      activityLevel: string,
+      targetWeight: number,
+      timeline: number
+    } | null,
     
-    // Backend parameters (if no profile used)
-    backendParameters: {
-      prompt: string,               // Original prompt sent to backend
-      userDetails: object,          // User details sent to backend
-      endpoint: string,             // Backend endpoint used
-      // For meal plans:
-      targetCalories?: number,      // Target calories for meal plan
-      dietaryRestrictions?: array,  // Dietary restrictions
-      allergies?: array,           // Allergies
-      healthGoals?: string,        // Health goals
-      targetWeight?: number,       // Target weight
-      timelineWeeks?: number,      // Timeline in weeks
-      // For workout plans:
-      goal?: string,               // Fitness goal
-      workout_focus?: string,      // Workout focus
-      workout_days?: number,       // Number of workout days
-    } | null,                      // null if profile was used
+    freeStylePrompt: string,        // Only present when profileOption is 'no'
     
-    // Response data (meal plan, workout plan data sent to frontend)
-    responseData: {
-      type: string,                 // Type of response (e.g., 'complete_plan', 'meal_plan', 'workout_plan')
+    // Plan data (only meal and workout plan data)
+    planData: {
       hasMealPlan: boolean,         // Whether response contains meal plan
       hasWorkoutPlan: boolean,      // Whether response contains workout plan
-      mealPlansByDay: array,        // Meal plans data sent to frontend
-      workoutSections: array,       // Workout sections data sent to frontend
-      endOfPlanSuggestion: string,  // End of plan suggestion
-      streaming: boolean,           // Whether response was streamed
-      completedDays: number,        // Number of completed days (for meal plans)
+      mealPlanContent: string,      // Extracted meal plan content
+      workoutPlanContent: string    // Extracted workout plan content
     },
     
     // Additional metadata
-    timestamp: string,              // ISO timestamp string
     promptLength: number,           // Length of the prompt
     responseLength: number,         // Length of the response
   }
@@ -155,44 +134,32 @@ The AI Coach component automatically:
 4. Shows conversation metadata, timestamps, and request parameters
 
 ### Key Features:
-- **Comprehensive Data Storage**: All AI responses are saved with complete request parameters
-- **Backend Parameter Tracking**: Every parameter sent to backend APIs is stored
-- **User Profile Integration**: Complete user profile data is included
-- **Request/Response Mapping**: Full traceability of what was sent and received
+- **Data Structure Compliance**: Data is stored in the exact format specified (timestamp, user email, user name, profile option, conditional data, plan data)
+- **Storage Efficiency**: Only necessary data is stored (no extra metadata)
+- **Conditional Storage**: Either profile details or free style prompt are stored based on user choice
+- **Plan Data Focus**: Only meal and workout plan data is stored (no extra data)
 - **History Display**: Users can view their conversation history with request details
-- **Metadata Tracking**: Rich metadata is stored for analytics
+- **Metadata Tracking**: Essential metadata is stored for analytics
 - **Search Functionality**: Conversations can be searched by content
 - **Statistics**: Conversation statistics are available
 
 ### Data Captured for Each Interaction:
 
-#### 1. **Complete Plan Generation**
-- User prompt
-- User details (age, weight, height, gender, activity level, goal, target weight, timeline)
-- Backend endpoint used
-- Complete AI response
-- Profile completion status
+#### When Profile is Used ('yes'):
+- Timestamp
+- User email
+- User name
+- Profile details (age, gender, height, weight, activity level, target weight, timeline)
+- Meal plan content (if generated)
+- Workout plan content (if generated)
 
-#### 2. **Meal Plan Generation**
-- Target calories
-- Dietary restrictions and allergies
-- Health goals
-- Target weight and timeline
-- Streaming status and completed days
-- Complete meal plan response
-
-#### 3. **Workout Plan Generation**
-- Fitness goal and workout focus
-- Number of workout days
-- Target weight and timeline
-- Streaming status
-- Complete workout plan response
-
-#### 4. **Calorie Calculations**
-- User details for TDEE calculation
-- Calculated calorie data
-- BMR, TDEE, and macro breakdowns
-- Goal-specific recommendations
+#### When Free Style Prompt is Used ('no'):
+- Timestamp
+- User email
+- User name
+- Free style prompt
+- Meal plan content (if generated)
+- Workout plan content (if generated)
 
 ## Usage Example
 
@@ -204,7 +171,21 @@ const conversationId = await saveAiCoachData(
   user.uid,
   "I want to lose weight",
   "Here's your personalized plan...",
-  { type: 'complete_plan', hasMealPlan: true }
+  { 
+    timestamp: new Date().toISOString(),
+    userEmail: "user@example.com",
+    userName: "John Doe",
+    profileOption: "no",
+    freeStylePrompt: "I want to lose weight",
+    planData: {
+      hasMealPlan: true,
+      hasWorkoutPlan: true,
+      mealPlanContent: "MEAL_PLAN:\nDay 1: ...",
+      workoutPlanContent: "WORKOUT_PLAN:\nDay 1: ..."
+    },
+    promptLength: 18,
+    responseLength: 100
+  }
 );
 
 // Fetch conversation history
@@ -245,3 +226,5 @@ This will test all the service functions and verify that the Firebase integratio
 4. **Search**: Users can search through their past conversations
 5. **Scalability**: Firebase handles scaling automatically
 6. **Real-time**: Data is available in real-time across devices
+7. **Compliance**: Data is stored in the exact format specified
+8. **Efficiency**: Only necessary data is stored, reducing storage costs

@@ -6,6 +6,9 @@ html, body, #root {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
 }
 
 *, *:before, *:after {
@@ -22,6 +25,7 @@ img, video, iframe, embed, object {
 div, section, article, aside, nav, header, footer, main {
   max-width: 100%;
   box-sizing: border-box;
+  position: relative;
 }
 
 /* Bootstrap specific fixes */
@@ -65,6 +69,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.3s ease, color 0.3s ease;
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 /* Dark theme support */
@@ -116,6 +125,7 @@ code {
 /* Additional global styles */
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: var(--navbar-height, 80px);
 }
 
 /* Remove default list styles */
@@ -157,4 +167,12 @@ html {
 .custom-tooltip .label {
   font-weight: bold;
   margin-bottom: 5px;
+}
+
+/* Root element styles for proper scrolling */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  scroll-margin-top: var(--navbar-height, 80px);
 }

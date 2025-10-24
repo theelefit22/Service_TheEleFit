@@ -1,307 +1,235 @@
-import { 
-  collection, 
-  addDoc, 
-  query, 
-  where, 
-  orderBy, 
-  getDocs, 
-  doc, 
-  getDoc,
-  updateDoc,
-  deleteDoc,
-  serverTimestamp 
-} from 'firebase/firestore';
+import { collection, query, where, orderBy, limit, getDocs, addDoc, serverTimestamp, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from './firebase';
 
 /**
- * Save AI Coach conversation data to Firebase
- * @param {string} userId - The user's UID
+ * Save AI Coach conversation data to Firebase Firestore
+ * @param {string} userId - The user's Firebase UID
  * @param {string} prompt - The user's input/prompt
  * @param {string} response - The AI's response
- * @param {Object} metadata - Additional metadata (optional)
+ * @param {object} metadata - Additional metadata
  * @returns {Promise<string>} - Document ID of the saved conversation
  */
 export const saveAiCoachData = async (userId, prompt, response, metadata = {}) => {
   try {
-    console.log('Saving AI Coach data to Firebase:', { userId, prompt: prompt.substring(0, 100) + '...', response: response.substring(0, 100) + '...' });
+    // First, check if a conversation with the same prompt already exists for this user
+    // within the last few minutes (to handle streaming responses)
+    const recentThreshold = new Date(Date.now() - 5 * 60 * 1000); // 5 minutes ago
     
-    if (!userId) {
-      throw new Error('User ID is required to save AI Coach data');
-    }
+    const q = query(
+      collection(db, 'aicoach'),
+      where('userId', '==', userId),
+      where('prompt', '==', prompt)
+    );
     
-    if (!prompt || !response) {
-      throw new Error('Both prompt and response are required');
-    }
-
+    const querySnapshot = await getDocs(q);
+    let existingConversation = null;
+    
+    // Look for a recent conversation with the same prompt
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const timestamp = data.timestamp?.toDate?.() || new Date(data.timestamp);
+      
+      // If this conversation is recent, consider it the same conversation
+      if (timestamp > recentThreshold) {
+        existingConversation = { id: doc.id, ...data };
+      }
+    });
+    
     const conversationData = {
-      userId: userId,
-      prompt: prompt,
-      response: response,
+      userId,
+      prompt,
+      response,
       timestamp: serverTimestamp(),
       createdAt: new Date(),
-      metadata: {
-        promptLength: prompt.length,
-        responseLength: response.length,
-        ...metadata
-      }
+      metadata
     };
 
-    // Log the comprehensive data being saved
-    console.log('Comprehensive conversation data structure:', {
-      userId: conversationData.userId,
-      promptLength: conversationData.prompt.length,
-      responseLength: conversationData.response.length,
-      metadataKeys: Object.keys(conversationData.metadata),
-      hasRequestParams: !!conversationData.metadata.requestParams,
-      hasUserProfileData: !!conversationData.metadata.userProfileData,
-      hasCalculatedCalories: !!conversationData.metadata.calculatedCalories
-    });
-
-    const docRef = await addDoc(collection(db, 'aicoach'), conversationData);
-    console.log('AI Coach data saved successfully with ID:', docRef.id);
+    let docRef;
     
+    if (existingConversation) {
+      // Update existing conversation instead of creating a new one
+      console.log('Updating existing conversation with ID:', existingConversation.id);
+      const docRefToUpdate = doc(db, 'aicoach', existingConversation.id);
+      await updateDoc(docRefToUpdate, conversationData);
+      docRef = { id: existingConversation.id };
+    } else {
+      // Create new conversation
+      console.log('Creating new conversation');
+      docRef = await addDoc(collection(db, 'aicoach'), conversationData);
+    }
+    
+    console.log('Conversation saved with ID:', docRef.id);
     return docRef.id;
   } catch (error) {
-    console.error('Error saving AI Coach data:', error);
+    console.error('Error saving conversation:', error);
     throw error;
   }
 };
 
 /**
  * Fetch AI Coach conversation history for a user
- * @param {string} userId - The user's UID
- * @param {number} limit - Maximum number of conversations to fetch (default: 50)
+ * @param {string} userId - The user's Firebase UID
+ * @param {number} limitCount - Maximum number of conversations to fetch (default: 50)
  * @returns {Promise<Array>} - Array of conversation objects
  */
-export const fetchAiCoachHistory = async (userId, limit = 50) => {
+export const fetchAiCoachHistory = async (userId, limitCount = 50) => {
   try {
-    console.log('Fetching AI Coach history for user:', userId);
-    
-    if (!userId) {
-      throw new Error('User ID is required to fetch AI Coach history');
-    }
+    // Create query to fetch user's conversations without orderBy first to avoid index issues
+    let q = query(
+      collection(db, 'aicoach'),
+      where('userId', '==', userId)
+    );
 
-    // Try with orderBy first, fallback to without orderBy if index doesn't exist
-    let q;
-    try {
-      q = query(
-        collection(db, 'aicoach'),
-        where('userId', '==', userId),
-        orderBy('timestamp', 'desc')
-      );
-    } catch (indexError) {
-      console.log('Index not found, trying without orderBy:', indexError);
-      // Fallback: query without orderBy and sort in memory
-      q = query(
-        collection(db, 'aicoach'),
-        where('userId', '==', userId)
-      );
-    }
+    // Apply limit
+    q = query(q, limit(limitCount));
 
     const querySnapshot = await getDocs(q);
     const conversations = [];
-    
+
     querySnapshot.forEach((doc) => {
-      const data = doc.data();
       conversations.push({
         id: doc.id,
-        ...data,
-        // Convert Firestore timestamp to JavaScript Date
-        timestamp: data.timestamp?.toDate() || data.createdAt,
-        createdAt: data.createdAt
+        ...doc.data()
       });
     });
 
-    // Sort by timestamp if we didn't use orderBy
-    if (!q._query.orderBy || q._query.orderBy.length === 0) {
-      conversations.sort((a, b) => {
-        const timeA = new Date(a.timestamp || a.createdAt);
-        const timeB = new Date(b.timestamp || b.createdAt);
-        return timeB - timeA; // Newest first
-      });
-    }
+    // Sort conversations by timestamp in descending order (newest first)
+    conversations.sort((a, b) => {
+      // Handle cases where timestamp might be missing
+      const timestampA = a.timestamp?.toDate?.() || new Date(a.timestamp) || new Date(0);
+      const timestampB = b.timestamp?.toDate?.() || new Date(b.timestamp) || new Date(0);
+      return timestampB - timestampA;
+    });
 
-    // Limit results
-    const limitedConversations = conversations.slice(0, limit);
-    console.log(`Fetched ${limitedConversations.length} AI Coach conversations`);
-    console.log('Sample conversation:', limitedConversations[0]);
-    
-    return limitedConversations;
+    console.log(`Fetched ${conversations.length} conversations for user ${userId}`);
+    return conversations;
   } catch (error) {
     console.error('Error fetching AI Coach history:', error);
-    // Return empty array instead of throwing to prevent UI crashes
-    return [];
+    throw error;
   }
 };
 
 /**
- * Get a specific AI Coach conversation by ID
+ * Get a specific conversation by ID
  * @param {string} conversationId - The conversation document ID
  * @returns {Promise<Object|null>} - Conversation object or null if not found
  */
 export const getAiCoachConversation = async (conversationId) => {
   try {
-    console.log('Fetching AI Coach conversation:', conversationId);
-    
-    if (!conversationId) {
-      throw new Error('Conversation ID is required');
-    }
-
     const docRef = doc(db, 'aicoach', conversationId);
     const docSnap = await getDoc(docRef);
     
     if (docSnap.exists()) {
-      const data = docSnap.data();
       return {
         id: docSnap.id,
-        ...data,
-        timestamp: data.timestamp?.toDate() || data.createdAt,
-        createdAt: data.createdAt
+        ...docSnap.data()
       };
     } else {
-      console.log('No conversation found with ID:', conversationId);
       return null;
     }
   } catch (error) {
-    console.error('Error fetching AI Coach conversation:', error);
+    console.error('Error fetching conversation:', error);
     throw error;
   }
 };
 
 /**
- * Update an existing AI Coach conversation
+ * Update an existing conversation
  * @param {string} conversationId - The conversation document ID
- * @param {Object} updateData - Data to update
+ * @param {object} updateData - Data to update
  * @returns {Promise<void>}
  */
 export const updateAiCoachConversation = async (conversationId, updateData) => {
   try {
-    console.log('Updating AI Coach conversation:', conversationId);
-    
-    if (!conversationId) {
-      throw new Error('Conversation ID is required');
-    }
-
     const docRef = doc(db, 'aicoach', conversationId);
-    await updateDoc(docRef, {
-      ...updateData,
-      updatedAt: new Date()
-    });
-    
-    console.log('AI Coach conversation updated successfully');
+    await updateDoc(docRef, updateData);
   } catch (error) {
-    console.error('Error updating AI Coach conversation:', error);
+    console.error('Error updating conversation:', error);
     throw error;
   }
 };
 
 /**
- * Delete an AI Coach conversation
+ * Delete a conversation
  * @param {string} conversationId - The conversation document ID
  * @returns {Promise<void>}
  */
 export const deleteAiCoachConversation = async (conversationId) => {
   try {
-    console.log('Deleting AI Coach conversation:', conversationId);
-    
-    if (!conversationId) {
-      throw new Error('Conversation ID is required');
-    }
-
     const docRef = doc(db, 'aicoach', conversationId);
     await deleteDoc(docRef);
-    
-    console.log('AI Coach conversation deleted successfully');
   } catch (error) {
-    console.error('Error deleting AI Coach conversation:', error);
+    console.error('Error deleting conversation:', error);
     throw error;
   }
 };
 
 /**
- * Get AI Coach conversation statistics for a user
- * @param {string} userId - The user's UID
+ * Get conversation statistics for a user
+ * @param {string} userId - The user's Firebase UID
  * @returns {Promise<Object>} - Statistics object
  */
 export const getAiCoachStats = async (userId) => {
   try {
-    console.log('Fetching AI Coach stats for user:', userId);
-    
-    if (!userId) {
-      throw new Error('User ID is required to fetch AI Coach stats');
-    }
+    const q = query(
+      collection(db, 'aicoach'),
+      where('userId', '==', userId)
+    );
 
-    const conversations = await fetchAiCoachHistory(userId, 1000); // Get more for stats
-    
-    const stats = {
-      totalConversations: conversations.length,
-      totalPrompts: conversations.length,
-      totalResponses: conversations.length,
-      averagePromptLength: 0,
-      averageResponseLength: 0,
-      firstConversation: null,
-      lastConversation: null,
-      conversationsByMonth: {}
+    const querySnapshot = await getDocs(q);
+    const conversations = [];
+
+    querySnapshot.forEach((doc) => {
+      conversations.push(doc.data());
+    });
+
+    const totalConversations = conversations.length;
+    const totalPromptLength = conversations.reduce((sum, conv) => sum + (conv.metadata?.promptLength || 0), 0);
+    const totalResponseLength = conversations.reduce((sum, conv) => sum + (conv.metadata?.responseLength || 0), 0);
+
+    return {
+      totalConversations,
+      averagePromptLength: totalConversations > 0 ? Math.round(totalPromptLength / totalConversations) : 0,
+      averageResponseLength: totalConversations > 0 ? Math.round(totalResponseLength / totalConversations) : 0
     };
-
-    if (conversations.length > 0) {
-      // Calculate averages
-      const totalPromptLength = conversations.reduce((sum, conv) => sum + (conv.metadata?.promptLength || 0), 0);
-      const totalResponseLength = conversations.reduce((sum, conv) => sum + (conv.metadata?.responseLength || 0), 0);
-      
-      stats.averagePromptLength = Math.round(totalPromptLength / conversations.length);
-      stats.averageResponseLength = Math.round(totalResponseLength / conversations.length);
-      
-      // Get first and last conversations
-      stats.firstConversation = conversations[conversations.length - 1]; // Oldest
-      stats.lastConversation = conversations[0]; // Newest
-      
-      // Group by month
-      conversations.forEach(conv => {
-        const date = new Date(conv.timestamp);
-        const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-        stats.conversationsByMonth[monthKey] = (stats.conversationsByMonth[monthKey] || 0) + 1;
-      });
-    }
-
-    console.log('AI Coach stats calculated:', stats);
-    return stats;
   } catch (error) {
-    console.error('Error fetching AI Coach stats:', error);
+    console.error('Error fetching stats:', error);
     throw error;
   }
 };
 
 /**
- * Search AI Coach conversations by content
- * @param {string} userId - The user's UID
+ * Search conversations by content
+ * @param {string} userId - The user's Firebase UID
  * @param {string} searchTerm - Term to search for
  * @returns {Promise<Array>} - Array of matching conversations
  */
 export const searchAiCoachConversations = async (userId, searchTerm) => {
   try {
-    console.log('Searching AI Coach conversations:', { userId, searchTerm });
-    
-    if (!userId) {
-      throw new Error('User ID is required to search AI Coach conversations');
-    }
-    
-    if (!searchTerm || searchTerm.trim().length < 2) {
-      throw new Error('Search term must be at least 2 characters long');
-    }
-
-    const conversations = await fetchAiCoachHistory(userId, 1000); // Get more for search
-    
-    const searchTermLower = searchTerm.toLowerCase();
-    const matchingConversations = conversations.filter(conv => 
-      conv.prompt.toLowerCase().includes(searchTermLower) ||
-      conv.response.toLowerCase().includes(searchTermLower)
+    const q = query(
+      collection(db, 'aicoach'),
+      where('userId', '==', userId)
     );
 
-    console.log(`Found ${matchingConversations.length} matching conversations`);
-    return matchingConversations;
+    const querySnapshot = await getDocs(q);
+    const conversations = [];
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      if (
+        data.prompt?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        data.response?.toLowerCase().includes(searchTerm.toLowerCase())
+      ) {
+        conversations.push({
+          id: doc.id,
+          ...data
+        });
+      }
+    });
+
+    return conversations;
   } catch (error) {
-    console.error('Error searching AI Coach conversations:', error);
+    console.error('Error searching conversations:', error);
     throw error;
   }
 };

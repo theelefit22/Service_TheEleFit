@@ -1,5 +1,5 @@
 .navbar {
-  background-color: white;
+  background: linear-gradient(135deg, #0a0a0a, #000000);
   height: 80px;
   display: flex;
   justify-content: center;
@@ -13,12 +13,16 @@
   font-family: 'Inter', 'Aktiv Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
   transition: all 0.4s ease;
   box-shadow: none;
+  will-change: transform;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .navbar.scrolled {
-  background-color: white;
+  background: linear-gradient(135deg, #0a0a0a, #000000);
   height: 70px;
-  box-shadow: 0 4px 20px rgba(77, 77, 77, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  will-change: transform;
 }
 
 .navbar-container {
@@ -30,6 +34,8 @@
   max-width: 1400px;
   padding: 0 20px;
   margin: 0;
+  position: relative;
+  z-index: 1000;
 }
 
 .navbar-logo {
@@ -98,8 +104,8 @@
 .nav-item:nth-child(4) { animation-delay: 0.4s; }
 
 .nav-link {
-  color: #4D4D4D;
-  text-decoration: none;
+  color: white !important;
+  text-decoration: none !important;
   font-weight: 500;
   padding: 8px 0;
   position: relative;
@@ -109,7 +115,7 @@
 }
 
 .scrolled .nav-link {
-  color: grey;
+  color: white !important;
   text-shadow: none;
 }
 
@@ -129,34 +135,52 @@
 }
 
 .nav-link:hover {
-  color:black
-
+  color: #C8DA2B !important; /* Green color on hover */
 }
 
 .scrolled .nav-link:hover {
-  color: #4E3580;
+  color: #C8DA2B !important; /* Green color on hover when scrolled */
 }
 
 /* Add active link styling */
 .nav-link.active {
-  color: #402C69;
+  color: #C8DA2B; /* Green color for active links */
   font-weight: 600;
+  background: transparent !important; /* Remove background box */
+  border: none !important; /* Remove border */
+  border-radius: 0 !important; /* Remove border radius */
+  box-shadow: none !important; /* Remove any box shadow */
+  outline: none !important; /* Remove any outline */
 }
 
 .scrolled .nav-link.active {
-  color: #402C69;
+  color: #C8DA2B; /* Green color for active links when scrolled */
 }
 
 .nav-link.active::after {
   width: 100%;
-  background-color: #402C69;
+  background-color: #C8DA2B; /* Green underline for active links */
+}
+
+/* Focus styles for all navigation elements */
+.nav-link:focus, .nav-button:focus, .nav-link-button:focus {
+  outline: none !important;
+  border: 1px solid #C8DA2B !important;
+  box-shadow: none !important;
+}
+
+/* Ensure no box appears on focus for active links */
+.nav-link.active:focus {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 .nav-button {
-  background-color: transparent;
-  border: 1px solid white;
-  color:  #4D4D4D;;
-  background-color:#C8DA2B;
+  background-color: #C8DA2B; /* Green background */
+  border: 1px solid #C8DA2B;
+  color: black;
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
@@ -166,28 +190,35 @@
   position: relative;
   overflow: hidden;
   text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  outline: none !important;
+  box-shadow: none !important;
+  border: 1px solid #C8DA2B !important;
 }
 
 .scrolled .nav-button {
-  border: 1px solid #4D4D4D;
-  color: #4D4D4D;
+  border: 1px solid #C8DA2B !important;
+  color: black;
   text-shadow: none;
+  background-color: #C8DA2B;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .nav-button:hover {
-color: black;
-  border-color: #C8DA2B;
-  
+  color: black;
+  border-color: #b7c824;
+  background-color: #b7c824; /* Darker green background */
 }
 
 .scrolled .nav-button:hover {
-  color: #4E3580;
-  border-color: #4E3580;
+  color: black;
+  border-color: #b7c824;
+  background-color: #b7c824;
 }
 
 .nav-link-button {
-  background-color: #C8DA2B;
-  color: #4D4D4D;
+  background-color: #C8DA2B; /* Green background */
+  color: black;
   text-decoration: none;
   padding: 10px 20px;
   border-radius: 4px;
@@ -198,7 +229,18 @@ color: black;
   position: relative;
   overflow: hidden;
   z-index: 1;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid #C8DA2B !important;
+  outline: none !important;
+}
+
+.scrolled .nav-link-button {
+  border: 1px solid #C8DA2B !important;
+  color: black;
+  text-shadow: none;
+  background-color: #C8DA2B;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .nav-link-button::after {
@@ -216,7 +258,11 @@ color: black;
 }
 
 .nav-link-button:hover {
-  color: white;
+  color: black;
+  background-color: #b7c824; /* Darker green on hover */
+  border: 1px solid #b7c824 !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .nav-link-button:hover::after {
@@ -243,6 +289,13 @@ color: black;
   border: none;
   padding: 10px;
   z-index: 1000;
+  outline: none !important; /* Remove default focus outline */
+  box-shadow: none !important;
+}
+
+.mobile-menu-toggle:focus {
+  outline: none;
+  border: none;
 }
 
 .mobile-menu-toggle span {
@@ -250,12 +303,15 @@ color: black;
   width: 25px;
   height: 3px;
   margin: 5px 0;
-  background-color: #C8DA2B;
+  background-color: white;
   transition: all 0.3s ease;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 .scrolled .mobile-menu-toggle span {
-  background-color: #C8DA2B;
+  background-color: white;
 }
 
 .mobile-menu-toggle.open span:nth-child(1) {
@@ -283,13 +339,14 @@ color: black;
     width: 100vw;
     max-width: 100%;
     height: 100vh;
-    background: rgba(255, 255, 255, 0.98);
+    background: rgba(0, 0, 0, 0.98); /* Black background for mobile menu */
     padding: 50px 0;
     z-index: 999;
     overflow-x: hidden;
     box-sizing: border-box;
     margin: 0;
     transition: all 0.5s ease;
+    will-change: transform;
   }
   
   .nav-menu.active {
@@ -313,8 +370,23 @@ color: black;
   .nav-menu.active .nav-item:nth-child(3) { animation-delay: 0.4s; }
   .nav-menu.active .nav-item:nth-child(4) { animation-delay: 0.5s; }
   
+  /* Focus styles for mobile menu items */
+  .nav-link:focus, .nav-button:focus, .nav-link-button:focus {
+    outline: none !important;
+    border: 1px solid #C8DA2B !important;
+    box-shadow: none !important;
+  }
+  
+  /* Ensure no box appears on focus for active links in mobile */
+  .nav-link.active:focus {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+  
   .nav-link {
-    color: #4D4D4D;
+    color: white;
     font-size: 1.2rem;
     text-shadow: none;
     display: inline-block;
@@ -323,6 +395,15 @@ color: black;
   
   .mobile-menu-toggle {
     display: block;
+    will-change: transform;
+  }
+  
+  /* Fix for mobile scrolling */
+  body.menu-open {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
   }
 }
 
@@ -343,17 +424,17 @@ color: black;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #4D4D4D;
+  color: white;
   transition: all 0.3s ease;
   position: relative;
   padding: 8px;
   border-radius: 50%;
-  background: rgba(200, 218, 43, 0.1);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .nav-icon-link:hover {
-  background: rgba(200, 218, 43, 0.2);
-  color: #000;
+  background: rgba(200, 218, 43, 0.3); /* Light green background on hover */
+  color: #C8DA2B; /* Green icon color on hover */
   transform: translateY(-2px);
 }
 
@@ -365,8 +446,8 @@ color: black;
   position: absolute;
   top: -5px;
   right: -5px;
-  background-color: #C8DA2B;
-  color: #4D4D4D;
+  background-color: #C8DA2B; /* Green badge background */
+  color: black;
   font-size: 0.75rem;
   font-weight: 600;
   min-width: 18px;
@@ -422,6 +503,19 @@ body.menu-open {
 .navbar-container {
   max-width: 100%;
   box-sizing: border-box;
+}
+
+/* Specific styles for Eva customer navbar */
+.navbar .nav-button {
+  background-color: #C8DA2B; /* Green background */
+  color: black;
+  border: 1px solid #C8DA2B;
+}
+
+.navbar .nav-button:hover {
+  background-color: #b7c824; /* Darker green background on hover */
+  color: black;
+  border-color: #b7c824;
 }
 
 @keyframes fadeInUp {
