@@ -1,5 +1,5 @@
 .navbar {
-  background: linear-gradient(135deg, #0a0a0a, #000000);
+  background-color: black;
   height: 80px;
   display: flex;
   justify-content: center;
@@ -13,16 +13,12 @@
   font-family: 'Inter', 'Aktiv Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
   transition: all 0.4s ease;
   box-shadow: none;
-  will-change: transform;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
 }
 
 .navbar.scrolled {
-  background: linear-gradient(135deg, #0a0a0a, #000000);
+  background-color: black;
   height: 70px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  will-change: transform;
+  box-shadow: 0 4px 20px rgba(77, 77, 77, 0.15);
 }
 
 .navbar-container {
@@ -34,8 +30,6 @@
   max-width: 1400px;
   padding: 0 20px;
   margin: 0;
-  position: relative;
-  z-index: 1000;
 }
 
 .navbar-logo {
@@ -104,8 +98,8 @@
 .nav-item:nth-child(4) { animation-delay: 0.4s; }
 
 .nav-link {
-  color: white !important;
-  text-decoration: none !important;
+  color: white;
+  text-decoration: none;
   font-weight: 500;
   padding: 8px 0;
   position: relative;
@@ -115,7 +109,7 @@
 }
 
 .scrolled .nav-link {
-  color: white !important;
+  color: white;
   text-shadow: none;
 }
 
@@ -127,60 +121,44 @@
   width: 0;
   height: 2px;
   background-color: #C8DA2B;
-  transition: width 0.3s cubic-bezier(0.65, 0, 0.35, 1);
+  transition: all 0.3s cubic-bezier(0.65, 0, 0.35, 1);
+  opacity: 0;
 }
 
 .nav-link:hover::after {
   width: 100%;
+  opacity: 1;
 }
 
 .nav-link:hover {
-  color: #C8DA2B !important; /* Green color on hover */
+  color: white;
 }
 
 .scrolled .nav-link:hover {
-  color: #C8DA2B !important; /* Green color on hover when scrolled */
+  color: #C8DA2B;
 }
 
 /* Add active link styling */
 .nav-link.active {
-  color: #C8DA2B; /* Green color for active links */
+  color: white;
   font-weight: 600;
-  background: transparent !important; /* Remove background box */
-  border: none !important; /* Remove border */
-  border-radius: 0 !important; /* Remove border radius */
-  box-shadow: none !important; /* Remove any box shadow */
-  outline: none !important; /* Remove any outline */
 }
 
 .scrolled .nav-link.active {
-  color: #C8DA2B; /* Green color for active links when scrolled */
+  color: #C8DA2B;
 }
 
 .nav-link.active::after {
   width: 100%;
-  background-color: #C8DA2B; /* Green underline for active links */
-}
-
-/* Focus styles for all navigation elements */
-.nav-link:focus, .nav-button:focus, .nav-link-button:focus {
-  outline: none !important;
-  border: 1px solid #C8DA2B !important;
-  box-shadow: none !important;
-}
-
-/* Ensure no box appears on focus for active links */
-.nav-link.active:focus {
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  outline: none !important;
+  opacity: 1;
+  background-color: #C8DA2B;
 }
 
 .nav-button {
-  background-color: #C8DA2B; /* Green background */
-  border: 1px solid #C8DA2B;
-  color: black;
+  background-color: transparent;
+  border: 1px solid white;
+  color:  black;
+  background-color:#C8DA2B;
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
@@ -190,35 +168,28 @@
   position: relative;
   overflow: hidden;
   text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-  outline: none !important;
-  box-shadow: none !important;
-  border: 1px solid #C8DA2B !important;
 }
 
 .scrolled .nav-button {
-  border: 1px solid #C8DA2B !important;
-  color: black;
+  border: 1px solid #4D4D4D;
+  color: #4D4D4D;
   text-shadow: none;
-  background-color: #C8DA2B;
-  outline: none !important;
-  box-shadow: none !important;
 }
 
 .nav-button:hover {
-  color: black;
-  border-color: #b7c824;
-  background-color: #b7c824; /* Darker green background */
+color: black;
+  border-color: #C8DA2B;
+  
 }
 
 .scrolled .nav-button:hover {
-  color: black;
-  border-color: #b7c824;
-  background-color: #b7c824;
+  color: #4E3580;
+  border-color: #4E3580;
 }
 
 .nav-link-button {
-  background-color: #C8DA2B; /* Green background */
-  color: black;
+  background-color: #C8DA2B;
+  color: #4D4D4D;
   text-decoration: none;
   padding: 10px 20px;
   border-radius: 4px;
@@ -229,18 +200,7 @@
   position: relative;
   overflow: hidden;
   z-index: 1;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
-  border: 1px solid #C8DA2B !important;
-  outline: none !important;
-}
-
-.scrolled .nav-link-button {
-  border: 1px solid #C8DA2B !important;
-  color: black;
-  text-shadow: none;
-  background-color: #C8DA2B;
-  outline: none !important;
-  box-shadow: none !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
 .nav-link-button::after {
@@ -258,11 +218,7 @@
 }
 
 .nav-link-button:hover {
-  color: black;
-  background-color: #b7c824; /* Darker green on hover */
-  border: 1px solid #b7c824 !important;
-  outline: none !important;
-  box-shadow: none !important;
+  color: white;
 }
 
 .nav-link-button:hover::after {
@@ -289,13 +245,6 @@
   border: none;
   padding: 10px;
   z-index: 1000;
-  outline: none !important; /* Remove default focus outline */
-  box-shadow: none !important;
-}
-
-.mobile-menu-toggle:focus {
-  outline: none;
-  border: none;
 }
 
 .mobile-menu-toggle span {
@@ -303,15 +252,12 @@
   width: 25px;
   height: 3px;
   margin: 5px 0;
-  background-color: white;
+  background-color: #C8DA2B;
   transition: all 0.3s ease;
-  border: none !important;
-  box-shadow: none !important;
-  outline: none !important;
 }
 
 .scrolled .mobile-menu-toggle span {
-  background-color: white;
+  background-color: #C8DA2B;
 }
 
 .mobile-menu-toggle.open span:nth-child(1) {
@@ -339,14 +285,13 @@
     width: 100vw;
     max-width: 100%;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.98); /* Black background for mobile menu */
+    background: black;
     padding: 50px 0;
     z-index: 999;
     overflow-x: hidden;
     box-sizing: border-box;
     margin: 0;
     transition: all 0.5s ease;
-    will-change: transform;
   }
   
   .nav-menu.active {
@@ -370,40 +315,33 @@
   .nav-menu.active .nav-item:nth-child(3) { animation-delay: 0.4s; }
   .nav-menu.active .nav-item:nth-child(4) { animation-delay: 0.5s; }
   
-  /* Focus styles for mobile menu items */
-  .nav-link:focus, .nav-button:focus, .nav-link-button:focus {
-    outline: none !important;
-    border: 1px solid #C8DA2B !important;
-    box-shadow: none !important;
-  }
-  
-  /* Ensure no box appears on focus for active links in mobile */
-  .nav-link.active:focus {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
-  }
-  
   .nav-link {
     color: white;
     font-size: 1.2rem;
     text-shadow: none;
     display: inline-block;
     width: auto;
+    position: relative;
+  }
+  
+  /* Reset underline styles for mobile */
+  .nav-link::after {
+    transition: all 0.2s ease;
+  }
+
+  .nav-link.active::after {
+    opacity: 0;
+    width: 0;
+  }
+
+  /* Only show underline on current active link */
+  .nav-menu.active .nav-link.active::after {
+    opacity: 1;
+    width: 100%;
   }
   
   .mobile-menu-toggle {
     display: block;
-    will-change: transform;
-  }
-  
-  /* Fix for mobile scrolling */
-  body.menu-open {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
   }
 }
 
@@ -424,17 +362,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: #4D4D4D;
   transition: all 0.3s ease;
   position: relative;
   padding: 8px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(200, 218, 43, 0.1);
 }
 
 .nav-icon-link:hover {
-  background: rgba(200, 218, 43, 0.3); /* Light green background on hover */
-  color: #C8DA2B; /* Green icon color on hover */
+  background: rgba(200, 218, 43, 0.2);
+  color: #000;
   transform: translateY(-2px);
 }
 
@@ -446,8 +384,8 @@
   position: absolute;
   top: -5px;
   right: -5px;
-  background-color: #C8DA2B; /* Green badge background */
-  color: black;
+  background-color: #C8DA2B;
+  color: #4D4D4D;
   font-size: 0.75rem;
   font-weight: 600;
   min-width: 18px;
@@ -503,19 +441,6 @@ body.menu-open {
 .navbar-container {
   max-width: 100%;
   box-sizing: border-box;
-}
-
-/* Specific styles for Eva customer navbar */
-.navbar .nav-button {
-  background-color: #C8DA2B; /* Green background */
-  color: black;
-  border: 1px solid #C8DA2B;
-}
-
-.navbar .nav-button:hover {
-  background-color: #b7c824; /* Darker green background on hover */
-  color: black;
-  border-color: #b7c824;
 }
 
 @keyframes fadeInUp {

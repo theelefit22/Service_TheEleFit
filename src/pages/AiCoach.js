@@ -1642,7 +1642,7 @@ const AIFitnessCoach = () => {
   };
 
   const getApiUrl = (endpoint = 'chat') => {
-    return `http://127.0.0.1:5002/${endpoint}`;
+    return `https://yantraprise.com/${endpoint}`;
   };
 
   const cleanItemText = (text) => {
