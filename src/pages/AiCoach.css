@@ -5345,6 +5345,34 @@ color: #FFFFFF !important;
   color: #555;
 }
 
+/* Add margin-top to position popups below navbar for both large and small devices */
+.missing-profile-fields-popup .popup-content,
+.profile-form-popup .popup-content,
+.profile-update-popup .popup-content,
+.profile-choice-popup .popup-content {
+  margin-top: 90px !important;
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .missing-profile-fields-popup .popup-content,
+  .profile-form-popup .popup-content,
+  .profile-update-popup .popup-content,
+  .profile-choice-popup .popup-content {
+    margin-top: 80px !important;
+  }
+}
+
+/* Media query for very small screens */
+@media (max-width: 480px) {
+  .missing-profile-fields-popup .popup-content,
+  .profile-form-popup .popup-content,
+  .profile-update-popup .popup-content,
+  .profile-choice-popup .popup-content {
+    margin-top: 70px !important;
+  }
+}
+
 /* Cursor blink animation for streaming */
 @keyframes blink {
     0%, 50% { opacity: 1; }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation, NavLink } from 'react-router-dom';
 import { auth, getUserType } from '../services/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
@@ -18,6 +18,8 @@ const Navbar = () => {
   const [isEvaCustomer, setIsEvaCustomer] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const menuRef = useRef(null);
+  const toggleRef = useRef(null);
 
   // Debug logging
   console.log('🔍 Navbar Debug - AuthContext state:', {
@@ -39,6 +41,47 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Handle window resize to close menu on larger screens
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        // Close mobile menu when screen becomes larger
+        setMenuOpen(false);
+        document.body.classList.remove('menu-open');
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Handle click outside to close menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuOpen && menuRef.current && toggleRef.current) {
+        if (!menuRef.current.contains(event.target) && !toggleRef.current.contains(event.target)) {
+          closeMenu();
+        }
+      }
+    };
+
+    const handleEscKey = (event) => {
+      if (event.keyCode === 27 && menuOpen) {
+        closeMenu();
+      }
+    };
+
+    if (menuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscKey);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscKey);
+    };
+  }, [menuOpen]);
 
   // Check for EVA customer status when user changes
   useEffect(() => {
@@ -68,11 +111,13 @@ const Navbar = () => {
   }, [currentUser, location.pathname, navigate]);
 
   useEffect(() => {
+    // Close menu when route changes
     setMenuOpen(false);
     document.body.classList.remove('menu-open');
   }, [location.pathname]);
 
   useEffect(() => {
+    // Handle body overflow when menu is open
     document.body.style.overflow = menuOpen ? 'hidden' : 'auto';
     if (menuOpen) {
       document.body.classList.add('menu-open');
@@ -116,7 +161,17 @@ const Navbar = () => {
   };
 
   const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
+    console.log('Toggling menu. Current state:', menuOpen);
+    setMenuOpen(prevState => {
+      const newState = !prevState;
+      console.log('New state will be:', newState);
+      return newState;
+    });
+  };
+
+  const closeMenu = () => {
+    console.log('Closing menu');
+    setMenuOpen(false);
   };
 
   // If user is Eva customer, show simplified navbar
@@ -165,21 +220,33 @@ const Navbar = () => {
         </Link>
         
         <button 
+          ref={toggleRef}
           className={`mobile-menu-toggle ${menuOpen ? 'open' : ''}`}
-          onClick={toggleMenu}
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleMenu();
+          }}
           aria-label="Toggle menu"
+          aria-expanded={menuOpen}
         >
           <span></span>
           <span></span>
           <span></span>
         </button>
        
-        <ul className={`nav-menu ${menuOpen ? 'active' : ''}`}>
+        <ul 
+          ref={menuRef}
+          className={`nav-menu ${menuOpen ? 'active' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            // Don't close menu when clicking on it, only when clicking menu items
+          }}
+        >
           <li className="nav-item">
             <NavLink 
               to="/" 
               className={({isActive}) => isActive ? "nav-link active" : "nav-link"} 
-              onClick={() => setMenuOpen(false)}
+              onClick={closeMenu}
             >
               Home
             </NavLink>
@@ -188,7 +255,7 @@ const Navbar = () => {
             <NavLink 
               to="/community" 
               className={({isActive}) => isActive ? "nav-link active" : "nav-link"} 
-              onClick={() => setMenuOpen(false)}
+              onClick={closeMenu}
             >
               Community
             </NavLink>
@@ -197,7 +264,7 @@ const Navbar = () => {
             <NavLink 
               to="/experts" 
               className={({isActive}) => isActive ? "nav-link active" : "nav-link"} 
-              onClick={() => setMenuOpen(false)}
+              onClick={closeMenu}
             >
               Find Expert
             </NavLink>
@@ -206,7 +273,7 @@ const Navbar = () => {
             <NavLink 
               to="/apply-as-expert" 
               className={({isActive}) => isActive ? "nav-link active" : "nav-link"} 
-              onClick={() => setMenuOpen(false)}
+              onClick={closeMenu}
             >
               Apply as Expert
             </NavLink>
@@ -216,7 +283,7 @@ const Navbar = () => {
             <NavLink
               to={isAuthenticated ? "/aicoach" : "/auth"}
               className={({isActive}) => isActive ? "nav-link active" : "nav-link"}
-              onClick={() => setMenuOpen(false)}
+              onClick={closeMenu}
             >
               AI Coach
             </NavLink>
@@ -231,7 +298,7 @@ const Navbar = () => {
                       <NavLink 
                         to="/expert-dashboard" 
                         className={({isActive}) => isActive ? "nav-link active" : "nav-link"} 
-                        onClick={() => setMenuOpen(false)}
+                        onClick={closeMenu}
                       >
                         Dashboard
                       </NavLink>
@@ -239,7 +306,7 @@ const Navbar = () => {
                       <NavLink 
                         to="/user-dashboard" 
                         className={({isActive}) => isActive ? "nav-link active" : "nav-link"} 
-                        onClick={() => setMenuOpen(false)}
+                        onClick={closeMenu}
                       >
                         My Dashboard
                       </NavLink>
@@ -247,14 +314,18 @@ const Navbar = () => {
                   </li>
 
                   <li className="nav-item">
-                    <button onClick={handleLogout} className="nav-button">
+                    <button onClick={(e) => {
+                      e.stopPropagation();
+                      handleLogout();
+                      closeMenu();
+                    }} className="nav-button">
                       Logout
                     </button>
                   </li>
                 </>
               ) : (
                 <li className="nav-item">
-                  <Link to="/auth" className="nav-link-button" onClick={() => setMenuOpen(false)}>
+                  <Link to="/auth" className="nav-link-button" onClick={closeMenu}>
                     Login / Register
                   </Link>
                 </li>

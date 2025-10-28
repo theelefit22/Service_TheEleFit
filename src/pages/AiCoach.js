@@ -1642,7 +1642,7 @@ const AIFitnessCoach = () => {
   };
 
   const getApiUrl = (endpoint = 'chat') => {
-    return `https://yantraprise.com/${endpoint}`;
+     return `https://yantraprise.com/${endpoint}`;
   };
 
   const cleanItemText = (text) => {
@@ -2694,14 +2694,27 @@ const AIFitnessCoach = () => {
         },
         body: JSON.stringify({
           targetCalories: calculatedCalories.targetCalories,
-          dietaryRestrictions: [], // Empty array is fine now - backend handles it properly
-          allergies: [], // Empty array is fine now - backend handles it properly
+          dietaryRestrictions: useExistingProfile ? (userProfileData?.dietaryRestrictions || []) : [], // Only send if user chose to use profile
+          allergies: useExistingProfile ? (userProfileData?.allergies || []) : [], // Only send if user chose to use profile
           healthGoals: extractedProfileData?.healthGoals || profileFormData?.goal,
           targetWeight: extractedProfileData?.targetWeight?.value || profileFormData?.targetWeight,
           timelineWeeks: parseInt(extractedProfileData?.timelineWeeks || profileFormData?.targetTimeline * 4 || 12),
           prompt: fitnessGoal || `Generate meal plan for ${extractedProfileData?.goal || profileFormData.goal || 'fitness'} goal`
         })
       });
+
+      // Save conversation data to Firebase with all meal plan parameters
+      const mealPlanParams1 = {
+        targetCalories: calculatedCalories.targetCalories,
+        dietaryRestrictions: useExistingProfile ? (userProfileData?.dietaryRestrictions || []) : [], // Only send if user chose to use profile
+        allergies: useExistingProfile ? (userProfileData?.allergies || []) : [], // Only send if user chose to use profile
+        healthGoals: extractedProfileData?.healthGoals || profileFormData?.goal,
+        targetWeight: extractedProfileData?.targetWeight?.value || profileFormData?.targetWeight,
+        timelineWeeks: parseInt(extractedProfileData?.timelineWeeks || profileFormData?.targetTimeline * 4 || 12),
+        prompt: `Generate meal plan for ${extractedProfileData?.goal || profileFormData.goal || 'fitness'} goal`,
+        endpoint: 'mealplan'
+      };
+      await saveConversationData(mealPlanParams1);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -2865,68 +2878,45 @@ const AIFitnessCoach = () => {
         if (completedDays > 0) {
           setMealPlansByDay(prev => [...prev]);
         }
-      }
-
-      // Process any remaining content in the buffer (last day and suggestions)
-      if (currentDayBuffer.trim()) {
+        
+        // Parse and update meal plans in real-time with immediate parsing
         try {
-          const finalResponse = `MEAL_PLAN:${currentDayBuffer}`;
-          parseResponseLiveImmediate(finalResponse, 'meal');
+          const liveResponse = `MEAL_PLAN:${accumulatedText}`;
+          console.log('Parsing meal response:', liveResponse.substring(0, 200) + '...');
           
-          // Also extract suggestion from remaining buffer
-          console.log('DEBUG: Final buffer to check for suggestions:', currentDayBuffer.substring(0, 200) + '...');
-          const suggestionMatch = currentDayBuffer.match(/END-OF-PLAN[\s-]?SUGGESTION:?\s*(.*)/i) || 
-            currentDayBuffer.match(/\*\*End-of-Plan Suggestion:\*\*\s*(.*)/i) ||
-            currentDayBuffer.match(/\*\*Recommendation:\*\*\s*(.*)/i);
-          if (suggestionMatch) {
-            const extractedSuggestion = suggestionMatch[1].trim();
-            console.log('DEBUG: Extracted suggestion from final buffer:', extractedSuggestion);
-            setEndOfPlanSuggestion(extractedSuggestion);
-            // Suggestions will be auto-opened by useEffect when first available
-            console.log('DEBUG: Set endOfPlanSuggestion from final buffer and opened accordion');
-          }
+          // Use immediate parsing for real-time UI updates
+          parseResponseLiveImmediate(liveResponse, 'meal');
+          
+          // Debug: Log current meal plans after parsing
+          console.log('Current meal plans after parsing:', mealPlansByDay);
         } catch (parseError) {
-          console.log('Error parsing final content:', parseError.message);
+          console.log('Temporary meal parse error (continuing):', parseError.message);
+          // Fallback: try to create days from text
+          createDaysFromText(accumulatedText, 'meal');
         }
       }
 
-      // Store the original response for accurate parsing
-      setOriginalMealPlanResponse(accumulatedText);
-      
-      // Debug: Show what backend is streaming to frontend
-      console.log('DEBUG: Backend streaming response to frontend:');
-      console.log(accumulatedText);
-      
-      // Parse the original response to get accurate calorie values
-      parseOriginalResponse(accumulatedText);
-      
-      // Final parse for complete meal plan (this will handle any remaining content and suggestions)
+      // Final parse for complete meal plan - use the same parsing logic as streaming
       const finalResponse = `MEAL_PLAN:${accumulatedText}`;
-      parseResponse(finalResponse);
-      clearTimeout(mealStreamingTimeout); // Clear the timeout since we completed successfully
-      setIsStreamingMeal(false);
-      setCurrentMealDay(completedDays); // Use actual count of processed days
+      parseResponseLiveImmediate(finalResponse, 'meal');
       
       // Save conversation data to Firebase with all meal plan parameters
       const mealPlanRequestParams = {
         targetCalories: calculatedCalories.targetCalories,
-        dietaryRestrictions: [], // Empty array is fine now - backend handles it properly
-        allergies: [], // Empty array is fine now - backend handles it properly
+        dietaryRestrictions: useExistingProfile ? (userProfileData?.dietaryRestrictions || []) : [], // Only send if user chose to use profile
+        allergies: useExistingProfile ? (userProfileData?.allergies || []) : [], // Only send if user chose to use profile
         healthGoals: extractedProfileData?.healthGoals || profileFormData?.goal,
         targetWeight: extractedProfileData?.targetWeight?.value || profileFormData?.targetWeight,
         timelineWeeks: parseInt(extractedProfileData?.timelineWeeks || profileFormData?.targetTimeline * 4 || 12),
-        prompt: `Generate meal plan for ${extractedProfileData?.goal || profileFormData.goal || 'fitness'} goal`,
+        prompt: fitnessGoal || `Generate meal plan for ${extractedProfileData?.goal || profileFormData.goal || 'fitness'} goal`,
         endpoint: 'mealplan'
       };
       
-      /*
       await saveConversationData(fitnessGoal, finalResponse, mealPlanRequestParams, {
         type: 'meal_plan',
         streaming: true,
-        completedDays: completedDays,
         responseLength: finalResponse.length
       });
-      */
 
       setCombinedConversationData(prev => ({
         ...prev,
@@ -2935,20 +2925,42 @@ const AIFitnessCoach = () => {
         isMealPlanComplete: true
       }));
 
-      console.log(`DEBUG: Final completion - currentMealDay set to ${completedDays}, will show "Finalizing meal plan..." and "${completedDays} of 7 days completed"`);
-      setShowWorkoutPlanChoice(true);
+      // Extract end-of-plan suggestion
+      const suggestionMatch = accumulatedText.match(/END-OF-PLAN[\s-]?SUGGESTION:?\s*(.*)/i) || 
+        accumulatedText.match(/\*\*End-of-Plan Suggestion:\*\*\s*(.*)/i) ||
+        accumulatedText.match(/\*\*Recommendation:\*\*\s*(.*)/i);
+      if (suggestionMatch) {
+        const extractedSuggestion = suggestionMatch[1].trim();
+        console.log('DEBUG: Extracted meal plan suggestion:', extractedSuggestion);
+        setEndOfPlanSuggestion(extractedSuggestion);
+        console.log('DEBUG: Set endOfPlanSuggestion:', extractedSuggestion);
+      }
       
-      // Plans are not complete yet - waiting for user to choose workout plan
+      console.log('Meal plan generation completed, setting isStreamingMeal to false');
+      clearTimeout(mealStreamingTimeout); // Clear the timeout since we completed successfully
+      setIsStreamingMeal(false);
+      
+      // Force a re-render to ensure UI updates
+      setTimeout(() => {
+        setMealPlansByDay(prev => [...prev]);
+      }, 500);
+      
+      // Show workout plan choice popup
+      setShowWorkoutPlanChoice(true);
       
     } catch (error) {
       console.error('Error generating meal plan:', error);
+      console.log('Error occurred, setting isStreamingMeal to false');
       clearTimeout(mealStreamingTimeout); // Clear the timeout since we had an error
       setIsStreamingMeal(false);
-      setCurrentMealDay(0); // Reset current meal day on error
-      console.log('DEBUG: Error occurred - currentMealDay reset to 0');
+      
+      // Force a re-render to ensure UI updates
+      setTimeout(() => {
+        setMealPlansByDay(prev => [...prev]);
+      }, 500);
       let errorMessage = 'Failed to generate meal plan. ';
       if (error.message.includes('400')) {
-        errorMessage += 'Invalid request format. Please check your profile data.';
+        errorMessage += 'Invalid request format.';
       } else if (error.message.includes('Failed to fetch')) {
         errorMessage += 'Backend server not responding.';
       } else {
@@ -7801,18 +7813,20 @@ const AIFitnessCoach = () => {
           bottom: 0,
           backgroundColor: 'rgba(0, 0, 0, 0.5)',
           display: 'flex',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           justifyContent: 'center',
-          zIndex: 10000
+          zIndex: 10000,
+          paddingTop: '90px'
         }}>
           <div className="popup-content" style={{
             backgroundColor: 'white',
-            padding: '40px',
+            padding: window.innerWidth < 768 ? '20px' : '40px',
             borderRadius: '20px',
-            maxWidth: '450px',
-            width: '90%',
+            maxWidth: '500px',
+            width: window.innerWidth < 768 ? '95%' : '90%',
             boxShadow: '0 10px 30px rgba(0, 0, 0, 0.2)',
-            textAlign: 'center'
+            textAlign: 'center',
+            margin: '10px'
           }}>
             <h2 style={{ 
               marginBottom: '20px', 
@@ -7940,7 +7954,7 @@ const AIFitnessCoach = () => {
           zIndex: 10000
         }}>
           <div className="popup-content" style={{
-            backgroundColor: 'white',
+              backgroundColor: 'white',
             padding: window.innerWidth < 768 ? '20px' : '40px',
             borderRadius: '20px',
             maxWidth: '600px',
@@ -7995,7 +8009,7 @@ const AIFitnessCoach = () => {
           zIndex: 10000
         }}>
           <div className="popup-content" style={{
-            backgroundColor: 'white',
+           backgroundColor: 'white',
             padding: window.innerWidth < 768 ? '20px' : '32px',
             borderRadius: '16px',
             maxWidth: '600px',
@@ -8423,8 +8437,8 @@ const AIFitnessCoach = () => {
                       padding: '10px 24px',
                     border: 'none',
                       borderRadius: '8px',
-                    backgroundColor: '#7c3aed',
-                    color: 'white',
+                    backgroundColor: '#BCCE32',
+                    color: 'black',
                       fontSize: '14px',
                     fontWeight: '500',
                       cursor: 'pointer',
