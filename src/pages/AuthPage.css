@@ -69,24 +69,6 @@
   filter: drop-shadow(0.125rem 0.125rem 0.25rem rgba(0, 0, 0, 0.3));
 }
 
-.logo-text {
-  font-size: 2rem;
-  font-weight: 700;
-  letter-spacing: 0.15rem;
-  margin: 0;
-  color: #C8DA2B;
-  text-shadow: 0.125rem 0.125rem 0.25rem rgba(0, 0, 0, 0.3);
-}
-
-.logo-tagline {
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: 0.25rem;
-  margin: 0.25rem 0 0 0;
-  color: #C8DA2B;
-  text-shadow: 0.0625rem 0.0625rem 0.125rem rgba(0, 0, 0, 0.3);
-}
-
 /* Right Side - Form Section */
 .auth-form-section {
   flex: 0 0 50%;
@@ -547,15 +529,6 @@
 
   .logo-image {
     max-width: 75%;
-  }
-
-  .logo-text {
-    font-size: 2rem;
-  }
-
-  .logo-tagline {
-    font-size: 0.8125rem;
-    letter-spacing: 0.25rem;
   }
 
   .auth-form-section {

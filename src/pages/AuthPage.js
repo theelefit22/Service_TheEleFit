@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { auth, registerUser, loginUser, getUserType, sendPasswordResetEmail } from '../services/firebase';
 import { useAuthContext } from '../contexts/AuthContext';
-import LoadingSpinner from '../components/LoadingSpinner';
 import './AuthPage.css';
 // Import eye icons for password visibility
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
@@ -30,7 +29,6 @@ const AuthPage = () => {
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [retryData, setRetryData] = useState(null);
   const [showLoginHint, setShowLoginHint] = useState(false);
-  const [registeredEmail, setRegisteredEmail] = useState('');
   const [isEvaCustomer, setIsEvaCustomer] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState({
     score: 0,
@@ -152,11 +150,7 @@ const AuthPage = () => {
             return;
           } catch (customTokenError) {
             console.log('⚠️ AuthPage: Custom token failed, trying alternative approach...');
-            
-            // Alternative: Create a temporary auth state using the token data
-            // We'll simulate a successful login by directly calling the auth context
-            const { useAuthContext } = await import('../contexts/AuthContext');
-            
+
             // Since we can't directly modify the auth context from here,
             // we'll redirect to a special endpoint that handles token-based login
             const redirectPath = urlParams.get('redirect') || '/aicoach';
@@ -198,9 +192,6 @@ const AuthPage = () => {
       console.log('🛍️ DEBUG: Customer ID to validate:', customerId);
       
       try {
-        // Import Shopify validation function
-        const { validateShopifyCustomer } = await import('../services/shopifyService');
-        
         // Use the authenticateCustomer function for proper auto-login
         const { authenticateCustomer } = await import('../services/firebase');
         const customerObject = { email, customerId: customerId };
@@ -743,12 +734,6 @@ const AuthPage = () => {
     setSuccess('');
     setRetryData(null);
     setShowLoginHint(false);
-    // Keep email if switching after registration
-    if (isLoginTab && registeredEmail) {
-      setEmail(registeredEmail);
-    } else {
-      setEmail('');
-    }
     setPassword('');
   };
 
