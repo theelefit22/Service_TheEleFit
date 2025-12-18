@@ -6,6 +6,8 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import './AuthPage.css';
 // Import eye icons for password visibility
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+// Import logo
+import logoImage from '../assets/images/logo.png';
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -757,89 +759,90 @@ const AuthPage = () => {
 
   return (
     <div className="auth-page">
-      <div className="auth-container">
-        <div className="auth-header">
-          <h1>{isForgotPassword ? 'Reset Password' : isLogin ? 'Welcome Back!' : 'Create Account'}</h1>
-          <p>
-            {isForgotPassword
-              ? 'Enter your email to reset your password'
-              : isLogin
-              ? 'Sign in to access your account'
-              : 'Join our community of nutrition experts'}
-          </p>
+      <div className="auth-card">
+        {/* Left Side - Image */}
+        <div className="auth-image-section">
+          <div className="auth-image-container">
+            <div className="auth-logo-overlay">
+              <img src={logoImage} alt="ELEFIT Logo" className="logo-image" />
+            </div>
+          </div>
         </div>
 
-        {!isForgotPassword && (
-          <div className="auth-tabs">
-            <button
-              className={`auth-tab ${isLogin ? 'active' : ''}`}
-              onClick={() => handleTabSwitch(true)}
-            >
-              Sign In
-            </button>
-            <button
-              className={`auth-tab ${!isLogin ? 'active' : ''}`}
-              onClick={() => handleTabSwitch(false)}
-            >
-              Sign Up
-            </button>
+        {/* Right Side - Form */}
+        <div className="auth-form-section">
+          <div className="auth-header">
+            <h1>{isForgotPassword ? 'Reset Password' : isLogin ? 'Welcome Back!' : 'Create Account'}</h1>
+            <p>
+              {isForgotPassword
+                ? 'Enter your email to reset your password'
+                : isLogin
+                ? 'Sign in to access your account'
+                : 'Join our community of nutrition experts'}
+            </p>
           </div>
-        )}
 
-        {/* Session Token Authentication Messages */}
-        {sessionTokenError && (
-          <div className="auth-error">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-            {sessionTokenError}
-          </div>
-        )}
+          {isLogin && !isForgotPassword && (
+            <div className="password-tips">
+              <h3>Password Tips:</h3>
+              <p>If you have a Shopify account, use your Shopify password. If you created an account directly here, use your account password.</p>
+            </div>
+          )}
 
-        {sessionTokenSuccess && (
-          <div className="auth-success">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-              <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
-            {sessionTokenSuccess}
-          </div>
-        )}
+          {/* Session Token Authentication Messages */}
+          {sessionTokenError && (
+            <div className="auth-error">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              {sessionTokenError}
+            </div>
+          )}
 
-        {/* Manual Authentication Messages */}
-        {error && (
-          <div className="auth-error">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-            {error}
-          </div>
-        )}
+          {sessionTokenSuccess && (
+            <div className="auth-success">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              {sessionTokenSuccess}
+            </div>
+          )}
 
-        {success && (
-          <div className="auth-success">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-              <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
-            {success}
-          </div>
-        )}
+          {/* Manual Authentication Messages */}
+          {error && (
+            <div className="auth-error">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              {error}
+            </div>
+          )}
 
-        {showLoginHint && (
-          <div className="auth-info">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="16" x2="12" y2="12"></line>
-              <line x1="12" y1="8" x2="12.01" y2="8"></line>
-            </svg>
-            Setting up your account, please wait...
-          </div>
-        )}
+          {success && (
+            <div className="auth-success">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              {success}
+            </div>
+          )}
+
+          {showLoginHint && (
+            <div className="auth-info">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              Setting up your account, please wait...
+            </div>
+          )}
 
         {urlParams.get('tokenVerified') === 'true' && (
           <div className="auth-success">
@@ -851,18 +854,7 @@ const AuthPage = () => {
           </div>
         )}
 
-        {isLogin && !isForgotPassword && (
-          <div className="auth-info" style={{ backgroundColor: '#f0f8ff', color: '#1e40af', padding: '12px', borderRadius: '8px', marginBottom: '16px', border: '1px solid #3b82f6' }}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: '8px' }}>
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="16" x2="12" y2="12"></line>
-              <line x1="12" y1="8" x2="12.01" y2="8"></line>
-            </svg>
-            <strong>Password Tip:</strong> If you have a Shopify account, use your Shopify password. If you created an account directly here, use your account password.
-          </div>
-        )}
-
-        {sessionTokenLoading && (
+          {sessionTokenLoading && (
           <div className="auth-info">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="12" cy="12" r="10"></circle>
@@ -1043,6 +1035,7 @@ const AuthPage = () => {
             </>
           )}
         </form>
+        </div>
       </div>
     </div>
   );
