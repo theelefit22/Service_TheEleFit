@@ -1002,18 +1002,44 @@ const AuthPage = () => {
 
           <button type="submit" className="auth-button" disabled={loading || sessionTokenLoading}>
             {loading ? (
-              isForgotPassword ? 'Resetting...' : 
-              isLogin && retryData ? 'Connecting account...' : 
-              isLogin ? 'Authenticating...' : 
+              isForgotPassword ? 'Resetting...' :
+              isLogin && retryData ? 'Connecting account...' :
+              isLogin ? 'Authenticating...' :
               'Processing...'
             ) : sessionTokenLoading ? (
               'Processing authentication...'
             ) : (
-              isForgotPassword ? 'Reset Password' : 
-              isLogin ? 'Sign In' : 
+              isForgotPassword ? 'Reset Password' :
+              isLogin ? 'Sign In' :
               'Create Account'
             )}
           </button>
+
+          {isLogin && !isForgotPassword && (
+            <div className="signup-link">
+              Don't have an Account? <button
+                type="button"
+                className="signup-button"
+                onClick={() => handleTabSwitch(false)}
+                disabled={loading || sessionTokenLoading}
+              >
+                Sign up
+              </button>
+            </div>
+          )}
+
+          {!isLogin && !isForgotPassword && (
+            <div className="signup-link">
+              Already have an account? <button
+                type="button"
+                className="signup-button"
+                onClick={() => handleTabSwitch(true)}
+                disabled={loading || sessionTokenLoading}
+              >
+                Sign in
+              </button>
+            </div>
+          )}
 
           {isForgotPassword && (
             <>
