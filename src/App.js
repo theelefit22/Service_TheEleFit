@@ -30,6 +30,7 @@ import { auth, getUserType } from './services/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import './App.css';
 import AiCoach from './pages/AiCoach';
+import AiFitnessCoach from './pages/AiFitnessCoach';
 import CustomerAuth from './pages/CustomerAuth';
 import ThankYouPage from './pages/ThankYouPage';
 import DetailsPage from './pages/DetailsPage';
@@ -162,6 +163,7 @@ function App() {
                   <AiCoach />
                 </ProtectedRoute>
               } />
+              <Route path="/ai-fitness-coach" element={<AiFitnessCoach />} />
               <Route path="/grocery-list" element={
                 <ProtectedRoute>
                   <GroceryListProcessor />

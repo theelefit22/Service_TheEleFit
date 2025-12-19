@@ -281,7 +281,7 @@ const Navbar = () => {
 
           <li className="nav-item">
             <NavLink
-              to={isAuthenticated ? "/aicoach" : "/auth"}
+              to="/ai-fitness-coach"
               className={({isActive}) => isActive ? "nav-link active" : "nav-link"}
               onClick={closeMenu}
             >
