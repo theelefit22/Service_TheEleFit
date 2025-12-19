@@ -19,22 +19,22 @@ const AiFitnessCoach = () => {
 
   const features = [
     {
-      icon: <Restaurant sx={{ fontSize: 20 }} />,
+      icon: <Restaurant sx={{ fontSize: { xs: 18, sm: 20 } }} />,
       title: 'Smart Meal Plans',
       description: 'Breakfast, lunch, dinner & snacks with calorie tracking'
     },
     {
-      icon: <FitnessCenter sx={{ fontSize: 20 }} />,
+      icon: <FitnessCenter sx={{ fontSize: { xs: 18, sm: 20 } }} />,
       title: 'Custom Workouts',
       description: 'Personalized exercise plans based on your goals'
     },
     {
-      icon: <BarChart sx={{ fontSize: 20 }} />,
+      icon: <BarChart sx={{ fontSize: { xs: 18, sm: 20 } }} />,
       title: 'Calorie Tracking',
       description: 'Complete nutritional breakdown for every meal'
     },
     {
-      icon: <PictureAsPdf sx={{ fontSize: 20 }} />,
+      icon: <PictureAsPdf sx={{ fontSize: { xs: 18, sm: 20 } }} />,
       title: 'PDF Downloads',
       description: 'Save your plans for offline access'
     }
@@ -54,7 +54,17 @@ const AiFitnessCoach = () => {
             Get personalized meal plans and workout routines tailored just for you.<br />
             Smart nutrition and fitness guidance powered by AI.
           </p>
-          <Box sx={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <Box sx={{
+            display: 'flex',
+            gap: '1rem',
+            flexWrap: 'wrap',
+            '@media (max-width: 48rem)': {
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '100%',
+            }
+          }}>
             <Button
               variant="contained"
               onClick={handleTryNow}
@@ -65,7 +75,7 @@ const AiFitnessCoach = () => {
                 color: '#2D5F6D !important',
                 padding: '0.5rem 1.25rem !important',
                 borderRadius: '0.5rem !important',
-                fontSize: '0.875rem !important',
+                fontSize: 'clamp(0.813rem, 1.5vw, 0.875rem) !important',
                 fontWeight: 600,
                 textTransform: 'none',
                 gap: '5px',
@@ -77,6 +87,11 @@ const AiFitnessCoach = () => {
                 },
                 '.MuiButton-endIcon': {
                   marginLeft: 0,
+                },
+                '@media (max-width: 48rem)': {
+                  minWidth: '160px',
+                  maxWidth: '200px',
+                  padding: '0.75rem 1.5rem !important',
                 }
               }}
             >
@@ -91,7 +106,7 @@ const AiFitnessCoach = () => {
                 padding: '0.5rem 1.25rem !important',
                 border: '0.125rem solid #B8D843 !important',
                 borderRadius: '0.5rem !important',
-                fontSize: '0.875rem !important',
+                fontSize: 'clamp(0.813rem, 1.5vw, 0.875rem) !important',
                 fontWeight: 600,
                 textTransform: 'none',
                 gap: '5px',
@@ -102,6 +117,11 @@ const AiFitnessCoach = () => {
                 },
                 '.MuiButton-endIcon': {
                   marginLeft: 0,
+                },
+                '@media (max-width: 48rem)': {
+                  minWidth: '160px',
+                  maxWidth: '200px',
+                  padding: '0.75rem 1.5rem !important',
                 }
               }}
             >
@@ -121,6 +141,14 @@ const AiFitnessCoach = () => {
                 backdropFilter: 'blur(26px)',
                 WebkitBackdropFilter: 'blur(26px)',
                 padding: '1.5rem 1.25rem !important',
+                '@media (max-width: 48rem)': {
+                  padding: '1.25rem 1rem !important',
+                  minHeight: '140px',
+                },
+                '@media (max-width: 30rem)': {
+                  padding: '1rem 0.75rem !important',
+                  minHeight: '130px',
+                }
               }}
             >
               <CardContent sx={{
@@ -141,6 +169,15 @@ const AiFitnessCoach = () => {
                   marginBottom: '0.75rem',
                   color: '#2D5F6D',
                   flexShrink: 0,
+                  '@media (max-width: 48rem)': {
+                    width: '2.75rem',
+                    height: '2.75rem',
+                    marginBottom: '0.625rem',
+                  },
+                  '@media (max-width: 30rem)': {
+                    width: '2.5rem',
+                    height: '2.5rem',
+                  }
                 }}>
                   {feature.icon}
                 </Box>
