@@ -43,8 +43,6 @@ const AiFitnessCoach = () => {
   return (
     <Box className="ai-fitness-coach-background">
       <Box className="ai-fitness-coach-container">
-        <Box className="hero-spacer" />
-
         <Box className="hero-text">
           <h1>
             Your Personal<br />
