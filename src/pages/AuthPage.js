@@ -885,21 +885,6 @@ const AuthPage = () => {
                   disabled={loading || sessionTokenLoading}
                 />
               </div>
-              <div className="form-group">
-                <label htmlFor="evaCustomer">
-                  Are you an EVA customer? <span className="required-star">*</span>
-                </label>
-                <select
-                  id="evaCustomer"
-                  value={isEvaCustomer}
-                  onChange={(e) => setIsEvaCustomer(e.target.value === 'true')}
-                  required
-                  disabled={loading || sessionTokenLoading}
-                >
-                  <option value="false">No</option>
-                  <option value="true">Yes</option>
-                </select>
-              </div>
             </>
           )}
 
