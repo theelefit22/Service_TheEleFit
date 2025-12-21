@@ -6476,7 +6476,7 @@ const AIFitnessCoach = () => {
           />
           {/* Generate Prompt Button - Inside the input */}
           <Tooltip
-            title="AI Helper: Creates a personalized prompt using your profile information (age, weight, height, goals, etc.)"
+            title="Creates a personalized prompt using your profile information (age, weight, height, goals, etc.)"
             placement="top"
             arrow
           >
