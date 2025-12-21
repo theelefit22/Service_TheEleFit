@@ -202,3 +202,11 @@
     line-height: 1.4;
   }
 }
+
+/* Background image for small screens */
+@media (max-width: 48rem) {
+  .ai-fitness-coach-background {
+    background-image: url('../assets/images/sign-up-bg.jpg');
+    background-position: bottom;
+  }
+}
