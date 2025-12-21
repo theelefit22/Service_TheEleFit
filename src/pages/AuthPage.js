@@ -29,14 +29,14 @@ const AuthPage = () => {
   const [retryData, setRetryData] = useState(null);
   const [showLoginHint, setShowLoginHint] = useState(false);
   const [isEvaCustomer, setIsEvaCustomer] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState({
-    score: 0,
-    hasMinLength: false,
-    hasUpperCase: false,
-    hasLowerCase: false,
-    hasNumber: false,
-    hasSpecialChar: false
-  });
+  // const [passwordStrength, setPasswordStrength] = useState({
+  //   score: 0,
+  //   hasMinLength: false,
+  //   hasUpperCase: false,
+  //   hasLowerCase: false,
+  //   hasNumber: false,
+  //   hasSpecialChar: false
+  // });
   const [showPassword, setShowPassword] = useState(false);
 
   // Session token authentication state
@@ -45,26 +45,26 @@ const AuthPage = () => {
   const [sessionTokenSuccess, setSessionTokenSuccess] = useState('');
 
   // Password validation function
-  const validatePassword = (value) => {
-    const strength = {
-      score: 0,
-      hasMinLength: value.length >= 8,
-      hasUpperCase: /[A-Z]/.test(value),
-      hasLowerCase: /[a-z]/.test(value),
-      hasNumber: /[0-9]/.test(value),
-      hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(value)
-    };
+  // const validatePassword = (value) => {
+  //   const strength = {
+  //     score: 0,
+  //     hasMinLength: value.length >= 8,
+  //     hasUpperCase: /[A-Z]/.test(value),
+  //     hasLowerCase: /[a-z]/.test(value),
+  //     hasNumber: /[0-9]/.test(value),
+  //     hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(value)
+  //   };
 
-    // Calculate score based on criteria
-    if (strength.hasMinLength) strength.score++;
-    if (strength.hasUpperCase) strength.score++;
-    if (strength.hasLowerCase) strength.score++;
-    if (strength.hasNumber) strength.score++;
-    if (strength.hasSpecialChar) strength.score++;
+  //   // Calculate score based on criteria
+  //   if (strength.hasMinLength) strength.score++;
+  //   if (strength.hasUpperCase) strength.score++;
+  //   if (strength.hasLowerCase) strength.score++;
+  //   if (strength.hasNumber) strength.score++;
+  //   if (strength.hasSpecialChar) strength.score++;
 
-    setPasswordStrength(strength);
-    return strength;
-  };
+  //   setPasswordStrength(strength);
+  //   return strength;
+  // };
 
   // Enhanced email validator for client-side checks
   const isValidEmail = (value) => {
@@ -85,13 +85,13 @@ const AuthPage = () => {
   };
 
   // Handle password change with validation
-  const handlePasswordChange = (e) => {
-    const newPassword = e.target.value;
-    setPassword(newPassword);
-    if (!isLogin) {
-      validatePassword(newPassword);
-    }
-  };
+  // const handlePasswordChange = (e) => {
+  //   const newPassword = e.target.value;
+  //   setPassword(newPassword);
+  //   if (!isLogin) {
+  //     validatePassword(newPassword);
+  //   }
+  // };
 
   // ===== SESSION TOKEN AUTHENTICATION LOGIC =====
   
@@ -681,12 +681,12 @@ const AuthPage = () => {
     try {
       if (!isLogin) {
         // Validate password for registration
-        const strength = validatePassword(password);
-        if (strength.score < 4) {
-          setError('Password must meet all requirements');
-          setLoading(false);
-          return;
-        }
+        // const strength = validatePassword(password);
+        // if (strength.score < 4) {
+        //   setError('Password must meet all requirements');
+        //   setLoading(false);
+        //   return;
+        // }
 
         await handleManualSignUp(email, password, firstName, lastName, isEvaCustomer);
 
@@ -913,7 +913,7 @@ const AuthPage = () => {
                   type={showPassword ? "text" : "password"}
                   id="password"
                   value={password}
-                  onChange={handlePasswordChange}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder={isLogin ? 'Enter your password' : 'Create a password'}
                   required
                   disabled={loading || sessionTokenLoading}
@@ -927,14 +927,14 @@ const AuthPage = () => {
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>
               </div>
-              {!isLogin && (
+              {/* {!isLogin && (
                 <div className="password-strength">
                   <div className={`strength-bar ${passwordStrength.score >= 1 ? 'active' : ''}`}></div>
                   <div className={`strength-bar ${passwordStrength.score >= 2 ? 'active' : ''}`}></div>
                   <div className={`strength-bar ${passwordStrength.score >= 3 ? 'active' : ''}`}></div>
                   <div className={`strength-bar ${passwordStrength.score >= 4 ? 'active' : ''}`}></div>
                   <div className={`strength-bar ${passwordStrength.score >= 5 ? 'active' : ''}`}></div>
-                  
+
                   <div className="password-requirements">
                     <p className={passwordStrength.hasMinLength ? 'met' : ''}>
                       ✓ At least 8 characters
@@ -953,7 +953,7 @@ const AuthPage = () => {
                     </p>
                   </div>
                 </div>
-              )}
+              )} */}
             </div>
           )}
 
