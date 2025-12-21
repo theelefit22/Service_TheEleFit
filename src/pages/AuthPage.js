@@ -3,10 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { auth, registerUser, loginUser, getUserType, sendPasswordResetEmail } from '../services/firebase';
 import { useAuthContext } from '../contexts/AuthContext';
 import './AuthPage.css';
-// Import eye icons for password visibility
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-// Import logo
 import logoImage from '../assets/images/logo.png';
+import signupBg from '../assets/images/sign-up-bg.jpg';
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -747,7 +746,12 @@ const AuthPage = () => {
       <div className="auth-card">
         {/* Left Side - Image */}
         <div className="auth-image-section">
-          <div className="auth-image-container">
+          <div
+            className="auth-image-container"
+            style={{
+              backgroundImage: !isLogin && !isForgotPassword ? `url(${signupBg})` : undefined
+            }}
+          >
             <div className="auth-logo-overlay">
               <img src={logoImage} alt="ELEFIT Logo" className="logo-image" />
             </div>
