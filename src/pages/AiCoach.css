@@ -6567,3 +6567,115 @@ color: #FFFFFF !important;
     max-width: 95%;
   }
 }
+
+/* PDF Download Button */
+.pdf-download-button {
+  width: auto;
+  max-width: 320px;
+  margin: 0 auto;
+  padding: 16px 32px;
+  background: #CCD853 !important;
+  color: #1A1F14 !important;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 4px 20px rgba(204, 216, 83, 0.4);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  animation: subtlePulse 3s ease-in-out infinite;
+}
+
+/* Shimmer effect on button */
+.pdf-download-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.pdf-download-button:hover::before {
+  left: 100%;
+}
+
+.pdf-download-button:hover {
+  background: #B8D843 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 30px rgba(204, 216, 83, 0.5);
+  animation: none;
+}
+
+.pdf-download-button i {
+  font-size: 18px;
+  color: #1A1F14;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.pdf-download-button span {
+  position: relative;
+  z-index: 2;
+}
+
+.pdf-download-button:hover i.fa-download {
+  animation: pdfDownloadBounce 0.6s ease infinite;
+}
+
+.pdf-download-button:active {
+  transform: translateY(0);
+}
+
+@keyframes pdfDownloadBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+/* Responsive adjustments for PDF button */
+@media (max-width: 768px) {
+  .pdf-download-button {
+    padding: 14px 28px;
+    font-size: 15px;
+    max-width: 90%;
+  }
+
+  .pdf-download-button i {
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pdf-download-button {
+    padding: 13px 24px;
+    font-size: 14px;
+    gap: 10px;
+    width: 100%;
+    max-width: 95%;
+  }
+
+  .pdf-download-button i {
+    font-size: 16px;
+  }
+}

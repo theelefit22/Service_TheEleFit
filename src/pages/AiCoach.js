@@ -7072,14 +7072,22 @@ const AIFitnessCoach = () => {
       {showPlans && (
         <div className="plans-container" id="plansContainer" ref={plansContainerRef}>
           {plansComplete && (
-          <div style={{ width: '100%', textAlign: 'right', marginBottom: 16 }}>
+          <div style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            marginBottom: '24px'
+          }}>
             <PDFDownloadLink
               document={<PlanPDFDocument fitnessGoal={fitnessGoal} mealPlansByDay={mealPlansByDay} workoutSections={workoutSections} endOfPlanSuggestion={endOfPlanSuggestion} workoutPlanSuggestion={workoutPlanSuggestion} />}
               fileName="AI_Fitness_Plan.pdf"
+              style={{ textDecoration: 'none' }}
             >
               {({ loading }) => (
-                <button className="recommend-button" style={{ marginBottom: 8 }}>
-                  {loading ? 'Preparing PDF...' : 'Download PDF'}
+                <button className="pdf-download-button">
+                  <i className="fas fa-file-pdf"></i>
+                  <span>{loading ? 'Preparing PDF...' : 'Download PDF'}</span>
+                  {!loading && <i className="fas fa-download"></i>}
                 </button>
               )}
             </PDFDownloadLink>
@@ -7292,7 +7300,7 @@ const AIFitnessCoach = () => {
 
 
                <div className="accordion" id="workoutAccordion" ref={workoutAccordionRef}>
-                 {isStreamingMeal ? (
+                 {true ? (
                    // Show meal plan generation animation
                    <div className="meal-generation-container">
                      <div className="meal-generation-animation">
