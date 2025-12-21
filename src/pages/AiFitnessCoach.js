@@ -10,7 +10,7 @@ const AiFitnessCoach = () => {
 
   const handleTryNow = () => {
     if (!isAuthenticated) {
-      navigate('/auth');
+      navigate('/auth?redirect=/aicoach');
     } else {
       // Navigate to the actual AI coach functionality
       navigate('/aicoach');
