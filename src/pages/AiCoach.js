@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 // import { gsap } from 'gsap'; // No longer needed - using video instead of animated icons
 import CircularProgress from '@mui/material/CircularProgress';
+import Tooltip from '@mui/material/Tooltip';
 import { ref, push, serverTimestamp, get } from 'firebase/database';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { database, db, auth } from '../services/firebase';
@@ -6443,7 +6444,8 @@ const AIFitnessCoach = () => {
             )}
           </div>
         )}
-        <div className="input-container">
+        {/* Input Wrapper with Generate Prompt Button Inside */}
+        <div className="input-wrapper-with-button">
           <textarea
             id="fitnessGoal"
             className={`goal-input ${inputError ? 'input-error' : ''} ${currentPopupGoal ? 'disabled' : ''}`}
@@ -6471,30 +6473,37 @@ const AIFitnessCoach = () => {
             aria-disabled={!!currentPopupGoal}
             rows="1"
           />
-          <button
-            className={`recommend-button ${currentPopupGoal ? 'disabled' : ''}`}
-            onClick={(e) => {
-              e.preventDefault();
-              handleRecommendation();
-            }}
-            disabled={!!currentPopupGoal}
-            aria-disabled={!!currentPopupGoal}
+          {/* Generate Prompt Button - Inside the input */}
+          <Tooltip
+            title="AI Helper: Creates a personalized prompt using your profile information (age, weight, height, goals, etc.)"
+            placement="top"
+            arrow
           >
-            Get Recommendations
-          </button>
+            <span>
+              <button
+                className={`generate-prompt-inline-button ${copyButtonClicked ? 'clicked' : ''}`}
+                onClick={handleCopyDefaultPrompt}
+                disabled={!!currentPopupGoal}
+              >
+                <i className={`fas ${copyButtonClicked ? 'fa-check' : 'fa-lightbulb'}`}></i>
+              </button>
+            </span>
+          </Tooltip>
         </div>
 
-        {/* Copy Default Prompt Button */}
-        <div className="copy-prompt-container">
-          <button
-            className={`copy-prompt-button ${copyButtonClicked ? 'clicked' : ''}`}
-            onClick={handleCopyDefaultPrompt}
-            title="Copy Generate prompt template"
-          >
-            <i className={`fas ${copyButtonClicked ? 'fa-check' : 'fa-copy'}`}></i>
-            <span>{copyButtonClicked ? 'Copied!' : 'Generate Prompt'}</span>
-          </button>
-        </div>
+        {/* Get Recommendations Button - Below the input */}
+        <button
+          className={`recommend-button-main ${currentPopupGoal ? 'disabled' : ''}`}
+          onClick={(e) => {
+            e.preventDefault();
+            handleRecommendation();
+          }}
+          disabled={!!currentPopupGoal}
+          aria-disabled={!!currentPopupGoal}
+        >
+          <span className="button-text">GET RECOMMENDATIONS</span>
+          <i className="fas fa-arrow-right button-icon"></i>
+        </button>
 
         {inputError && (
           <div className="input-error-message">

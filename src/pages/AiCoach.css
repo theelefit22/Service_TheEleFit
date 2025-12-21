@@ -6268,3 +6268,302 @@ color: #FFFFFF !important;
     line-height: 1.5;
   }
 }
+
+/* ============================================
+   NEW REDESIGNED INPUT SECTION STYLES
+   ============================================ */
+
+/* Input Wrapper - Contains input and inline button */
+.input-wrapper-with-button {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 20px auto;
+  display: flex;
+  align-items: stretch;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  background: transparent;
+  transition: all 0.3s ease;
+  min-height: 50px;
+}
+
+.input-wrapper-with-button:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.input-wrapper-with-button:focus-within {
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+/* Updated Goal Input - Now part of the wrapper */
+.input-wrapper-with-button .goal-input {
+  flex: 1;
+  padding: 16px 20px;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 16px 0 0 16px;
+  font-size: 16px;
+  color: #C8DA2B !important;
+  font-weight: 400;
+  resize: none;
+  overflow: hidden;
+  height: 50px;
+  min-height: 50px;
+  max-height: 200px;
+  line-height: 1.4;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: none !important;
+  outline: none !important;
+  width: auto !important;
+  max-width: none !important;
+  transition: none !important;
+  transform: none !important;
+}
+
+.input-wrapper-with-button .goal-input::placeholder {
+  color: rgba(200, 218, 43, 0.5) !important;
+  font-size: 16px;
+}
+
+.input-wrapper-with-button .goal-input:focus {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.input-wrapper-with-button .goal-input:focus::placeholder {
+  opacity: 1;
+  color: rgba(200, 218, 43, 0.6) !important;
+}
+
+.input-wrapper-with-button .goal-input:disabled {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(200, 218, 43, 0.4) !important;
+  cursor: not-allowed;
+}
+
+/* Generate Prompt Button - Inline within input (Icon Only) */
+.generate-prompt-inline-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 100%;
+  min-height: 48px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0 14px 14px 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  margin-right: 2px;
+}
+
+.generate-prompt-inline-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.02);
+}
+
+.generate-prompt-inline-button:active {
+  transform: scale(0.98);
+}
+
+.generate-prompt-inline-button.clicked {
+  background: rgba(72, 187, 120, 0.3);
+  color: #48bb78;
+}
+
+.generate-prompt-inline-button i {
+  font-size: 20px;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.generate-prompt-inline-button:hover i {
+  transform: scale(1.15);
+  filter: brightness(1.3);
+}
+
+.generate-prompt-inline-button.clicked i {
+  animation: lightbulbGlow 0.6s ease-out;
+}
+
+@keyframes lightbulbGlow {
+  0% { transform: scale(1); filter: brightness(1); }
+  25% { transform: scale(1.2); filter: brightness(1.5); }
+  50% { transform: scale(1.3); filter: brightness(2); }
+  75% { transform: scale(1.2); filter: brightness(1.5); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+
+.generate-prompt-inline-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Main Recommendations Button - Below input */
+.recommend-button-main {
+  width: auto;
+  max-width: 320px;
+  margin: 0 auto;
+  padding: 16px 32px;
+  background: #CCD853 !important;
+  color: #1A1F14 !important;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 4px 20px rgba(204, 216, 83, 0.4);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  animation: subtlePulse 3s ease-in-out infinite;
+}
+
+/* Subtle pulse animation to draw attention */
+@keyframes subtlePulse {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(204, 216, 83, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 25px rgba(204, 216, 83, 0.6);
+  }
+}
+
+/* Button text */
+.recommend-button-main .button-text {
+  position: relative;
+  z-index: 2;
+}
+
+/* Button icon */
+.recommend-button-main .button-icon {
+  font-size: 18px;
+  transition: transform 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+/* Shimmer effect on button */
+.recommend-button-main::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.recommend-button-main:hover {
+  background: #B8D843 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 30px rgba(204, 216, 83, 0.5);
+  animation: none; /* Stop pulse on hover */
+}
+
+.recommend-button-main:hover::before {
+  left: 100%;
+}
+
+.recommend-button-main:hover .button-icon {
+  transform: translateX(5px);
+  animation: arrowBounce 0.6s ease infinite;
+}
+
+@keyframes arrowBounce {
+  0%, 100% {
+    transform: translateX(5px);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+}
+
+.recommend-button-main:active {
+  transform: translateY(0);
+}
+
+.recommend-button-main.disabled,
+.recommend-button-main:disabled {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+  animation: none;
+}
+
+.recommend-button-main.disabled .button-icon,
+.recommend-button-main:disabled .button-icon {
+  opacity: 0.4;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .input-wrapper-with-button {
+    max-width: 100%;
+    flex-direction: column;
+    border-radius: 12px;
+  }
+
+  .input-wrapper-with-button .goal-input {
+    border-radius: 12px 12px 0 0;
+    padding: 14px 16px;
+    font-size: 15px;
+  }
+
+  .generate-prompt-inline-button {
+    width: 100%;
+    height: auto;
+    min-height: 44px;
+    justify-content: center;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0 0 10px 10px;
+    margin-right: 0;
+    margin-bottom: 2px;
+  }
+
+  .recommend-button-main {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 480px) {
+  .input-wrapper-with-button .goal-input {
+    font-size: 14px;
+    padding: 12px 14px;
+  }
+
+  .generate-prompt-inline-button {
+    height: auto;
+    min-height: 40px;
+  }
+
+  .generate-prompt-inline-button i {
+    font-size: 18px;
+  }
+
+  .recommend-button-main {
+    max-width: 95%;
+  }
+}
