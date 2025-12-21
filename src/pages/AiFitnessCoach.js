@@ -1,12 +1,15 @@
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../contexts/AuthContext';
-import { Button, Card, CardContent, Box } from '@mui/material';
-import { Restaurant, FitnessCenter, BarChart, PictureAsPdf, ArrowForward, PlayArrow } from '@mui/icons-material';
+import { Button, Card, CardContent, Box, Modal, IconButton } from '@mui/material';
+import { Restaurant, FitnessCenter, BarChart, PictureAsPdf, ArrowForward, PlayArrow, Close } from '@mui/icons-material';
 import './AiFitnessCoach.css';
+import demoVideo from '../assets/loading-animation.mp4'; // Replace with actual demo video path
 
 const AiFitnessCoach = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuthContext();
+  const [isDemoModalOpen, setIsDemoModalOpen] = React.useState(false);
 
   const handleTryNow = () => {
     if (!isAuthenticated) {
@@ -15,6 +18,14 @@ const AiFitnessCoach = () => {
       // Navigate to the actual AI coach functionality
       navigate('/aicoach');
     }
+  };
+
+  const openDemoModal = () => {
+    setIsDemoModalOpen(true);
+  };
+
+  const closeDemoModal = () => {
+    setIsDemoModalOpen(false);
   };
 
   const features = [
@@ -97,6 +108,7 @@ const AiFitnessCoach = () => {
             </Button>
             <Button
               variant="outlined"
+              onClick={openDemoModal}
               endIcon={<PlayArrow />}
               sx={{
                 background: 'transparent !important',
@@ -186,6 +198,57 @@ const AiFitnessCoach = () => {
           ))}
         </Box>
       </Box>
+
+      {/* Video Demo Modal */}
+      <Modal
+        open={isDemoModalOpen}
+        onClose={closeDemoModal}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Box
+          sx={{
+            position: 'relative',
+            width: '90%',
+            maxWidth: '800px',
+            borderRadius: '12px',
+            outline: 'none',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.8)',
+          }}
+        >
+          <IconButton
+            onClick={closeDemoModal}
+            sx={{
+              position: 'absolute',
+              top: '10px',
+              right: '10px',
+              color: '#fff',
+              backgroundColor: 'rgba(0, 0, 0, 0.1)',
+              '&:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.2)',
+              },
+              zIndex: 1,
+            }}
+          >
+            <Close />
+          </IconButton>
+          <video
+            src={demoVideo}
+            autoPlay
+            loop
+            controls
+            style={{
+              width: '100%',
+              height: 'auto',
+              borderRadius: '8px',
+              display: 'block',
+            }}
+          />
+        </Box>
+      </Modal>
     </Box>
   );
 };
