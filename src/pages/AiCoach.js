@@ -15,6 +15,7 @@ import { cleanWorkoutContent, isRecommendationContent } from '../utils/test-pars
 import { useAuth } from '../hooks/useAuth';
 import { saveAiCoachData, fetchAiCoachHistory } from '../services/aicoachService';
 import { historySecure } from '../utils/Secure';
+import CalorieResultsPopup from '../components/CalorieResultsPopup';
 
 
 // Missing Profile Fields Form Component
@@ -8474,70 +8475,12 @@ const AIFitnessCoach = () => {
 
       {/* Calorie Results Popup */}
       {showCalorieResults && calculatedCalories && (
-        <div className="calorie-results-popup" style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 10000
-        }}>
-          <div className="popup-content">
-            <h2>Your Daily Calorie Target</h2>
-
-            <div className="calorie-target-container">
-              <div className="calorie-target-value">
-                {calculatedCalories.targetCalories}
-              </div>
-              <div className="calorie-target-label">
-                calories per day
-              </div>
-              <div className="calorie-tdee-info">
-                TDEE: {calculatedCalories.tdee} calories
-              </div>
-
-              {/* Know More Links */}
-              <div className="calorie-links-container">
-                <button
-                  onClick={() => navigate('/details?type=tdee')}
-                  className="calorie-link-button"
-                >
-                  know more about TDEE
-                </button>
-                <span className="calorie-link-separator">|</span>
-                <button
-                  onClick={() => navigate('/details?type=calories')}
-                  className="calorie-link-button"
-                >
-                  know more about calorie calculation
-                </button>
-              </div>
-            </div>
-
-            <p className="calorie-info-text">
-              Based on your profile, you need to consume {calculatedCalories.targetCalories} calories per day to achieve your {profileFormData.goal} goal.
-            </p>
-
-            <div className="calorie-popup-buttons">
-              <button
-                onClick={() => handleMealPlanChoice(false)}
-                className="calorie-popup-button cancel"
-              >
-                No, Thanks
-              </button>
-              <button
-                onClick={() => handleMealPlanChoice(true)}
-                className="calorie-popup-button generate"
-              >
-                Generate Meal Plan
-              </button>
-            </div>
-          </div>
-        </div>
+        <CalorieResultsPopup
+          calculatedCalories={calculatedCalories}
+          profileFormData={profileFormData}
+          onGenerateMealPlan={() => handleMealPlanChoice(true)}
+          onClose={() => handleMealPlanChoice(false)}
+        />
       )}
 
       {/* Workout Plan Choice Popup */}
