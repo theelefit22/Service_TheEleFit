@@ -21,10 +21,10 @@ import CalorieResultsPopup from '../components/CalorieResultsPopup';
 // Missing Profile Fields Form Component
 const MissingProfileFieldsForm = ({ missingFields, currentProfileData, onSave, onGenerate, onCancel }) => {
   const [weightError, setWeightError] = useState('');
-    const [ageError, setAgeError] = useState('');
-    const [heightError, setHeightError] = useState('');
-    const [currentWeightError, setCurrentWeightError] = useState('');
-    const [targetWeightError, setTargetWeightError] = useState('');
+  const [ageError, setAgeError] = useState('');
+  const [heightError, setHeightError] = useState('');
+  const [currentWeightError, setCurrentWeightError] = useState('');
+  const [targetWeightError, setTargetWeightError] = useState('');
 
   const [formData, setFormData] = useState({
     age: currentProfileData?.age || '',
@@ -38,7 +38,7 @@ const MissingProfileFieldsForm = ({ missingFields, currentProfileData, onSave, o
     targetWeight: currentProfileData?.targetWeight || '', // Pre-fill from profile
     targetWeightUnit: currentProfileData?.targetWeightUnit || 'kg',
     targetTimeline: currentProfileData?.targetTimeline || '3', // Pre-fill from profile
-      targetTimelineUnit: 'months'
+    targetTimelineUnit: 'months'
   });
 
   // Refs for focusing on required fields
@@ -131,8 +131,8 @@ const MissingProfileFieldsForm = ({ missingFields, currentProfileData, onSave, o
   const handleInputChange = (field, value) => {
     setFormData(prev => {
       const newFormData = {
-      ...prev,
-      [field]: value
+        ...prev,
+        [field]: value
       };
 
       // Check age validation when age changes
@@ -162,14 +162,14 @@ const MissingProfileFieldsForm = ({ missingFields, currentProfileData, onSave, o
       }
 
       // Check weight comparison validation when weight, target weight, or their units change
-    if (field === 'weight' || field === 'targetWeight' || field === 'weightUnit' || field === 'targetWeightUnit') {
+      if (field === 'weight' || field === 'targetWeight' || field === 'weightUnit' || field === 'targetWeightUnit') {
         const currentWeight = field === 'weight' ? value : newFormData.weight;
         const targetWeight = field === 'targetWeight' ? value : newFormData.targetWeight;
         const currentUnit = field === 'weightUnit' ? value : newFormData.weightUnit;
         const targetUnit = field === 'targetWeightUnit' ? value : newFormData.targetWeightUnit;
 
-      validateWeights(currentWeight, targetWeight, currentUnit, targetUnit);
-    }
+        validateWeights(currentWeight, targetWeight, currentUnit, targetUnit);
+      }
 
       return newFormData;
     });
@@ -634,7 +634,7 @@ const MissingProfileFieldsForm = ({ missingFields, currentProfileData, onSave, o
             <option value="other">Other</option>
           </select>
         </div>
-        </div>
+      </div>
 
       <div className="form-row" style={{
         display: 'grid',
@@ -733,7 +733,7 @@ const MissingProfileFieldsForm = ({ missingFields, currentProfileData, onSave, o
             <option value="7">7 days</option>
           </select>
         </div>
-        </div>
+      </div>
 
       <div className="form-row" style={{
         display: 'grid',
@@ -854,21 +854,21 @@ const MissingProfileFieldsForm = ({ missingFields, currentProfileData, onSave, o
             Target Timeline (months)
             {isFieldRequired('targetTimeline') && <span style={{ color: '#ef4444', fontWeight: '600' }}> *</span>}
           </label>
-            <input
+          <input
             type="range"
             value={formData.targetTimeline || '3'}
-              onChange={(e) => {
-                handleInputChange('targetTimeline', e.target.value);
-              }}
-              style={{
+            onChange={(e) => {
+              handleInputChange('targetTimeline', e.target.value);
+            }}
+            style={{
               width: '100%',
               padding: '8px 0',
               background: 'transparent',
               outline: 'none',
               marginBottom: '8px'
-              }}
-              required={isFieldRequired('targetTimeline')}
-              min="1"
+            }}
+            required={isFieldRequired('targetTimeline')}
+            min="1"
             max="12"
             step="1"
           />
@@ -1099,7 +1099,7 @@ const AIFitnessCoach = () => {
   const [streamingMealPlan, setStreamingMealPlan] = useState('');
   const [originalMealPlanResponse, setOriginalMealPlanResponse] = useState(''); // Store original response
   const [streamingWorkoutPlan, setStreamingWorkoutPlan] = useState('');
-    const [isStreamingMeal, setIsStreamingMeal] = useState(false);
+  const [isStreamingMeal, setIsStreamingMeal] = useState(false);
   const [currentMealDay, setCurrentMealDay] = useState(0); // Track current day being generated
   const [isStreamingWorkout, setIsStreamingWorkout] = useState(false);
   const [incompleteExerciseBuffer, setIncompleteExerciseBuffer] = useState('');
@@ -1115,19 +1115,19 @@ const AIFitnessCoach = () => {
   const [showWorkoutDaysConfirmation, setShowWorkoutDaysConfirmation] = useState(false);
   const [selectedWorkoutDays, setSelectedWorkoutDays] = useState(7);
   const [profileFormData, setProfileFormData] = useState({
-     age: '',
-     gender: '',
-     height: '',
-     heightUnit: 'cm',
-     currentWeight: '',
-     currentWeightUnit: 'kg',
-     targetWeight: '',
-     targetWeightUnit: 'kg',
-     activityLevel: '',
-     targetTimeline: '3',
-     workoutDays: '5',
-     goal: ''
-   });
+    age: '',
+    gender: '',
+    height: '',
+    heightUnit: 'cm',
+    currentWeight: '',
+    currentWeightUnit: 'kg',
+    targetWeight: '',
+    targetWeightUnit: 'kg',
+    activityLevel: '',
+    targetTimeline: '3',
+    workoutDays: '5',
+    goal: ''
+  });
   const [profileWeightError, setProfileWeightError] = useState('');
   const [profileAgeError, setProfileAgeError] = useState('');
   const [profileHeightError, setProfileHeightError] = useState('');
@@ -1645,7 +1645,7 @@ const AIFitnessCoach = () => {
   };
 
   const getApiUrl = (endpoint = 'chat') => {
-     return `https://yantraprise.com/${endpoint}`;
+    return `https://yantraprise.com/${endpoint}`;
   };
 
   const cleanItemText = (text) => {
@@ -1789,21 +1789,21 @@ const AIFitnessCoach = () => {
         // Store only necessary data based on profile usage
         ...(usedProfile
           ? {
-              // If profile was used, store profile details
-              profileDetails: {
-                age: userProfileData?.age,
-                gender: userProfileData?.gender,
-                height: userProfileData?.height,
-                weight: userProfileData?.weight,
-                activityLevel: userProfileData?.activityLevel,
-                targetWeight: userProfileData?.targetWeight,
-                timeline: userProfileData?.targetTimeline
-              }
+            // If profile was used, store profile details
+            profileDetails: {
+              age: userProfileData?.age,
+              gender: userProfileData?.gender,
+              height: userProfileData?.height,
+              weight: userProfileData?.weight,
+              activityLevel: userProfileData?.activityLevel,
+              targetWeight: userProfileData?.targetWeight,
+              timeline: userProfileData?.targetTimeline
             }
+          }
           : {
-              // If profile was not used, store the free style prompt
-              freeStylePrompt: prompt
-            }
+            // If profile was not used, store the free style prompt
+            freeStylePrompt: prompt
+          }
         ),
 
         // Store only meal and workout plan data (no extra data)
@@ -2157,15 +2157,15 @@ const AIFitnessCoach = () => {
       const userDetails = useProfile
         ? await getExistingProfileDetails()
         : {
-            height: extractedData.height || "",
-            weight: extractedData.weight || "",
-            age: extractedData.age || "",
-            gender: extractedData.gender || "",
-            activityLevel: extractedData.activityLevel || "moderate",
-            healthGoals: extractedData.healthGoals || "",
-            dietaryRestrictions: extractedData.dietaryRestrictions || [],
-            allergies: extractedData.allergies || []
-          };
+          height: extractedData.height || "",
+          weight: extractedData.weight || "",
+          age: extractedData.age || "",
+          gender: extractedData.gender || "",
+          activityLevel: extractedData.activityLevel || "moderate",
+          healthGoals: extractedData.healthGoals || "",
+          dietaryRestrictions: extractedData.dietaryRestrictions || [],
+          allergies: extractedData.allergies || []
+        };
 
       const response = await fetch(getApiUrl(), {
         method: 'POST',
@@ -2339,9 +2339,9 @@ const AIFitnessCoach = () => {
     try {
       // Check if user is authenticated using the useAuth hook
       if (!isAuthenticated || !user) {
-          setErrorPopupMessage('Please log in to get personalized recommendations.');
-         setShowErrorPopup(true);
-         setTimeout(() => setShowErrorPopup(false), 5000);
+        setErrorPopupMessage('Please log in to get personalized recommendations.');
+        setShowErrorPopup(true);
+        setTimeout(() => setShowErrorPopup(false), 5000);
         setIsLoading(false);
         return;
       }
@@ -2497,33 +2497,33 @@ const AIFitnessCoach = () => {
     }
   };
 
-     const loadProfileDataToForm = async () => {
-     try {
-       if (user) {
-         const userRef = doc(db, 'users', user.uid);
-         const userDoc = await getDoc(userRef);
-         if (userDoc.exists()) {
-           const userData = userDoc.data();
-           setProfileFormData({
-             age: userData.age || '',
-             gender: userData.gender || '',
-             height: userData.height || '',
-             heightUnit: userData.heightUnit || 'cm',
-             currentWeight: userData.weight || '',
-             currentWeightUnit: userData.weightUnit || 'kg',
-             targetWeight: userData.weight || '', // Default to current weight
-             targetWeightUnit: userData.targetWeightUnit || userData.weightUnit || 'kg',
-             activityLevel: userData.activityLevel || '',
-             targetTimeline: '3', // Default
-             workoutDays: '5', // Default to 5 days
-             goal: fitnessGoal || '' // Use the fitness goal from input
-           });
-         }
-       }
-     } catch (error) {
-       console.error('Error loading profile data:', error);
-     }
-   };
+  const loadProfileDataToForm = async () => {
+    try {
+      if (user) {
+        const userRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userRef);
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          setProfileFormData({
+            age: userData.age || '',
+            gender: userData.gender || '',
+            height: userData.height || '',
+            heightUnit: userData.heightUnit || 'cm',
+            currentWeight: userData.weight || '',
+            currentWeightUnit: userData.weightUnit || 'kg',
+            targetWeight: userData.weight || '', // Default to current weight
+            targetWeightUnit: userData.targetWeightUnit || userData.weightUnit || 'kg',
+            activityLevel: userData.activityLevel || '',
+            targetTimeline: '3', // Default
+            workoutDays: '5', // Default to 5 days
+            goal: fitnessGoal || '' // Use the fitness goal from input
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading profile data:', error);
+    }
+  };
 
   const handleUpdateProfile = async () => {
     try {
@@ -2574,8 +2574,8 @@ const AIFitnessCoach = () => {
 
     // Validate required fields
     if (!profileFormData.age || !profileFormData.gender || !profileFormData.height ||
-        !profileFormData.currentWeight || !profileFormData.targetWeight ||
-        !profileFormData.activityLevel || !profileFormData.targetTimeline) {
+      !profileFormData.currentWeight || !profileFormData.targetWeight ||
+      !profileFormData.activityLevel || !profileFormData.targetTimeline) {
       setSuccessMessage('Please fill in all required fields.');
       setShowSuccessPopup(true);
       setTimeout(() => setShowSuccessPopup(false), 3000);
@@ -2588,7 +2588,7 @@ const AIFitnessCoach = () => {
 
     // Check if units are different
     if (profileFormData.currentWeightUnit && profileFormData.targetWeightUnit &&
-        profileFormData.currentWeightUnit !== profileFormData.targetWeightUnit) {
+      profileFormData.currentWeightUnit !== profileFormData.targetWeightUnit) {
       setProfileWeightError('Current weight and target weight should use the same units');
       return;
     }
@@ -2775,7 +2775,7 @@ const AIFitnessCoach = () => {
                 console.log(`DEBUG: Progress will show "${completedDays} of 7 days completed"`);
               }
             }
-        } catch (parseError) {
+          } catch (parseError) {
             console.log('Error parsing complete day:', parseError.message);
           }
 
@@ -2797,8 +2797,8 @@ const AIFitnessCoach = () => {
           const suggestionIndex = currentDayBuffer.search(/END-OF-PLAN[\s-]?SUGGESTION/i) !== -1 ?
             currentDayBuffer.search(/END-OF-PLAN[\s-]?SUGGESTION/i) :
             currentDayBuffer.indexOf('**End-of-Plan Suggestion:**') !== -1 ?
-            currentDayBuffer.indexOf('**End-of-Plan Suggestion:**') :
-            currentDayBuffer.indexOf('**Recommendation:**');
+              currentDayBuffer.indexOf('**End-of-Plan Suggestion:**') :
+              currentDayBuffer.indexOf('**Recommendation:**');
           const totalCaloriesIndex = currentDayBuffer.indexOf('Total Daily Calories:');
 
           // If we found "Total Daily Calories" after the day start, we might have a complete day
@@ -2981,60 +2981,60 @@ const AIFitnessCoach = () => {
   };
 
   // Handle workout plan generation choice
-     const handleWorkoutPlanChoice = async (generateWorkoutPlan) => {
-     setShowWorkoutPlanChoice(false);
-     setWorkoutPlanChoice(generateWorkoutPlan); // Track the choice
+  const handleWorkoutPlanChoice = async (generateWorkoutPlan) => {
+    setShowWorkoutPlanChoice(false);
+    setWorkoutPlanChoice(generateWorkoutPlan); // Track the choice
 
-     if (!generateWorkoutPlan) {
-       // User selected "No" for workout plan
-       // Check if they also said "No" to meal plan
-       if (mealPlanChoice === false) {
-         navigate('/thank-you');
-         return;
-       }
+    if (!generateWorkoutPlan) {
+      // User selected "No" for workout plan
+      // Check if they also said "No" to meal plan
+      if (mealPlanChoice === false) {
+        navigate('/thank-you');
+        return;
+      }
 
-       // Plans are complete (meal plan only)
-       setPlansComplete(true);
-       setNoWorkoutPlan(true); // Set flag to show no workout animation
+      // Plans are complete (meal plan only)
+      setPlansComplete(true);
+      setNoWorkoutPlan(true); // Set flag to show no workout animation
 
-       // Generate suggestions even when user selects No to workout plan
-       // Use actual backend suggestions if available, otherwise fallback
-       if (endOfPlanSuggestion) {
-         setPersonalizedSuggestions(endOfPlanSuggestion);
-       } else {
-       const fallbackSuggestions = generateFallbackSuggestions();
-       setPersonalizedSuggestions(fallbackSuggestions);
-       }
-       // Auto-open suggestions when they are first generated
-       if (!userHasToggledAccordion) {
-         setOpenSuggestionsAccordion(true);
-       }
+      // Generate suggestions even when user selects No to workout plan
+      // Use actual backend suggestions if available, otherwise fallback
+      if (endOfPlanSuggestion) {
+        setPersonalizedSuggestions(endOfPlanSuggestion);
+      } else {
+        const fallbackSuggestions = generateFallbackSuggestions();
+        setPersonalizedSuggestions(fallbackSuggestions);
+      }
+      // Auto-open suggestions when they are first generated
+      if (!userHasToggledAccordion) {
+        setOpenSuggestionsAccordion(true);
+      }
 
-       setSuccessMessage('Thank you for using AI Coach!');
-       setShowSuccessPopup(true);
-       setTimeout(() => setShowSuccessPopup(false), 3000);
-       return; // Keep showing meal plan only
-     }
+      setSuccessMessage('Thank you for using AI Coach!');
+      setShowSuccessPopup(true);
+      setTimeout(() => setShowSuccessPopup(false), 3000);
+      return; // Keep showing meal plan only
+    }
 
-     // User selected "Yes" - show workout days confirmation popup
-     // Extract workout days from the prompt or use default
-     let detectedDays = 7; // Default to 7 days
+    // User selected "Yes" - show workout days confirmation popup
+    // Extract workout days from the prompt or use default
+    let detectedDays = 7; // Default to 7 days
 
-     if (extractedProfileData && (extractedProfileData.workoutDays || extractedProfileData.frequency)) {
-       const extractedDays = parseInt(extractedProfileData.workoutDays || extractedProfileData.frequency);
-       if (!isNaN(extractedDays) && extractedDays > 0 && extractedDays <= 7) {
-         detectedDays = extractedDays;
-       }
-     } else if (profileFormData.workoutDays) {
-       const formDays = parseInt(profileFormData.workoutDays);
-       if (!isNaN(formDays) && formDays > 0 && formDays <= 7) {
-         detectedDays = formDays;
-       }
-     }
+    if (extractedProfileData && (extractedProfileData.workoutDays || extractedProfileData.frequency)) {
+      const extractedDays = parseInt(extractedProfileData.workoutDays || extractedProfileData.frequency);
+      if (!isNaN(extractedDays) && extractedDays > 0 && extractedDays <= 7) {
+        detectedDays = extractedDays;
+      }
+    } else if (profileFormData.workoutDays) {
+      const formDays = parseInt(profileFormData.workoutDays);
+      if (!isNaN(formDays) && formDays > 0 && formDays <= 7) {
+        detectedDays = formDays;
+      }
+    }
 
-     setSelectedWorkoutDays(detectedDays);
-     setShowWorkoutDaysConfirmation(true);
-   };
+    setSelectedWorkoutDays(detectedDays);
+    setShowWorkoutDaysConfirmation(true);
+  };
 
   // Handle workout days confirmation
   const handleWorkoutDaysConfirmation = async (confirmed) => {
@@ -3069,40 +3069,40 @@ const AIFitnessCoach = () => {
       setIsStreamingWorkout(false);
     }, 120000); // 120 seconds timeout (increased from 60 seconds)
 
-     try {
-       // Use the confirmed workout days from the popup
-       let workoutPrompt;
+    try {
+      // Use the confirmed workout days from the popup
+      let workoutPrompt;
 
-       console.log('=== WORKOUT PLAN WITH CONFIRMED DAYS ===');
-       console.log('Selected workout days:', workoutDays);
-       console.log('extractedProfileData:', extractedProfileData);
-       console.log('profileFormData:', profileFormData);
+      console.log('=== WORKOUT PLAN WITH CONFIRMED DAYS ===');
+      console.log('Selected workout days:', workoutDays);
+      console.log('extractedProfileData:', extractedProfileData);
+      console.log('profileFormData:', profileFormData);
 
-       // Use the full user prompt for better context
-       workoutPrompt = fitnessGoal || `Generate workout plan for ${extractedProfileData?.goal || profileFormData.goal || 'fitness'} goal, I prefer to workout ${workoutDays} days per week`;
+      // Use the full user prompt for better context
+      workoutPrompt = fitnessGoal || `Generate workout plan for ${extractedProfileData?.goal || profileFormData.goal || 'fitness'} goal, I prefer to workout ${workoutDays} days per week`;
 
-       console.log('Final workout prompt:', workoutPrompt);
-       console.log('Sending to backend:', {
-         goal: extractedProfileData?.goal || profileFormData.goal || 'fitness',
-         workout_focus: calculatedCalories.WorkoutFocus || 'Mixed Cardio and Strength',
-         workout_days: workoutDays,
-         prompt: workoutPrompt
-       });
+      console.log('Final workout prompt:', workoutPrompt);
+      console.log('Sending to backend:', {
+        goal: extractedProfileData?.goal || profileFormData.goal || 'fitness',
+        workout_focus: calculatedCalories.WorkoutFocus || 'Mixed Cardio and Strength',
+        workout_days: workoutDays,
+        prompt: workoutPrompt
+      });
 
-       const response = await fetch(getApiUrl('workoutplan'), {
-         method: 'POST',
-         headers: {
-           'Content-Type': 'application/json',
-         },
-         body: JSON.stringify({
-           goal: extractedProfileData?.goal || profileFormData.goal || 'fitness',
-           workout_focus: calculatedCalories.WorkoutFocus || 'Mixed Cardio and Strength',
-           workout_days: workoutDays,
-           targetWeight: extractedProfileData?.targetWeight?.value || profileFormData?.targetWeight,
-           timelineWeeks: parseInt(extractedProfileData?.timelineWeeks || profileFormData?.targetTimeline * 4 || 12),
-           prompt: workoutPrompt
-         })
-       });
+      const response = await fetch(getApiUrl('workoutplan'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          goal: extractedProfileData?.goal || profileFormData.goal || 'fitness',
+          workout_focus: calculatedCalories.WorkoutFocus || 'Mixed Cardio and Strength',
+          workout_days: workoutDays,
+          targetWeight: extractedProfileData?.targetWeight?.value || profileFormData?.targetWeight,
+          timelineWeeks: parseInt(extractedProfileData?.timelineWeeks || profileFormData?.targetTimeline * 4 || 12),
+          prompt: workoutPrompt
+        })
+      });
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -3232,7 +3232,7 @@ const AIFitnessCoach = () => {
         console.log('DEBUG: Extracted workout plan suggestion:', extractedWorkoutSuggestion);
 
         // Set workout plan suggestion - this should be separate from meal plan suggestion
-          setWorkoutPlanSuggestion(extractedWorkoutSuggestion);
+        setWorkoutPlanSuggestion(extractedWorkoutSuggestion);
         console.log('DEBUG: Set workout plan suggestion:', extractedWorkoutSuggestion);
 
         // Suggestions will be auto-opened by useEffect when first available
@@ -3255,8 +3255,8 @@ const AIFitnessCoach = () => {
       if (endOfPlanSuggestion) {
         setPersonalizedSuggestions(endOfPlanSuggestion);
       } else {
-      const fallbackSuggestions = generateFallbackSuggestions();
-      setPersonalizedSuggestions(fallbackSuggestions);
+        const fallbackSuggestions = generateFallbackSuggestions();
+        setPersonalizedSuggestions(fallbackSuggestions);
       }
       // Auto-open suggestions when they are first generated
       if (!userHasToggledAccordion) {
@@ -3306,8 +3306,8 @@ const AIFitnessCoach = () => {
       if (endOfPlanSuggestion) {
         setPersonalizedSuggestions(endOfPlanSuggestion);
       } else {
-      const fallbackSuggestions = generateFallbackSuggestions();
-      setPersonalizedSuggestions(fallbackSuggestions);
+        const fallbackSuggestions = generateFallbackSuggestions();
+        setPersonalizedSuggestions(fallbackSuggestions);
       }
 
       console.log('DEBUG: Generated suggestions:', endOfPlanSuggestion || 'fallback suggestions');
@@ -3464,11 +3464,11 @@ const AIFitnessCoach = () => {
     saveCombinedConversation();
   }, [combinedConversationData]);
 
-// Remove the duplicate useEffect hook
-// The useEffect hook below is a duplicate and causes conflicts
-// It has been removed to prevent double saving of conversation data
+  // Remove the duplicate useEffect hook
+  // The useEffect hook below is a duplicate and causes conflicts
+  // It has been removed to prevent double saving of conversation data
 
-// Check for profile updates after plan generation
+  // Check for profile updates after plan generation
   const checkForProfileUpdates = async () => {
     try {
       if (!user) return;
@@ -3535,14 +3535,14 @@ const AIFitnessCoach = () => {
   const handleCopyDefaultPrompt = async () => {
     try {
       // Always show popup with all fields pre-filled from profile data
-        setMissingProfileFieldsData({
+      setMissingProfileFieldsData({
         missingFields: [], // No missing fields since we're pre-filling everything
-          currentProfileData: userProfileData || {}
-        });
-        setShowMissingProfileFieldsPopup(true);
-        return;
+        currentProfileData: userProfileData || {}
+      });
+      setShowMissingProfileFieldsPopup(true);
+      return;
 
-        let defaultPrompt = `I am a [age]-year-old [gender], my height is [height] cm, weight is [weight] kg. My activity level is [activity level] (e.g., sedentary, lightly active, moderately active, very active). I want to workout [number of workout days] days per week. My target weight is [target weight] kg, and I want to achieve this goal in [target timeline] months.`;
+      let defaultPrompt = `I am a [age]-year-old [gender], my height is [height] cm, weight is [weight] kg. My activity level is [activity level] (e.g., sedentary, lightly active, moderately active, very active). I want to workout [number of workout days] days per week. My target weight is [target weight] kg, and I want to achieve this goal in [target timeline] months.`;
 
       // If user has profile data, populate the prompt with actual values
       if (userProfileData) {
@@ -3729,7 +3729,7 @@ const AIFitnessCoach = () => {
       const targetWeight = formData.targetWeight || '[target weight]';
       const targetWeightUnit = formData.targetWeightUnit || 'kg';
       const timeline = formData.targetTimeline || '[target timeline]';
-        const timelineUnit = 'months';
+      const timelineUnit = 'months';
 
       const activityLevelText = activityLevel
         ? `My activity level is ${activityLevel}.`
@@ -3893,17 +3893,17 @@ const AIFitnessCoach = () => {
         }
 
         mealPlanLines.forEach(line => {
-           // More flexible day matching patterns with better regex
-           const dayMatch = line.match(/Day\s*(\d+)(?:\s*[:-]\s*|\s+)(.*)/i) || line.match(/Day\s*(\d+)$/i);
+          // More flexible day matching patterns with better regex
+          const dayMatch = line.match(/Day\s*(\d+)(?:\s*[:-]\s*|\s+)(.*)/i) || line.match(/Day\s*(\d+)$/i);
           if (dayMatch) {
-             const dayNumber = parseInt(dayMatch[1]);
-             // Only process days 1-7
-             if (dayNumber >= 1 && dayNumber <= 7) {
-               currentDay = dayNumber;
-               console.log(`DEBUG: Found Day ${currentDay}`);
-             } else {
-               console.log(`DEBUG: Skipping Day ${dayNumber} (not in range 1-7)`);
-             }
+            const dayNumber = parseInt(dayMatch[1]);
+            // Only process days 1-7
+            if (dayNumber >= 1 && dayNumber <= 7) {
+              currentDay = dayNumber;
+              console.log(`DEBUG: Found Day ${currentDay}`);
+            } else {
+              console.log(`DEBUG: Skipping Day ${dayNumber} (not in range 1-7)`);
+            }
 
             // Create day if it doesn't exist - show immediately when day is detected
             if (!updatedMealPlans.find(day => day.dayNumber === currentDay)) {
@@ -3924,13 +3924,13 @@ const AIFitnessCoach = () => {
             return;
           }
 
-           // Improved meal type matching with better calorie extraction
-           const mealTypeMatch = line.match(/(Breakfast|Lunch|Snack|Dinner)\s*\((\d+)\s*(?:kcal|calories?)?\)(?:\s*:|$)/i);
+          // Improved meal type matching with better calorie extraction
+          const mealTypeMatch = line.match(/(Breakfast|Lunch|Snack|Dinner)\s*\((\d+)\s*(?:kcal|calories?)?\)(?:\s*:|$)/i);
           if (mealTypeMatch && currentDay && currentDay <= 7) {
             currentMealType = mealTypeMatch[1];
-             const calories = parseInt(mealTypeMatch[2]) || 0;
-             console.log(`DEBUG: Found meal type: ${currentMealType} with ${calories} kcal for Day ${currentDay}`);
-             console.log(`DEBUG: Setting meal totalCalories to ${calories} for ${currentMealType}`);
+            const calories = parseInt(mealTypeMatch[2]) || 0;
+            console.log(`DEBUG: Found meal type: ${currentMealType} with ${calories} kcal for Day ${currentDay}`);
+            console.log(`DEBUG: Setting meal totalCalories to ${calories} for ${currentMealType}`);
 
             const dayData = updatedMealPlans.find(day => day.dayNumber === currentDay);
             if (dayData) {
@@ -3954,9 +3954,9 @@ const AIFitnessCoach = () => {
             const itemQty = itemMatch[2].trim();
             const itemCalories = parseInt(itemMatch[3]) || 0;
 
-             console.log('DEBUG: Parsed item:', itemName, itemQty, itemCalories, 'from line:', line);
-             console.log('DEBUG: Raw calories text:', itemMatch[3], 'Parsed calories:', itemCalories);
-             console.log('DEBUG: Current meal type:', currentMealType, 'Current day:', currentDay);
+            console.log('DEBUG: Parsed item:', itemName, itemQty, itemCalories, 'from line:', line);
+            console.log('DEBUG: Raw calories text:', itemMatch[3], 'Parsed calories:', itemCalories);
+            console.log('DEBUG: Current meal type:', currentMealType, 'Current day:', currentDay);
             const description = itemQty ? `${itemName} - ${itemQty}` : itemName;
 
             const dayData = updatedMealPlans.find(day => day.dayNumber === currentDay);
@@ -3990,7 +3990,7 @@ const AIFitnessCoach = () => {
       });
     } else if (type === 'workout') {
       // Enhanced regex pattern to properly extract workout plan and stop before recommendations/suggestions
-      const workoutPlanMatch = response.match(/WORKOUT_PLAN:([\s\S]*?)(?=END-OF-PLAN[\s-]?SUGGESTION:|END-OF-PLAN SUGG:|END-OF-PLAN:|END-OF|END OF|end-of|end of|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|SUGGESTION|SUGGEST|RECOMMENDATION|RECOMMEND|CLOSING|CLOSE|FINAL|FINAL NOTE|FINAL SUGGESTION|FINAL RECOMMENDATION|Note:|Important:|Remember to|Make sure to|Don't forget to|It's important to|You should|Try to|Consider|Keep in mind|months to achieve|desired results|Follow this plan consistently|for.*months|achieve your desired|your goal and following|END-OF-PLAN SUGGESTIONS|END-OF-PLAN SUGGEST|\*\*Recommendation:\*\*|$)/i);
+      const workoutPlanMatch = response.match(/WORKOUT_PLAN:([\s\S]*?)(?=\b(?:END-OF-PLAN[\s-]?SUGGESTION|END-OF-PLAN SUGG|END-OF-PLAN|END-OF|END OF)\b[:]?|\b(?:Follow this plan consistently|Closing Recommendation|To achieve your goal|To effectively)\b[:]?|\b(?:RECOMMENDATION|SUGGESTION|CLOSING|FINAL NOTE|FINAL SUGGESTION|FINAL RECOMMENDATION)\b[:]|$)/i);
 
       if (!workoutPlanMatch) return;
 
@@ -4027,8 +4027,8 @@ const AIFitnessCoach = () => {
 
             if (dayLine) {
               const dayMatch = dayLine.match(/Day\s*(\d+)(?:\s*-\s*|\s*:\s*[—\-]?\s*)([^:]+)(?::|$)/i) ||
-                              dayLine.match(/Day\s*(\d+)\s*[:\s-][—\-]?\s*(.*)/i) ||
-                              dayLine.match(/Day\s*(\d+)[:\s-]/i);
+                dayLine.match(/Day\s*(\d+)\s*[:\s-][—\-]?\s*(.*)/i) ||
+                dayLine.match(/Day\s*(\d+)[:\s-]/i);
 
               if (dayMatch && dayMatch[2]) {
                 workoutType = dayMatch[2].trim()
@@ -4056,32 +4056,55 @@ const AIFitnessCoach = () => {
           updatedWorkoutSections.sort((a, b) => a.dayNumber - b.dayNumber);
         }
 
-      // Filter out any lines that contain recommendation/suggestion content
-      const filteredWorkoutLines = workoutPlanLines.filter(line =>
-        !isRecommendationContent(line)
-      );
+        // Filter out any lines that contain recommendation/suggestion content
+        const filteredWorkoutLines = workoutPlanLines.filter(line =>
+          !isRecommendationContent(line)
+        );
 
-      filteredWorkoutLines.forEach(line => {
-        // Skip if this line is just "END-OF" or similar
-        if (line.trim().toUpperCase() === 'END-OF' || line.trim().toUpperCase() === 'END OF') {
-          console.log(`Skipping END-OF line: "${line}"`);
-          return;
-        }
+        filteredWorkoutLines.forEach(line => {
+          // Skip if this line is just "END-OF" or similar
+          if (line.trim().toUpperCase() === 'END-OF' || line.trim().toUpperCase() === 'END OF') {
+            console.log(`Skipping END-OF line: "${line}"`);
+            return;
+          }
 
-        // Preprocess line to fix common OCR issues
-        line = line
-          .replace(/(\d+)\s*x\s*(\d+)/g, '$1 × $2') // Only convert x to × when between numbers (multiplication)
-          .replace(/\s+/g, ' ') // Normalize whitespace
-          .trim();
-        // Check for exclusion messages like "Day 5:, 6, and 7 are not included"
-        const exclusionMatch = line.match(/Day\s*(\d+)[:,]\s*(\d+),\s*and\s*(\d+)\s*are\s*not\s*included/i);
-        if (exclusionMatch) {
-          const day1 = parseInt(exclusionMatch[1]);
-          const day2 = parseInt(exclusionMatch[2]);
-          const day3 = parseInt(exclusionMatch[3]);
+          // Preprocess line to fix common OCR issues
+          line = line
+            .replace(/(\d+)\s*x\s*(\d+)/g, '$1 × $2') // Only convert x to × when between numbers (multiplication)
+            .replace(/\s+/g, ' ') // Normalize whitespace
+            .trim();
+          // Check for exclusion messages like "Day 5:, 6, and 7 are not included"
+          const exclusionMatch = line.match(/Day\s*(\d+)[:,]\s*(\d+),\s*and\s*(\d+)\s*are\s*not\s*included/i);
+          if (exclusionMatch) {
+            const day1 = parseInt(exclusionMatch[1]);
+            const day2 = parseInt(exclusionMatch[2]);
+            const day3 = parseInt(exclusionMatch[3]);
 
-          // Set these days as Rest Day
-          [day1, day2, day3].forEach(dayNum => {
+            // Set these days as Rest Day
+            [day1, day2, day3].forEach(dayNum => {
+              if (dayNum >= 1) {
+                const existingDay = updatedWorkoutSections.find(day => day.dayNumber === dayNum);
+                if (existingDay) {
+                  existingDay.workoutType = 'Rest Day';
+                  existingDay.exercises = [];
+                } else {
+                  updatedWorkoutSections.push({
+                    dayNumber: dayNum,
+                    workoutType: 'Rest Day',
+                    exercises: []
+                  });
+                }
+                hasChanges = true;
+                console.log(`Set Day ${dayNum} as Rest Day due to exclusion message (live)`);
+              }
+            });
+            return;
+          }
+
+          // Check for single day exclusion messages like "Day 5: not included"
+          const singleExclusionMatch = line.match(/Day\s*(\d+)[:\s]*not\s*included/i);
+          if (singleExclusionMatch) {
+            const dayNum = parseInt(singleExclusionMatch[1]);
             if (dayNum >= 1) {
               const existingDay = updatedWorkoutSections.find(day => day.dayNumber === dayNum);
               if (existingDay) {
@@ -4095,62 +4118,39 @@ const AIFitnessCoach = () => {
                 });
               }
               hasChanges = true;
-              console.log(`Set Day ${dayNum} as Rest Day due to exclusion message (live)`);
+              console.log(`Set Day ${dayNum} as Rest Day due to single exclusion message (live)`);
             }
-          });
-          return;
-        }
-
-        // Check for single day exclusion messages like "Day 5: not included"
-        const singleExclusionMatch = line.match(/Day\s*(\d+)[:\s]*not\s*included/i);
-        if (singleExclusionMatch) {
-          const dayNum = parseInt(singleExclusionMatch[1]);
-          if (dayNum >= 1) {
-            const existingDay = updatedWorkoutSections.find(day => day.dayNumber === dayNum);
-            if (existingDay) {
-              existingDay.workoutType = 'Rest Day';
-              existingDay.exercises = [];
-            } else {
-              updatedWorkoutSections.push({
-                dayNumber: dayNum,
-                workoutType: 'Rest Day',
-                exercises: []
-              });
-            }
-            hasChanges = true;
-            console.log(`Set Day ${dayNum} as Rest Day due to single exclusion message (live)`);
+            return;
           }
-          return;
-        }
 
           // More flexible day matching patterns - handle em dash and regular dash
           let dayMatch = line.match(/Day\s*(\d+)(?:\s*[–-]\s*|\s*:\s*[—\-]?\s*)([^:]+)(?::|$)/i);
-        if (!dayMatch) {
+          if (!dayMatch) {
             dayMatch = line.match(/Day\s*(\d+)\s*[:\s–-][—\-]?\s*(.*)/i);
-        }
-        if (!dayMatch) {
+          }
+          if (!dayMatch) {
             dayMatch = line.match(/Day\s*(\d+)[:\s–-]/i) || line.match(/Day\s*(\d+)$/i);
-        }
+          }
 
-        if (dayMatch) {
-          currentWorkoutDay = parseInt(dayMatch[1]);
-          currentWorkoutType = dayMatch[2] ? dayMatch[2].trim() : 'Training Day';
+          if (dayMatch) {
+            currentWorkoutDay = parseInt(dayMatch[1]);
+            currentWorkoutType = dayMatch[2] ? dayMatch[2].trim() : 'Training Day';
 
             console.log(`Found workout day ${currentWorkoutDay} with type: "${currentWorkoutType}"`);
 
-          // Clean up special characters and formatting
-          currentWorkoutType = currentWorkoutType
-            .replace(/:\s*$/, '') // Remove trailing colon
-            .replace(/\*\*/g, '') // Remove double asterisks
-            .replace(/\*/g, '') // Remove single asterisks
-            .replace(/^\s*[—\-]\s*/, '') // Remove leading dash or em dash
-            .replace(/\s+/g, ' ') // Normalize whitespace
-            .trim();
+            // Clean up special characters and formatting
+            currentWorkoutType = currentWorkoutType
+              .replace(/:\s*$/, '') // Remove trailing colon
+              .replace(/\*\*/g, '') // Remove double asterisks
+              .replace(/\*/g, '') // Remove single asterisks
+              .replace(/^\s*[—\-]\s*/, '') // Remove leading dash or em dash
+              .replace(/\s+/g, ' ') // Normalize whitespace
+              .trim();
 
             console.log(`Cleaned workout type: "${currentWorkoutType}"`);
 
             // Update existing day or create if it doesn't exist
-          if (currentWorkoutDay > 0) {
+            if (currentWorkoutDay > 0) {
               const existingDay = updatedWorkoutSections.find(day => day.dayNumber === currentWorkoutDay);
               if (existingDay) {
                 // Update existing day
@@ -4161,19 +4161,19 @@ const AIFitnessCoach = () => {
                 }
               } else {
                 // Create new day
-              console.log(`Creating workout day ${currentWorkoutDay}: ${currentWorkoutType}`);
-              updatedWorkoutSections.push({
-                dayNumber: currentWorkoutDay,
-                workoutType: currentWorkoutType,
-                exercises: []
-              });
-              hasChanges = true;
-              // Sort by day number to maintain order
-              updatedWorkoutSections.sort((a, b) => a.dayNumber - b.dayNumber);
+                console.log(`Creating workout day ${currentWorkoutDay}: ${currentWorkoutType}`);
+                updatedWorkoutSections.push({
+                  dayNumber: currentWorkoutDay,
+                  workoutType: currentWorkoutType,
+                  exercises: []
+                });
+                hasChanges = true;
+                // Sort by day number to maintain order
+                updatedWorkoutSections.sort((a, b) => a.dayNumber - b.dayNumber);
+              }
             }
+            return;
           }
-          return;
-        }
 
           // Handle potential OCR line breaks and continuation lines
           // Check if this line might be a continuation of the previous exercise
@@ -4186,10 +4186,10 @@ const AIFitnessCoach = () => {
               // Check if this line looks like it should be appended to the last exercise
               // (e.g., sets/reps that got split to a new line)
               if (currentLine.match(/^\d+\s*[x×]\s*\d+/) || // Sets x reps format
-                  currentLine.match(/^\d+\s*[-–—]\s*\d+/) || // Sets - reps format
-                  currentLine.match(/per\s+side/i) || // "per side" text
-                  currentLine.match(/^\d+\s*reps?/i) || // Just reps
-                  currentLine.match(/^\d+\s*sets?/i)) { // Just sets
+                currentLine.match(/^\d+\s*[-–—]\s*\d+/) || // Sets - reps format
+                currentLine.match(/per\s+side/i) || // "per side" text
+                currentLine.match(/^\d+\s*reps?/i) || // Just reps
+                currentLine.match(/^\d+\s*sets?/i)) { // Just sets
 
                 // Append to the last exercise
                 lastExercise.description += ' ' + currentLine;
@@ -4210,8 +4210,8 @@ const AIFitnessCoach = () => {
           // Parse exercises using improved number-based approach with better OCR handling
           // Handle various formats: "1. Exercise", "1 Exercise", "1) Exercise", etc.
           const exerciseNumberMatch = line.match(/^(\d+)\s*[.)]\s*(.*)/) ||
-                                    line.match(/^(\d+)\s+(.*)/) ||
-                                    line.match(/^(\d+)\s*[-–—]\s*(.*)/);
+            line.match(/^(\d+)\s+(.*)/) ||
+            line.match(/^(\d+)\s*[-–—]\s*(.*)/);
 
           if (currentWorkoutDay && exerciseNumberMatch) {
             const exerciseNumber = parseInt(exerciseNumberMatch[1]);
@@ -4231,11 +4231,11 @@ const AIFitnessCoach = () => {
 
             console.log(`Found exercise ${exerciseNumber}: "${exerciseText}"`);
 
-          // Skip if exercise is too short or incomplete (likely streaming artifact)
+            // Skip if exercise is too short or incomplete (likely streaming artifact)
             if (exerciseText.length < 3) {
               console.log(`Skipping incomplete exercise: "${exerciseText}"`);
-            return;
-          }
+              return;
+            }
 
             // Skip if this looks like a day header or recommendation content
             if (exerciseText.toLowerCase().includes('day') && exerciseText.length < 20) {
@@ -4251,13 +4251,13 @@ const AIFitnessCoach = () => {
 
             // Skip suggestion content like "Follow", "Follow this", etc.
             if (exerciseText.match(/^Follow(\s+this)?\s*$/i) ||
-                exerciseText.match(/^Follow(\s+this)?\s*plan/i) ||
-                exerciseText.match(/^Remember\s+to/i) ||
-                exerciseText.match(/^Make\s+sure\s+to/i) ||
-                exerciseText.match(/^Don't\s+forget\s+to/i)) {
+              exerciseText.match(/^Follow(\s+this)?\s*plan/i) ||
+              exerciseText.match(/^Remember\s+to/i) ||
+              exerciseText.match(/^Make\s+sure\s+to/i) ||
+              exerciseText.match(/^Don't\s+forget\s+to/i)) {
               console.log(`Skipping suggestion content: "${exerciseText}"`);
-            return;
-          }
+              return;
+            }
 
             // Check if this is a new exercise number (not seen before)
             const dayData = updatedWorkoutSections.find(day => day.dayNumber === currentWorkoutDay);
@@ -4328,10 +4328,10 @@ const AIFitnessCoach = () => {
 
             // Skip suggestion content like "Follow", "Follow this", etc.
             if (exercise.match(/^Follow(\s+this)?\s*$/i) ||
-                exercise.match(/^Follow(\s+this)?\s*plan/i) ||
-                exercise.match(/^Remember\s+to/i) ||
-                exercise.match(/^Make\s+sure\s+to/i) ||
-                exercise.match(/^Don't\s+forget\s+to/i)) {
+              exercise.match(/^Follow(\s+this)?\s*plan/i) ||
+              exercise.match(/^Remember\s+to/i) ||
+              exercise.match(/^Make\s+sure\s+to/i) ||
+              exercise.match(/^Don't\s+forget\s+to/i)) {
               console.log(`Skipping suggestion content: "${exercise}"`);
               return;
             }
@@ -4343,8 +4343,8 @@ const AIFitnessCoach = () => {
             }
 
             // Add plain text exercise to the current day
-             const dayData = updatedWorkoutSections.find(day => day.dayNumber === currentWorkoutDay);
-          if (dayData) {
+            const dayData = updatedWorkoutSections.find(day => day.dayNumber === currentWorkoutDay);
+            if (dayData) {
               // Skip if this is END-OF or recommendation content
               if (isRecommendationContent(exercise) || exercise.trim().toUpperCase() === 'END-OF') {
                 console.log(`Skipping END-OF/recommendation content: "${exercise}"`);
@@ -4357,23 +4357,23 @@ const AIFitnessCoach = () => {
               );
 
               if (!existingExercise) {
-              dayData.exercises.push({
-                number: dayData.exercises.length + 1,
-                description: exercise
-              });
-              hasChanges = true;
+                dayData.exercises.push({
+                  number: dayData.exercises.length + 1,
+                  description: exercise
+                });
+                hasChanges = true;
                 console.log(`Added plain text exercise to day ${currentWorkoutDay}: ${exercise}`);
               } else {
                 console.log(`Skipping duplicate exercise: ${exercise}`);
+              }
             }
           }
-        }
-      });
+        });
 
-      return hasChanges ? updatedWorkoutSections : prevWorkoutSections;
-    });
-  }
-};
+        return hasChanges ? updatedWorkoutSections : prevWorkoutSections;
+      });
+    }
+  };
 
   // Parse original streaming response to get accurate calorie values
   const parseOriginalResponse = (originalResponse) => {
@@ -4482,15 +4482,15 @@ const AIFitnessCoach = () => {
             const existingItem = dayData.meals[mealIndex].items.find(item =>
               item.description === description && item.calories === itemCalories
             );
-             if (!existingItem) {
-               dayData.meals[mealIndex].items.push({
-                 description: description,
-                 calories: itemCalories
-               });
-               console.log(`DEBUG: Added item to ${currentMealType}:`, description, itemCalories, 'kcal');
-             } else {
-               console.log(`DEBUG: Item already exists in ${currentMealType}:`, description, itemCalories, 'kcal');
-             }
+            if (!existingItem) {
+              dayData.meals[mealIndex].items.push({
+                description: description,
+                calories: itemCalories
+              });
+              console.log(`DEBUG: Added item to ${currentMealType}:`, description, itemCalories, 'kcal');
+            } else {
+              console.log(`DEBUG: Item already exists in ${currentMealType}:`, description, itemCalories, 'kcal');
+            }
           }
         }
       }
@@ -4508,7 +4508,7 @@ const AIFitnessCoach = () => {
         console.log(`  ${meal.type}: ${meal.totalCalories} kcal (${meal.items.length} items)`);
       });
     });
-};
+  };
 
   const parseResponse = (response) => {
     let cleanedResponse = formatResponse(response);
@@ -4563,17 +4563,17 @@ const AIFitnessCoach = () => {
     const mealPlanMatch = cleanedResponse.match(/MEAL_PLAN:([\s\S]*?)(?=WORKOUT_PLAN:|$)/i);
 
     // Enhanced regex pattern to properly extract workout plan and stop before recommendations/suggestions
-    let workoutPlanMatch = cleanedResponse.match(/WORKOUT_PLAN:([\s\S]*?)(?=END-OF-PLAN[\s-]?SUGGESTION:|END-OF-PLAN SUGG:|END-OF-PLAN:|END-OF|END OF|end-of|end of|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|SUGGESTION|SUGGEST|RECOMMENDATION|RECOMMEND|CLOSING|CLOSE|FINAL|FINAL NOTE|FINAL SUGGESTION|FINAL RECOMMENDATION|Note:|Important:|Remember to|Make sure to|Don't forget to|It's important to|You should|Try to|Consider|Keep in mind|months to achieve|desired results|Follow this plan consistently|for.*months|achieve your desired|your goal and following|END-OF-PLAN SUGGESTIONS|END-OF-PLAN SUGGEST|\*\*Recommendation:\*\*|$)/i);
+    let workoutPlanMatch = cleanedResponse.match(/WORKOUT_PLAN:([\s\S]*?)(?=\b(?:END-OF-PLAN[\s-]?SUGGESTION|END-OF-PLAN SUGG|END-OF-PLAN|END-OF|END OF)\b[:]?|\b(?:Follow this plan consistently|Closing Recommendation|To achieve your goal|To effectively)\b[:]?|\b(?:RECOMMENDATION|SUGGESTION|CLOSING|FINAL NOTE|FINAL SUGGESTION|FINAL RECOMMENDATION)\b[:]|$)/i);
 
     if (!workoutPlanMatch) {
       console.log('Trying alternate workout plan pattern');
-      workoutPlanMatch = cleanedResponse.match(/(?:WORKOUT|EXERCISE)[\s_]*PLAN:?([\s\S]*?)(?=END-OF-PLAN[\s-]?SUGGESTION:|END-OF-PLAN SUGG:|END-OF-PLAN:|END-OF|END OF|end-of|end of|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|SUGGESTION|SUGGEST|RECOMMENDATION|RECOMMEND|CLOSING|CLOSE|FINAL|FINAL NOTE|FINAL SUGGESTION|FINAL RECOMMENDATION|Note:|Important:|Remember to|Make sure to|Don't forget to|It's important to|You should|Try to|Consider|Keep in mind|months to achieve|desired results|Follow this plan consistently|for.*months|achieve your desired|your goal and following|END-OF-PLAN SUGGESTIONS|END-OF-PLAN SUGGEST|\*\*Recommendation:\*\*|$)/i);
+      workoutPlanMatch = cleanedResponse.match(/(?:WORKOUT|EXERCISE)[\s_]*PLAN:?([\s\S]*?)(?=\b(?:END-OF-PLAN[\s-]?SUGGESTION|END-OF-PLAN SUGG|END-OF-PLAN|END-OF|END OF)\b[:]?|\b(?:Follow this plan consistently|Closing Recommendation|To achieve your goal|To effectively)\b[:]?|\b(?:RECOMMENDATION|SUGGESTION|CLOSING|FINAL NOTE|FINAL SUGGESTION|FINAL RECOMMENDATION)\b[:]|$)/i);
     }
 
     // Additional safeguard: if we still have issues, try to find the workout content by looking for day patterns
     if (!workoutPlanMatch) {
       console.log('Attempting to extract workout content by day patterns');
-      const workoutSectionMatch = cleanedResponse.match(/(WORKOUT_PLAN:|EXERCISE_PLAN:|###\s*Workout.*?)[\s\S]*?(?=END-OF-PLAN[\s-]?SUGGESTION:|END-OF-PLAN SUGG:|END-OF-PLAN:|END-OF|END OF|end-of|end of|Follow this plan|consistently.*achieve|Closing Recommendation|To achieve your goal|To effectively|RECOMMENDATION:|SUGGESTION:|SUGGESTION|SUGGEST|RECOMMENDATION|RECOMMEND|CLOSING|CLOSE|FINAL|FINAL NOTE|FINAL SUGGESTION|FINAL RECOMMENDATION|Note:|Important:|\*\*Recommendation:\*\*|$)/i);
+      const workoutSectionMatch = cleanedResponse.match(/(WORKOUT_PLAN:|EXERCISE_PLAN:|###\s*Workout.*?)[\s\S]*?(?=\b(?:END-OF-PLAN[\s-]?SUGGESTION|END-OF-PLAN SUGG|END-OF-PLAN|END-OF|END OF)\b[:]?|\b(?:Follow this plan consistently|Closing Recommendation|To achieve your goal|To effectively)\b[:]?|\b(?:RECOMMENDATION|SUGGESTION|CLOSING|FINAL NOTE|FINAL SUGGESTION|FINAL RECOMMENDATION)\b[:]|$)/i);
       if (workoutSectionMatch) {
         // Extract just the content after the header
         let content = workoutSectionMatch[0];
@@ -4591,7 +4591,7 @@ const AIFitnessCoach = () => {
       const sections = cleanedResponse.split(/###\s+/);
       for (let i = 0; i < sections.length; i++) {
         if (sections[i].toLowerCase().includes('workout') ||
-            sections[i].toLowerCase().includes('exercise')) {
+          sections[i].toLowerCase().includes('exercise')) {
           // Make sure we stop before any recommendation content
           const cleanSection = cleanWorkoutContent(sections[i]);
           workoutPlanMatch = [sections[i], cleanSection];
@@ -4626,13 +4626,13 @@ const AIFitnessCoach = () => {
 
         if (!foundWorkoutSection) {
           if (line.match(/work\s*out|exercise|training/i) &&
-              !line.match(/meal|breakfast|lunch|dinner|snack/i)) {
+            !line.match(/meal|breakfast|lunch|dinner|snack/i)) {
             foundWorkoutSection = true;
             workoutLines.push(line);
           }
         } else {
           if (!line.match(/meal|breakfast|lunch|dinner|snack/i) ||
-              line.match(/day\s*\d+|exercise|workout|training/i)) {
+            line.match(/day\s*\d+|exercise|workout|training/i)) {
             // Skip recommendation content
             if (!isRecommendationContent(line)) {
               workoutLines.push(line);
@@ -4754,8 +4754,8 @@ const AIFitnessCoach = () => {
       }
     }
 
-         // Fill missing meals for all 7 days to ensure complete meal plan
-     // No fallback meal generation - only use exact backend data
+    // Fill missing meals for all 7 days to ensure complete meal plan
+    // No fallback meal generation - only use exact backend data
 
     // Process workout plan - create only days with actual workouts
     const workoutSections = [];
@@ -5083,8 +5083,8 @@ const AIFitnessCoach = () => {
     // Ensure rest days are properly handled and remove empty rest days
     workoutSections.forEach(section => {
       if (section.workoutType.toLowerCase().includes('rest') ||
-          section.workoutType.toLowerCase().includes('recovery') ||
-          section.workoutType.toLowerCase().includes('off')) {
+        section.workoutType.toLowerCase().includes('recovery') ||
+        section.workoutType.toLowerCase().includes('off')) {
         section.exercises = [];
         section.workoutType = 'Rest Day';
       } else if (section.exercises.length === 0) {
@@ -5316,50 +5316,50 @@ const AIFitnessCoach = () => {
 
   // Extract the natural language submission logic into a separate function
   const submitNaturalLanguageData = async (extractedData, prompt) => {
-      try {
-        const response = await fetch(getApiUrl('user'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            prompt: prompt,
-            userDetails: {
-              age: parseInt(extractedData.age),
-              weight: parseFloat(extractedData.weight),
-              height: parseFloat(extractedData.height),
-              gender: extractedData.gender,
-              activityLevel: extractedData.activityLevel,
-              targetWeight: parseFloat(extractedData.targetWeight?.value || extractedData.weight),
-              timelineWeeks: parseInt(extractedData.timelineWeeks || extractedData.timeline?.value || 12),
-              healthGoals: extractedData.goal || 'Get Fit'
-            }
-          })
-        });
+    try {
+      const response = await fetch(getApiUrl('user'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: prompt,
+          userDetails: {
+            age: parseInt(extractedData.age),
+            weight: parseFloat(extractedData.weight),
+            height: parseFloat(extractedData.height),
+            gender: extractedData.gender,
+            activityLevel: extractedData.activityLevel,
+            targetWeight: parseFloat(extractedData.targetWeight?.value || extractedData.weight),
+            timelineWeeks: parseInt(extractedData.timelineWeeks || extractedData.timeline?.value || 12),
+            healthGoals: extractedData.goal || 'Get Fit'
+          }
+        })
+      });
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
-        }
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+      }
 
-        const calorieData = await response.json();
-        setCalculatedCalories(calorieData);
-        setIsLoading(false);
-        setShowCalorieResults(true);
+      const calorieData = await response.json();
+      setCalculatedCalories(calorieData);
+      setIsLoading(false);
+      setShowCalorieResults(true);
 
-        // Store extracted data for later use
-        setExtractedProfileData(extractedData);
+      // Store extracted data for later use
+      setExtractedProfileData(extractedData);
 
-      } catch (error) {
-        console.error('Error calculating calories:', error);
-        setIsLoading(false);
-        let errorMessage = 'Failed to calculate calories. ';
-        if (error.message.includes('Failed to fetch')) {
-          errorMessage += 'Make sure the backend server is running';
-        } else {
-          errorMessage += 'Please try again.';
-        }
-        setSuccessMessage(errorMessage);
-        setShowSuccessPopup(true);
-        setTimeout(() => setShowSuccessPopup(false), 5000);
+    } catch (error) {
+      console.error('Error calculating calories:', error);
+      setIsLoading(false);
+      let errorMessage = 'Failed to calculate calories. ';
+      if (error.message.includes('Failed to fetch')) {
+        errorMessage += 'Make sure the backend server is running';
+      } else {
+        errorMessage += 'Please try again.';
+      }
+      setSuccessMessage(errorMessage);
+      setShowSuccessPopup(true);
+      setTimeout(() => setShowSuccessPopup(false), 5000);
     }
   };
 
@@ -5377,8 +5377,8 @@ const AIFitnessCoach = () => {
     // Only check profile for natural language prompts
 
     if (!formData.age || !formData.gender || !formData.height ||
-        !formData.currentWeight || !formData.targetWeight ||
-        !formData.activityLevel || formData.activityLevel === '' || !formData.workoutDays || !formData.timeframe) {
+      !formData.currentWeight || !formData.targetWeight ||
+      !formData.activityLevel || formData.activityLevel === '' || !formData.workoutDays || !formData.timeframe) {
       setSuccessMessage('Please fill in all required fields.');
       setShowSuccessPopup(true);
       setTimeout(() => setShowSuccessPopup(false), 3000);
@@ -5695,10 +5695,10 @@ const AIFitnessCoach = () => {
   useEffect(() => {
     const isInShopifyContext = () => {
       return window.Shopify !== undefined ||
-             window.ShopifyAnalytics !== undefined ||
-             window.meta?.page?.customerId !== undefined ||
-             window.customer !== undefined ||
-             document.querySelector('body.template-page') !== null;
+        window.ShopifyAnalytics !== undefined ||
+        window.meta?.page?.customerId !== undefined ||
+        window.customer !== undefined ||
+        document.querySelector('body.template-page') !== null;
     };
 
     const checkShopifyCustomer = () => {
@@ -5844,12 +5844,12 @@ const AIFitnessCoach = () => {
           if (customerName) {
             customerInfo = {
               id: window.Shopify?.customer?.id ||
-                  window.meta?.page?.customerId ||
-                  'unknown',
+                window.meta?.page?.customerId ||
+                'unknown',
               name: customerName,
               email: window.Shopify?.customer?.email ||
-                    window.meta?.page?.customer?.email ||
-                    'unknown'
+                window.meta?.page?.customer?.email ||
+                'unknown'
             };
           }
         }
@@ -5918,24 +5918,24 @@ const AIFitnessCoach = () => {
             {workoutSections
               .filter(section => section.workoutType !== 'Rest Day' || section.exercises.length > 0)
               .map((section, i) => (
-              <View key={i} style={pdfStyles.daySection}>
-                <Text style={pdfStyles.dayTitle}>Day {section.dayNumber}: {section.workoutType}</Text>
-                {section.workoutType === 'Rest Day' && section.exercises.length === 0 ? (
-                  <Text style={pdfStyles.text}>Rest Day - No exercises scheduled</Text>
-                ) : (
-                  <View>
-                    {section.exercises.map((ex, j) => (
-                      <Text key={j} style={pdfStyles.text}>{j + 1}. {ex.description}</Text>
-                    ))}
-                  </View>
-                )}
-              </View>
-            ))}
+                <View key={i} style={pdfStyles.daySection}>
+                  <Text style={pdfStyles.dayTitle}>Day {section.dayNumber}: {section.workoutType}</Text>
+                  {section.workoutType === 'Rest Day' && section.exercises.length === 0 ? (
+                    <Text style={pdfStyles.text}>Rest Day - No exercises scheduled</Text>
+                  ) : (
+                    <View>
+                      {section.exercises.map((ex, j) => (
+                        <Text key={j} style={pdfStyles.text}>{j + 1}. {ex.description}</Text>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              ))}
           </>
         )}
         {/* Show Personalized Suggestions section with both Meal Plan Focus and Workout Plan Focus */}
         {(mealPlansByDay && mealPlansByDay.length > 0 && endOfPlanSuggestion && endOfPlanSuggestion.trim() !== '') ||
-         (workoutSections && workoutSections.some(section => section.exercises && section.exercises.length > 0) && workoutPlanSuggestion && workoutPlanSuggestion.trim() !== '') ? (
+          (workoutSections && workoutSections.some(section => section.exercises && section.exercises.length > 0) && workoutPlanSuggestion && workoutPlanSuggestion.trim() !== '') ? (
           <>
             <Text style={pdfStyles.sectionTitle}>Personalized Suggestions</Text>
             {/* Show Meal Plan Focus section if meal plan exists */}
@@ -6536,196 +6536,196 @@ const AIFitnessCoach = () => {
                 </div>
               ))}
             </div>
-          {currentPopupGoal && goalData[currentPopupGoal] && (
-            <div className="goal-details-container" style={{ borderTopColor: goalData[currentPopupGoal].color }}>
-              <div className="goal-details-content">
-                <i
-                  key={`icon-${currentPopupGoal}`}
-                  className={`fas ${goalData[currentPopupGoal].icon} goal-details-icon`}
-                  style={{ color: goalData[currentPopupGoal].color }}
-                  data-goal={currentPopupGoal}
-                ></i>
-                <h2 className="goal-details-title">{currentPopupGoal}</h2>
-                <p className="goal-details-description">{goalData[currentPopupGoal].description}</p>
-                <form className="goal-details-form" id="goalForm" onSubmit={handleFormSubmit}>
-                  {/* Natural Language Input */}
-                  <div className="form-row">
-                    <div className="form-group" style={{ width: '100%' }}>
-                      <label htmlFor="naturalLanguagePrompt">
-                        Describe yourself and your goals naturally
-                        <button
-                          type="button"
-                          className="help-button"
-                          onClick={() => setShowPromptInput(!showPromptInput)}
-                          style={{ marginLeft: '10px' }}
-                        >
-                          {showPromptInput ? 'Hide' : 'Show'} Natural Input
-                        </button>
-                      </label>
-                      {showPromptInput && (
-                        <textarea
-                          id="naturalLanguagePrompt"
-                          name="naturalLanguagePrompt"
-                          value={naturalLanguagePrompt}
-                          onChange={(e) => {
-                            setNaturalLanguagePrompt(e.target.value);
-                            if (e.target.value) {
-                              handleNaturalLanguageInput(e.target.value);
-                            }
-                          }}
-                          placeholder="Example: I'm a 25-year-old female, 165cm tall, weighing 65kg. I'm moderately active and want to get stronger. I'm allergic to nuts."
-                          rows={4}
-                          style={{ width: '100%', marginBottom: '20px' }}
-                        />
-                      )}
+            {currentPopupGoal && goalData[currentPopupGoal] && (
+              <div className="goal-details-container" style={{ borderTopColor: goalData[currentPopupGoal].color }}>
+                <div className="goal-details-content">
+                  <i
+                    key={`icon-${currentPopupGoal}`}
+                    className={`fas ${goalData[currentPopupGoal].icon} goal-details-icon`}
+                    style={{ color: goalData[currentPopupGoal].color }}
+                    data-goal={currentPopupGoal}
+                  ></i>
+                  <h2 className="goal-details-title">{currentPopupGoal}</h2>
+                  <p className="goal-details-description">{goalData[currentPopupGoal].description}</p>
+                  <form className="goal-details-form" id="goalForm" onSubmit={handleFormSubmit}>
+                    {/* Natural Language Input */}
+                    <div className="form-row">
+                      <div className="form-group" style={{ width: '100%' }}>
+                        <label htmlFor="naturalLanguagePrompt">
+                          Describe yourself and your goals naturally
+                          <button
+                            type="button"
+                            className="help-button"
+                            onClick={() => setShowPromptInput(!showPromptInput)}
+                            style={{ marginLeft: '10px' }}
+                          >
+                            {showPromptInput ? 'Hide' : 'Show'} Natural Input
+                          </button>
+                        </label>
+                        {showPromptInput && (
+                          <textarea
+                            id="naturalLanguagePrompt"
+                            name="naturalLanguagePrompt"
+                            value={naturalLanguagePrompt}
+                            onChange={(e) => {
+                              setNaturalLanguagePrompt(e.target.value);
+                              if (e.target.value) {
+                                handleNaturalLanguageInput(e.target.value);
+                              }
+                            }}
+                            placeholder="Example: I'm a 25-year-old female, 165cm tall, weighing 65kg. I'm moderately active and want to get stronger. I'm allergic to nuts."
+                            rows={4}
+                            style={{ width: '100%', marginBottom: '20px' }}
+                          />
+                        )}
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="age">Age <span className="required-asterisk">*</span></label>
-                      <input
-                        type="number"
-                        id="age"
-                        name="age"
-                        min="16"
-                        max="100"
-                        required
-                        value={formData.age}
-                        onChange={handleFormChange}
-                      />
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label htmlFor="age">Age <span className="required-asterisk">*</span></label>
+                        <input
+                          type="number"
+                          id="age"
+                          name="age"
+                          min="16"
+                          max="100"
+                          required
+                          value={formData.age}
+                          onChange={handleFormChange}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="gender">Gender <span className="required-asterisk">*</span></label>
+                        <select
+                          id="gender"
+                          name="gender"
+                          required
+                          value={formData.gender}
+                          onChange={handleFormChange}
+                        >
+                          <option value="">Select gender</option>
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label htmlFor="height">Height (cm) <span className="required-asterisk">*</span></label>
+                        <input
+                          type="number"
+                          id="height"
+                          name="height"
+                          min="120"
+                          max="250"
+                          required
+                          value={formData.height}
+                          onChange={handleFormChange}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="currentWeight">Current Weight (kg) <span className="required-asterisk">*</span></label>
+                        <input
+                          type="number"
+                          id="currentWeight"
+                          name="currentWeight"
+                          min="30"
+                          max="650"
+                          step="0.1"
+                          required
+                          value={formData.currentWeight}
+                          onChange={handleFormChange}
+                        />
+                      </div>
+                    </div>
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label htmlFor="targetWeight">Target Weight (kg) <span className="required-asterisk">*</span></label>
+                        <input
+                          type="number"
+                          id="targetWeight"
+                          name="targetWeight"
+                          min="30"
+                          max="650"
+                          step="0.1"
+                          required
+                          value={formData.targetWeight}
+                          onChange={handleFormChange}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label htmlFor="activityLevel">Activity Level <span className="required-asterisk">*</span></label>
+                        <select
+                          id="activityLevel"
+                          name="activityLevel"
+                          required
+                          value={formData.activityLevel}
+                          onChange={handleFormChange}
+                        >
+                          <option value="">Select activity level</option>
+                          <option value="sedentary">Sedentary (little or no exercise)</option>
+                          <option value="light">Lightly active (light exercise 1-3 days/week)</option>
+                          <option value="moderate">Moderately active (moderate exercise 3-5 days/week)</option>
+                          <option value="very">Very active (hard exercise 6-7 days/week)</option>
+                          <option value="extra">Extra active (very hard exercise & physical job)</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label htmlFor="workoutDays">Preferred Workout Days <span className="required-asterisk">*</span></label>
+                        <select
+                          id="workoutDays"
+                          name="workoutDays"
+                          required
+                          value={formData.workoutDays}
+                          onChange={handleFormChange}
+                        >
+                          <option value="">Select workout days</option>
+                          <option value="1">1 day per week</option>
+                          <option value="2">2 days per week</option>
+                          <option value="3">3 days per week</option>
+                          <option value="4">4 days per week</option>
+                          <option value="5">5 days per week</option>
+                          <option value="6">6 days per week</option>
+                          <option value="7">7 days per week</option>
+                        </select>
+                      </div>
                     </div>
                     <div className="form-group">
-                      <label htmlFor="gender">Gender <span className="required-asterisk">*</span></label>
-                      <select
-                        id="gender"
-                        name="gender"
+                      <label htmlFor="timeframe">Target Timeframe (months) <span className="required-asterisk">*</span></label>
+                      <input
+                        type="range"
+                        id="timeframe"
+                        name="timeframe"
+                        min="1"
+                        max="12"
                         required
-                        value={formData.gender}
+                        value={formData.timeframe}
                         onChange={handleFormChange}
+                      />
+                      <div className="range-value" id="timeframeValue">
+                        {formData.timeframe} months
+                      </div>
+                    </div>
+                    <div className="goal-details-buttons">
+                      <button
+                        type="button"
+                        className="goal-details-button cancel"
+                        onClick={() => setCurrentPopupGoal(null)}
                       >
-                        <option value="">Select gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                      </select>
+                        Cancel
+                      </button>
+                      <button type="submit" className="goal-details-button submit">
+                        Continue
+                      </button>
                     </div>
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="height">Height (cm) <span className="required-asterisk">*</span></label>
-                      <input
-                        type="number"
-                        id="height"
-                        name="height"
-                        min="120"
-                        max="250"
-                        required
-                        value={formData.height}
-                        onChange={handleFormChange}
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="currentWeight">Current Weight (kg) <span className="required-asterisk">*</span></label>
-                      <input
-                        type="number"
-                        id="currentWeight"
-                        name="currentWeight"
-                        min="30"
-                        max="650"
-                        step="0.1"
-                        required
-                        value={formData.currentWeight}
-                        onChange={handleFormChange}
-                      />
-                    </div>
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="targetWeight">Target Weight (kg) <span className="required-asterisk">*</span></label>
-                      <input
-                        type="number"
-                        id="targetWeight"
-                        name="targetWeight"
-                        min="30"
-                        max="650"
-                        step="0.1"
-                        required
-                        value={formData.targetWeight}
-                        onChange={handleFormChange}
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="activityLevel">Activity Level <span className="required-asterisk">*</span></label>
-                      <select
-                        id="activityLevel"
-                        name="activityLevel"
-                        required
-                        value={formData.activityLevel}
-                        onChange={handleFormChange}
-                      >
-                        <option value="">Select activity level</option>
-                        <option value="sedentary">Sedentary (little or no exercise)</option>
-                        <option value="light">Lightly active (light exercise 1-3 days/week)</option>
-                        <option value="moderate">Moderately active (moderate exercise 3-5 days/week)</option>
-                        <option value="very">Very active (hard exercise 6-7 days/week)</option>
-                        <option value="extra">Extra active (very hard exercise & physical job)</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="workoutDays">Preferred Workout Days <span className="required-asterisk">*</span></label>
-                      <select
-                        id="workoutDays"
-                        name="workoutDays"
-                        required
-                        value={formData.workoutDays}
-                        onChange={handleFormChange}
-                      >
-                        <option value="">Select workout days</option>
-                        <option value="1">1 day per week</option>
-                        <option value="2">2 days per week</option>
-                        <option value="3">3 days per week</option>
-                        <option value="4">4 days per week</option>
-                        <option value="5">5 days per week</option>
-                        <option value="6">6 days per week</option>
-                        <option value="7">7 days per week</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="timeframe">Target Timeframe (months) <span className="required-asterisk">*</span></label>
-                    <input
-                      type="range"
-                      id="timeframe"
-                      name="timeframe"
-                      min="1"
-                      max="12"
-                      required
-                      value={formData.timeframe}
-                      onChange={handleFormChange}
-                    />
-                    <div className="range-value" id="timeframeValue">
-                      {formData.timeframe} months
-                    </div>
-                  </div>
-                  <div className="goal-details-buttons">
-                    <button
-                      type="button"
-                      className="goal-details-button cancel"
-                      onClick={() => setCurrentPopupGoal(null)}
-                    >
-                      Cancel
-                    </button>
-                    <button type="submit" className="goal-details-button submit">
-                      Continue
-                    </button>
-                  </div>
-                </form>
+                  </form>
+                </div>
               </div>
-            </div>
-          )}
+            )}
           </div>
         )}
       </div>
@@ -6885,13 +6885,13 @@ const AIFitnessCoach = () => {
                     <div style={{ color: 'white' }}>
                       {formatTimestamp(conversation.timestamp)}
                     </div>
-                    <div style={{ color: 'white' ,textAlign:'center'}}>
+                    <div style={{ color: 'white', textAlign: 'center' }}>
                       {conversation.metadata?.profileOption === 'yes' ? 'Yes' : 'No'}
                     </div>
-                    <div style={{ color: 'white' ,textAlign:'center'}}>
+                    <div style={{ color: 'white', textAlign: 'center' }}>
                       {conversation.metadata?.planData?.hasMealPlan ? 'Yes' : 'No'}
                     </div>
-                    <div style={{ color: 'white',textAlign:'center' }}>
+                    <div style={{ color: 'white', textAlign: 'center' }}>
                       {(conversation.metadata?.planData?.hasWorkoutPlan || conversation.metadata?.planData?.structuredWorkoutPlan) ? 'Yes' : 'No'}
                     </div>
                   </div>
@@ -7072,30 +7072,30 @@ const AIFitnessCoach = () => {
       {showPlans && (
         <div className="plans-container" id="plansContainer" ref={plansContainerRef}>
           {plansComplete && (
-          <div style={{
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            marginBottom: '24px'
-          }}>
-            <PDFDownloadLink
-              document={<PlanPDFDocument fitnessGoal={fitnessGoal} mealPlansByDay={mealPlansByDay} workoutSections={workoutSections} endOfPlanSuggestion={endOfPlanSuggestion} workoutPlanSuggestion={workoutPlanSuggestion} />}
-              fileName="AI_Fitness_Plan.pdf"
-              style={{ textDecoration: 'none' }}
-            >
-              {({ loading }) => (
-                <button className="pdf-download-button">
-                  <i className="fas fa-file-pdf"></i>
-                  <span>{loading ? 'Preparing PDF...' : 'Download PDF'}</span>
-                  {!loading && <i className="fas fa-download"></i>}
-                </button>
-              )}
-            </PDFDownloadLink>
-          </div>
+            <div style={{
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              marginBottom: '24px'
+            }}>
+              <PDFDownloadLink
+                document={<PlanPDFDocument fitnessGoal={fitnessGoal} mealPlansByDay={mealPlansByDay} workoutSections={workoutSections} endOfPlanSuggestion={endOfPlanSuggestion} workoutPlanSuggestion={workoutPlanSuggestion} />}
+                fileName="AI_Fitness_Plan.pdf"
+                style={{ textDecoration: 'none' }}
+              >
+                {({ loading }) => (
+                  <button className="pdf-download-button">
+                    <i className="fas fa-file-pdf"></i>
+                    <span>{loading ? 'Preparing PDF...' : 'Download PDF'}</span>
+                    {!loading && <i className="fas fa-download"></i>}
+                  </button>
+                )}
+              </PDFDownloadLink>
+            </div>
           )}
 
-          <div className={`plans-grid ${ (isStreamingMeal || showWorkoutPlanChoice || showWorkoutDaysConfirmation || workoutPlanChoice !== true) ? 'single-column' : 'two-columns' }`}>
-            <div className={`plan-section meal-section ${ (isStreamingMeal || showWorkoutPlanChoice || showWorkoutDaysConfirmation || workoutPlanChoice !== true) ? '' : 'slide-left' }`}>
+          <div className={`plans-grid ${(isStreamingMeal || showWorkoutPlanChoice || showWorkoutDaysConfirmation || workoutPlanChoice !== true) ? 'single-column' : 'two-columns'}`}>
+            <div className={`plan-section meal-section ${(isStreamingMeal || showWorkoutPlanChoice || showWorkoutDaysConfirmation || workoutPlanChoice !== true) ? '' : 'slide-left'}`}>
               <div className="plan-header">
                 <i className="fas fa-utensils plan-icon"></i>
                 <h2 className="mealpan-header-text-h2">Meal Plan</h2>
@@ -7119,7 +7119,7 @@ const AIFitnessCoach = () => {
                           >
                             <div className="day-header-content">
                               <i className="fas fa-calendar-day accordion-icon"></i>
-                              <span style={{fontSize: '18px', fontWeight: '600' }}>Day {dayData.dayNumber}</span>
+                              <span style={{ fontSize: '18px', fontWeight: '600' }}>Day {dayData.dayNumber}</span>
                             </div>
                             <div className="day-header-right">
                               <div className="total-calories">
@@ -7195,11 +7195,11 @@ const AIFitnessCoach = () => {
                         <div className="generating-indicator">
                           <div className="generating-spinner"></div>
                           <span className="generating-text">
-                 {currentMealDay === 0
-                   ? "Preparing meal plan..."
-                   : currentMealDay >= 7
-                   ? "Finalizing meal plan..."
-                   : `Generating Day ${currentMealDay + 1} of 7...`}
+                            {currentMealDay === 0
+                              ? "Preparing meal plan..."
+                              : currentMealDay >= 7
+                                ? "Finalizing meal plan..."
+                                : `Generating Day ${currentMealDay + 1} of 7...`}
                           </span>
                         </div>
                       </div>
@@ -7208,327 +7208,327 @@ const AIFitnessCoach = () => {
                 ) : (
                   // Show regular meal accordions when not streaming
                   mealPlansByDay.map((dayPlan, index) => (
-                  <div key={`day-${dayPlan.dayNumber}`}>
-                    <div className="accordion-item">
-                    <div
-                      className="accordion-header"
-                      data-meal={`day${dayPlan.dayNumber}`}
-                      onClick={() => toggleAccordion(`day${dayPlan.dayNumber}`, 'meal')}
-                    >
-                      <div className="day-header-content">
-                        <i className="fas fa-calendar-day accordion-icon"></i>
-                        <span style={{fontSize: '18px', fontWeight: '600' }}>Day {dayPlan.dayNumber}</span>
-                      </div>
-                      <div className="day-header-right">
-                        <div className="total-calories">
-                          <i className="fas fa-fire-alt"></i>
-                          {calculateDailyCalories(dayPlan.meals)} cal/day
-                        </div>
-                        <i
-                          className="fas fa-chevron-right accordion-arrow"
-                          style={{
-                            transform: openMealAccordion === `day${dayPlan.dayNumber}` ? 'rotate(90deg)' : 'rotate(0deg)'
-                          }}
-                        ></i>
-                      </div>
-                    </div>
-                    <div
-                      className="accordion-content"
-                      style={{
-                        display: openMealAccordion === `day${dayPlan.dayNumber}` ? 'block' : 'none',
-                        animation: openMealAccordion === `day${dayPlan.dayNumber}` ? 'slideDown 0.3s ease forwards' : 'none',
-                        width: '100%',
-                        boxSizing: 'border-box'
-                      }}
-                    >
-                      <div className="nested-accordion">
-                        {dayPlan.meals.map((meal) => (
-                          <div key={`${dayPlan.dayNumber}-${meal.type}`} className="nested-accordion-item">
-                            <div
-                              className="nested-accordion-header"
-                              data-meal-type={meal.type.toLowerCase()}
-                              onClick={() => toggleAccordion(`${dayPlan.dayNumber}-${meal.type}`, 'meal-sub')}
-                            >
-                              <div className="meal-header-content">
-                                <i className={`fas ${getMealIcon(meal.type)} nested-accordion-icon`}></i>
-                                <span style={{ fontSize: '16px', fontWeight: '500' }}>{meal.type}</span>
-                              </div>
-                              <div className="meal-header-right">
-                                <span className="calories-info">
-                                  {meal.totalCalories || meal.calories} cal
-                                </span>
-                                <i
-                                  className="fas fa-chevron-right nested-accordion-arrow"
-                                  style={{
-                                    transform: openMealSubAccordion === `${dayPlan.dayNumber}-${meal.type}` ? 'rotate(90deg)' : 'rotate(0deg)'
-                                  }}
-                                ></i>
-                              </div>
+                    <div key={`day-${dayPlan.dayNumber}`}>
+                      <div className="accordion-item">
+                        <div
+                          className="accordion-header"
+                          data-meal={`day${dayPlan.dayNumber}`}
+                          onClick={() => toggleAccordion(`day${dayPlan.dayNumber}`, 'meal')}
+                        >
+                          <div className="day-header-content">
+                            <i className="fas fa-calendar-day accordion-icon"></i>
+                            <span style={{ fontSize: '18px', fontWeight: '600' }}>Day {dayPlan.dayNumber}</span>
+                          </div>
+                          <div className="day-header-right">
+                            <div className="total-calories">
+                              <i className="fas fa-fire-alt"></i>
+                              {calculateDailyCalories(dayPlan.meals)} cal/day
                             </div>
-                            <div
-                              className="nested-accordion-content"
+                            <i
+                              className="fas fa-chevron-right accordion-arrow"
                               style={{
-                                display: openMealSubAccordion === `${dayPlan.dayNumber}-${meal.type}` ? 'block' : 'none',
-                                animation: openMealSubAccordion === `${dayPlan.dayNumber}-${meal.type}` ? 'slideDown 0.3s ease forwards' : 'none'
+                                transform: openMealAccordion === `day${dayPlan.dayNumber}` ? 'rotate(90deg)' : 'rotate(0deg)'
                               }}
-                            >
-                              <ol className="numbered-list" start="1">
+                            ></i>
+                          </div>
+                        </div>
+                        <div
+                          className="accordion-content"
+                          style={{
+                            display: openMealAccordion === `day${dayPlan.dayNumber}` ? 'block' : 'none',
+                            animation: openMealAccordion === `day${dayPlan.dayNumber}` ? 'slideDown 0.3s ease forwards' : 'none',
+                            width: '100%',
+                            boxSizing: 'border-box'
+                          }}
+                        >
+                          <div className="nested-accordion">
+                            {dayPlan.meals.map((meal) => (
+                              <div key={`${dayPlan.dayNumber}-${meal.type}`} className="nested-accordion-item">
+                                <div
+                                  className="nested-accordion-header"
+                                  data-meal-type={meal.type.toLowerCase()}
+                                  onClick={() => toggleAccordion(`${dayPlan.dayNumber}-${meal.type}`, 'meal-sub')}
+                                >
+                                  <div className="meal-header-content">
+                                    <i className={`fas ${getMealIcon(meal.type)} nested-accordion-icon`}></i>
+                                    <span style={{ fontSize: '16px', fontWeight: '500' }}>{meal.type}</span>
+                                  </div>
+                                  <div className="meal-header-right">
+                                    <span className="calories-info">
+                                      {meal.totalCalories || meal.calories} cal
+                                    </span>
+                                    <i
+                                      className="fas fa-chevron-right nested-accordion-arrow"
+                                      style={{
+                                        transform: openMealSubAccordion === `${dayPlan.dayNumber}-${meal.type}` ? 'rotate(90deg)' : 'rotate(0deg)'
+                                      }}
+                                    ></i>
+                                  </div>
+                                </div>
+                                <div
+                                  className="nested-accordion-content"
+                                  style={{
+                                    display: openMealSubAccordion === `${dayPlan.dayNumber}-${meal.type}` ? 'block' : 'none',
+                                    animation: openMealSubAccordion === `${dayPlan.dayNumber}-${meal.type}` ? 'slideDown 0.3s ease forwards' : 'none'
+                                  }}
+                                >
+                                  <ol className="numbered-list" start="1">
                                     {meal.items.map((item, itemIndex) => (
                                       <li className="ai-coach-numbered-item" key={`${dayPlan.dayNumber}-${meal.type}-item-${itemIndex}`}>
-                                    {item.description} {item.calories ? `(${item.calories} kcal)` : ''}
+                                        {item.description} {item.calories ? `(${item.calories} kcal)` : ''}
+                                      </li>
+                                    ))}
+                                  </ol>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+            <div className={`plan-section workout-section ${(isStreamingMeal || showWorkoutPlanChoice || showWorkoutDaysConfirmation || workoutPlanChoice !== true) ? 'hidden-during-meal' : ''} ${isStreamingMeal ? 'locked-section' : ''}`}>
+              {!isStreamingMeal && !noWorkoutPlan && (
+                <div className="plan-header">
+                  <i className="fas fa-dumbbell plan-icon"></i>
+                  <h2>Workout Plan</h2>
+                </div>
+              )}
+
+
+              <div className="accordion" id="workoutAccordion" ref={workoutAccordionRef}>
+                {(isStreamingMeal && !mealPlansByDay.length) ? (
+                  // Show meal plan generation animation
+                  <div className="meal-generation-container">
+                    <div className="meal-generation-animation">
+                      <div className="meal-generation-icon">
+                        <i className="fas fa-utensils"></i>
+                      </div>
+                      <div className="meal-generation-pulse"></div>
+                      <div className="meal-generation-pulse delay-1"></div>
+                      <div className="meal-generation-pulse delay-2"></div>
+                      <div className="meal-generation-pulse delay-3"></div>
+                    </div>
+                    <h3 className="meal-generation-title">Crafting Your Perfect Meal Plan</h3>
+                    <p className="meal-generation-subtitle">Our AI is analyzing your preferences and creating a personalized nutrition plan...</p>
+                    <div className="meal-generation-benefits">
+                      <div className="benefit-item">
+                        <i className="fas fa-clock"></i>
+                        <span>7-day comprehensive plan</span>
+                      </div>
+                      <div className="benefit-item">
+                        <i className="fas fa-calculator"></i>
+                        <span>Precise calorie calculations</span>
+                      </div>
+                      <div className="benefit-item">
+                        <i className="fas fa-heart"></i>
+                        <span>Balanced nutrition focus</span>
+                      </div>
+                    </div>
+                    <div className="meal-generation-progress">
+                      <div className="progress-bar">
+                        <div className="progress-fill"></div>
+                      </div>
+                      <span className="progress-text">Generating meal plan...</span>
+                    </div>
+                  </div>
+                ) : noWorkoutPlan ? (
+                  // Show no workout plan animation
+                  <div className="no-workout-container">
+                    <div className="no-workout-animation">
+                      <div className="no-workout-icon">
+                        <i className="fas fa-heart"></i>
+                      </div>
+                      <div className="no-workout-pulse"></div>
+                      <div className="no-workout-pulse delay-1"></div>
+                      <div className="no-workout-pulse delay-2"></div>
+                    </div>
+                    <h3 className="no-workout-title">Focus on Nutrition</h3>
+                    <p className="no-workout-subtitle">You documented only meal plan, we recommend you do workout plan also for consistency</p>
+                    <div className="no-workout-benefits">
+                      <div className="benefit-item">
+                        <i className="fas fa-check-circle"></i>
+                        <span>Consistent meal timing</span>
+                      </div>
+                      <div className="benefit-item">
+                        <i className="fas fa-check-circle"></i>
+                        <span>Proper nutrition balance</span>
+                      </div>
+                      <div className="benefit-item">
+                        <i className="fas fa-check-circle"></i>
+                        <span>Healthy lifestyle foundation</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (isStreamingWorkout || (workoutSections && workoutSections.length > 0)) ? (
+                  // Show workout days in order, streaming or completed
+                  <>
+                    {console.log('Workout plan display - isStreamingWorkout:', isStreamingWorkout, 'workoutSections.length:', workoutSections?.length, 'plansComplete:', plansComplete)}
+                    {workoutSections
+                      .filter(day => day.dayNumber) // Show any day that exists
+                      .sort((a, b) => a.dayNumber - b.dayNumber) // Sort by day number
+                      .map((dayData) => (
+                        <div key={`streaming-workout-day-${dayData.dayNumber}`} className="accordion-item generated">
+                          <div
+                            className="accordion-header"
+                            data-day={`day${dayData.dayNumber}`}
+                            onClick={() => toggleAccordion(`day${dayData.dayNumber}`, 'workout')}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            <div className="day-header-content">
+                              <i className={`fas ${getWorkoutIcon(dayData.workoutType)} accordion-icon`}></i>
+                              <span style={{ fontSize: '18px', fontWeight: '600' }}>
+                                Day {dayData.dayNumber}: {dayData.workoutType}
+                              </span>
+                            </div>
+                            <div className="day-header-right">
+                              <i
+                                className="fas fa-chevron-right accordion-arrow"
+                                style={{
+                                  transform: openWorkoutAccordion === `day${dayData.dayNumber}` ? 'rotate(90deg)' : 'rotate(0deg)'
+                                }}
+                              ></i>
+                            </div>
+                          </div>
+                          <div
+                            className="accordion-content"
+                            style={{
+                              display: openWorkoutAccordion === `day${dayData.dayNumber}` ? 'block' : 'none',
+                              animation: openWorkoutAccordion === `day${dayData.dayNumber}` ? 'slideDown 0.3s ease forwards' : 'none',
+                              width: '100%',
+                              boxSizing: 'border-box'
+                            }}
+                          >
+                            {dayData.workoutType === 'Rest Day' ? (
+                              <p className="rest-day-message">Rest Day - No exercises scheduled</p>
+                            ) : (
+                              <ol className="numbered-list" start="1">
+                                {dayData.exercises.map((exercise, exerciseIndex) => (
+                                  <li className="ai-coach-numbered-item" key={`exercise-${dayData.dayNumber}-${exerciseIndex}`}>
+                                    {exercise.description}
                                   </li>
                                 ))}
                               </ol>
-                            </div>
+                            )}
                           </div>
-                        ))}
-                      </div>
-                    </div>
-                    </div>
                         </div>
-                  ))
+                      ))}
+
+                    {/* Show loading effect below the last generated accordion */}
+                    {isStreamingWorkout && (
+                      <div className="generating-status">
+                        <div className="generating-indicator">
+                          <div className="generating-spinner"></div>
+                          <span className="generating-text">Generating Workout Plan...</span>
+                        </div>
+                      </div>
                     )}
-              </div>
-            </div>
-                         <div className={`plan-section workout-section ${ (isStreamingMeal || showWorkoutPlanChoice || showWorkoutDaysConfirmation || workoutPlanChoice !== true) ? 'hidden-during-meal' : ''} ${isStreamingMeal ? 'locked-section' : ''}`}>
-               {!isStreamingMeal && !noWorkoutPlan && (
-                 <div className="plan-header">
-                   <i className="fas fa-dumbbell plan-icon"></i>
-                   <h2>Workout Plan</h2>
-                 </div>
-               )}
-
-
-               <div className="accordion" id="workoutAccordion" ref={workoutAccordionRef}>
-                 {true ? (
-                   // Show meal plan generation animation
-                   <div className="meal-generation-container">
-                     <div className="meal-generation-animation">
-                       <div className="meal-generation-icon">
-                         <i className="fas fa-utensils"></i>
-                       </div>
-                       <div className="meal-generation-pulse"></div>
-                       <div className="meal-generation-pulse delay-1"></div>
-                       <div className="meal-generation-pulse delay-2"></div>
-                       <div className="meal-generation-pulse delay-3"></div>
-                     </div>
-                     <h3 className="meal-generation-title">Crafting Your Perfect Meal Plan</h3>
-                     <p className="meal-generation-subtitle">Our AI is analyzing your preferences and creating a personalized nutrition plan...</p>
-                     <div className="meal-generation-benefits">
-                       <div className="benefit-item">
-                         <i className="fas fa-clock"></i>
-                         <span>7-day comprehensive plan</span>
-                       </div>
-                       <div className="benefit-item">
-                         <i className="fas fa-calculator"></i>
-                         <span>Precise calorie calculations</span>
-                       </div>
-                       <div className="benefit-item">
-                         <i className="fas fa-heart"></i>
-                         <span>Balanced nutrition focus</span>
-                       </div>
-                     </div>
-                     <div className="meal-generation-progress">
-                       <div className="progress-bar">
-                         <div className="progress-fill"></div>
-                       </div>
-                       <span className="progress-text">Generating meal plan...</span>
-                     </div>
-                   </div>
-                 ) : noWorkoutPlan ? (
-                   // Show no workout plan animation
-                   <div className="no-workout-container">
-                     <div className="no-workout-animation">
-                       <div className="no-workout-icon">
-                         <i className="fas fa-heart"></i>
-                       </div>
-                       <div className="no-workout-pulse"></div>
-                       <div className="no-workout-pulse delay-1"></div>
-                       <div className="no-workout-pulse delay-2"></div>
-                     </div>
-                     <h3 className="no-workout-title">Focus on Nutrition</h3>
-                     <p className="no-workout-subtitle">You documented only meal plan, we recommend you do workout plan also for consistency</p>
-                     <div className="no-workout-benefits">
-                       <div className="benefit-item">
-                         <i className="fas fa-check-circle"></i>
-                         <span>Consistent meal timing</span>
-                       </div>
-                       <div className="benefit-item">
-                         <i className="fas fa-check-circle"></i>
-                         <span>Proper nutrition balance</span>
-                       </div>
-                       <div className="benefit-item">
-                         <i className="fas fa-check-circle"></i>
-                         <span>Healthy lifestyle foundation</span>
-                       </div>
-                     </div>
-                   </div>
-                 ) : (isStreamingWorkout || (workoutSections && workoutSections.length > 0)) ? (
-                   // Show workout days in order, streaming or completed
-                   <>
-                     {console.log('Workout plan display - isStreamingWorkout:', isStreamingWorkout, 'workoutSections.length:', workoutSections?.length, 'plansComplete:', plansComplete)}
-                     {workoutSections
-                       .filter(day => day.dayNumber) // Show any day that exists
-                       .sort((a, b) => a.dayNumber - b.dayNumber) // Sort by day number
-                       .map((dayData) => (
-                         <div key={`streaming-workout-day-${dayData.dayNumber}`} className="accordion-item generated">
-                           <div
-                             className="accordion-header"
-                             data-day={`day${dayData.dayNumber}`}
-                             onClick={() => toggleAccordion(`day${dayData.dayNumber}`, 'workout')}
-                             style={{ cursor: 'pointer' }}
-                           >
-                             <div className="day-header-content">
-                               <i className={`fas ${getWorkoutIcon(dayData.workoutType)} accordion-icon`}></i>
-                               <span style={{ fontSize: '18px', fontWeight: '600' }}>
-                                 Day {dayData.dayNumber}: {dayData.workoutType}
-                               </span>
-                         </div>
-                             <div className="day-header-right">
-                               <i
-                                 className="fas fa-chevron-right accordion-arrow"
-                                 style={{
-                                   transform: openWorkoutAccordion === `day${dayData.dayNumber}` ? 'rotate(90deg)' : 'rotate(0deg)'
-                                 }}
-                               ></i>
-                         </div>
-                       </div>
-                           <div
-                             className="accordion-content"
-                             style={{
-                               display: openWorkoutAccordion === `day${dayData.dayNumber}` ? 'block' : 'none',
-                               animation: openWorkoutAccordion === `day${dayData.dayNumber}` ? 'slideDown 0.3s ease forwards' : 'none',
-                               width: '100%',
-                               boxSizing: 'border-box'
-                             }}
-                           >
-                             {dayData.workoutType === 'Rest Day' ? (
-                               <p className="rest-day-message">Rest Day - No exercises scheduled</p>
-                             ) : (
-                               <ol className="numbered-list" start="1">
-                                 {dayData.exercises.map((exercise, exerciseIndex) => (
-                                   <li className="ai-coach-numbered-item" key={`exercise-${dayData.dayNumber}-${exerciseIndex}`}>
-                                     {exercise.description}
-                                   </li>
-                                 ))}
-                               </ol>
-                             )}
-                           </div>
-                         </div>
-                       ))}
-
-                     {/* Show loading effect below the last generated accordion */}
-                     {isStreamingWorkout && (
-                       <div className="generating-status">
-                         <div className="generating-indicator">
-                           <div className="generating-spinner"></div>
-                           <span className="generating-text">Generating Workout Plan...</span>
-                     </div>
-                   </div>
-                     )}
-                   </>
-                 ) : showWorkoutPlanChoice ? (
-                   <div className="locked-container">
-                     <div className="locked-card">
-                       <div className="locked-icon-container">
-                         <div className="locked-icon-background">
-                           <i className="fas fa-dumbbell locked-background-icon"></i>
-                         </div>
-                         <div className="locked-icon-foreground">
-                           <i className="fas fa-question-circle lock-icon"></i>
-                         </div>
-                       </div>
-                       <h3 className="locked-title">Workout Plan</h3>
-                       <p className="locked-subtitle">Waiting for your decision</p>
-                     </div>
-                   </div>
-                 ) : (
-                   // Show regular workout accordions when not streaming
-                   workoutSections.map((section, index) => (
-                  <div key={`workout-day-${section.dayNumber}`}>
-                    <div className="accordion-item">
-                    <div
-                      className="accordion-header"
-                      data-day={`day${section.dayNumber}`}
-                      onClick={() => toggleAccordion(`day${section.dayNumber}`, 'workout')}
-                    >
-                      <div className="day-header-content">
-                        <i className={`fas ${getWorkoutIcon(section.workoutType)} accordion-icon`}></i>
-                        <span style={{ fontSize: '18px', fontWeight: '600' }}>Day {section.dayNumber}: {section.workoutType}</span>
-                        {newlyCreatedDays.has(section.dayNumber) && (
-                          <span style={{
-                            marginLeft: '10px',
-                            fontSize: '12px',
-                            color: '#28a745',
-                            fontWeight: '500',
-                            backgroundColor: '#d4edda',
-                            padding: '2px 8px',
-                            borderRadius: '12px',
-                            border: '1px solid #c3e6cb'
-                          }}>
-                            <i className="fas fa-plus-circle" style={{ marginRight: '4px' }}></i>
-                            New
-                          </span>
-                        )}
-                        {isStreamingWorkout && section.exercises.length === 0 && !newlyCreatedDays.has(section.dayNumber) && (
-                          <span style={{
-                            marginLeft: '10px',
-                            fontSize: '14px',
-                            color: '#666',
-                            fontStyle: 'italic'
-                          }}>
-                            <i className="fas fa-spinner fa-spin" style={{ marginRight: '5px' }}></i>
-                            Generating exercises...
-                          </span>
-                        )}
+                  </>
+                ) : showWorkoutPlanChoice ? (
+                  <div className="locked-container">
+                    <div className="locked-card">
+                      <div className="locked-icon-container">
+                        <div className="locked-icon-background">
+                          <i className="fas fa-dumbbell locked-background-icon"></i>
+                        </div>
+                        <div className="locked-icon-foreground">
+                          <i className="fas fa-question-circle lock-icon"></i>
+                        </div>
                       </div>
-                      <div className="day-header-right">
-                        <i
-                          className="fas fa-chevron-right accordion-arrow"
-                          style={{
-                            transform: openWorkoutAccordion === `day${section.dayNumber}` ? 'rotate(90deg)' : 'rotate(0deg)'
-                          }}
-                        ></i>
-                      </div>
+                      <h3 className="locked-title">Workout Plan</h3>
+                      <p className="locked-subtitle">Waiting for your decision</p>
                     </div>
-                    <div
-                      className="accordion-content"
-                      style={{
-                        display: openWorkoutAccordion === `day${section.dayNumber}` ? 'block' : 'none',
-                        animation: openWorkoutAccordion === `day${section.dayNumber}` ? 'slideDown 0.3s ease forwards' : 'none',
-                        width: '100%',
-                        boxSizing: 'border-box'
-                      }}
-                    >
-                      {section.workoutType === 'Rest Day' ? (
-                        <p className="rest-day-message">Rest Day - No exercises scheduled</p>
-                      ) : (
-                        <div>
-                          <ol className="numbered-list" start="1">
-                            {section.exercises.map((exercise, exerciseIndex) => (
-                              <li className="ai-coach-numbered-item" key={`exercise-${section.dayNumber}-${exerciseIndex}`}>
-                                {exercise.description}
-                              </li>
-                            ))}
-                          </ol>
-                          {isStreamingWorkout && section.exercises.length === 0 && (
-                            <div style={{
-                              textAlign: 'center',
-                              padding: '20px',
-                              color: '#666',
-                              fontStyle: 'italic'
-                            }}>
-                              <i className="fas fa-spinner fa-spin" style={{ marginRight: '8px' }}></i>
-                              Generating exercises for this day...
+                  </div>
+                ) : (
+                  // Show regular workout accordions when not streaming
+                  workoutSections.map((section, index) => (
+                    <div key={`workout-day-${section.dayNumber}`}>
+                      <div className="accordion-item">
+                        <div
+                          className="accordion-header"
+                          data-day={`day${section.dayNumber}`}
+                          onClick={() => toggleAccordion(`day${section.dayNumber}`, 'workout')}
+                        >
+                          <div className="day-header-content">
+                            <i className={`fas ${getWorkoutIcon(section.workoutType)} accordion-icon`}></i>
+                            <span style={{ fontSize: '18px', fontWeight: '600' }}>Day {section.dayNumber}: {section.workoutType}</span>
+                            {newlyCreatedDays.has(section.dayNumber) && (
+                              <span style={{
+                                marginLeft: '10px',
+                                fontSize: '12px',
+                                color: '#28a745',
+                                fontWeight: '500',
+                                backgroundColor: '#d4edda',
+                                padding: '2px 8px',
+                                borderRadius: '12px',
+                                border: '1px solid #c3e6cb'
+                              }}>
+                                <i className="fas fa-plus-circle" style={{ marginRight: '4px' }}></i>
+                                New
+                              </span>
+                            )}
+                            {isStreamingWorkout && section.exercises.length === 0 && !newlyCreatedDays.has(section.dayNumber) && (
+                              <span style={{
+                                marginLeft: '10px',
+                                fontSize: '14px',
+                                color: '#666',
+                                fontStyle: 'italic'
+                              }}>
+                                <i className="fas fa-spinner fa-spin" style={{ marginRight: '5px' }}></i>
+                                Generating exercises...
+                              </span>
+                            )}
+                          </div>
+                          <div className="day-header-right">
+                            <i
+                              className="fas fa-chevron-right accordion-arrow"
+                              style={{
+                                transform: openWorkoutAccordion === `day${section.dayNumber}` ? 'rotate(90deg)' : 'rotate(0deg)'
+                              }}
+                            ></i>
+                          </div>
+                        </div>
+                        <div
+                          className="accordion-content"
+                          style={{
+                            display: openWorkoutAccordion === `day${section.dayNumber}` ? 'block' : 'none',
+                            animation: openWorkoutAccordion === `day${section.dayNumber}` ? 'slideDown 0.3s ease forwards' : 'none',
+                            width: '100%',
+                            boxSizing: 'border-box'
+                          }}
+                        >
+                          {section.workoutType === 'Rest Day' ? (
+                            <p className="rest-day-message">Rest Day - No exercises scheduled</p>
+                          ) : (
+                            <div>
+                              <ol className="numbered-list" start="1">
+                                {section.exercises.map((exercise, exerciseIndex) => (
+                                  <li className="ai-coach-numbered-item" key={`exercise-${section.dayNumber}-${exerciseIndex}`}>
+                                    {exercise.description}
+                                  </li>
+                                ))}
+                              </ol>
+                              {isStreamingWorkout && section.exercises.length === 0 && (
+                                <div style={{
+                                  textAlign: 'center',
+                                  padding: '20px',
+                                  color: '#666',
+                                  fontStyle: 'italic'
+                                }}>
+                                  <i className="fas fa-spinner fa-spin" style={{ marginRight: '8px' }}></i>
+                                  Generating exercises for this day...
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
-                      )}
+                      </div>
                     </div>
-                    </div>
-                  </div>
-                ))
-                 )}
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -7545,220 +7545,220 @@ const AIFitnessCoach = () => {
             console.log('DEBUG: endOfPlanSuggestion value:', endOfPlanSuggestion);
             return hasPlans && hasSuggestions;
           })() && (
-            <div className="suggestions-section" >
-              <div
-                className="suggestions-header accordion-header"
-                onClick={() => {
-                  setOpenSuggestionsAccordion(!openSuggestionsAccordion);
-                  setUserHasToggledAccordion(true);
-                }}
-                style={{
-                  cursor: 'pointer',
-                  userSelect: 'none',
-                  padding: '12px 16px',
-                  backgroundColor: openSuggestionsAccordion ? '#f8f9fa' : '#ffffff',
-                  borderBottom: openSuggestionsAccordion ? '1px solid #e9ecef' : 'none',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                <div className="suggestions-header-left" >
-                  <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>
-                    Personalized Suggestions
-                  </h2>
-                  <span style={{
-                    fontSize: '12px',
-                    color: '#6c757d',
-                    marginLeft: '8px',
-                    fontStyle: 'italic'
-                  }}>
-                    Click to {openSuggestionsAccordion ? 'hide' : 'show'}
-                  </span>
-                </div>
-                <i
-                  className="fas fa-chevron-right accordion-arrow"
-                  style={{
-                    transform: openSuggestionsAccordion ? 'rotate(90deg)' : 'rotate(0deg)',
-                    transition: 'transform 0.3s ease',
-                    fontSize: '14px',
-                    color: '#6c757d'
+              <div className="suggestions-section" >
+                <div
+                  className="suggestions-header accordion-header"
+                  onClick={() => {
+                    setOpenSuggestionsAccordion(!openSuggestionsAccordion);
+                    setUserHasToggledAccordion(true);
                   }}
-                ></i>
-              </div>
-              <div
-                className="suggestions-content accordion-content"
-                style={{
-                  display: openSuggestionsAccordion ? 'block' : 'none',
-                  maxHeight: openSuggestionsAccordion ? '1000px' : '0px',
-                  overflow: 'hidden',
-                  transition: 'max-height 0.3s ease, opacity 0.3s ease',
-                  opacity: openSuggestionsAccordion ? 1 : 0,
-                  padding: openSuggestionsAccordion ? '16px' : '0px'
-                }}
-                ref={(el) => {
-                  if (el) {
-                    console.log('DEBUG: Suggestions content element display style:', el.style.display);
-                    console.log('DEBUG: Suggestions content element computed display:', window.getComputedStyle(el).display);
-                    console.log('DEBUG: Suggestions content element height:', el.offsetHeight);
-                    console.log('DEBUG: Suggestions content element innerHTML length:', el.innerHTML.length);
-                  }
-                }}
-              >
-                {isLoadingSuggestions ? (
-                  <div className="suggestions-loading">
-                    <div className="loading-spinner"></div>
-                    <span className="loading-text">Generating personalized suggestions...</span>
+                  style={{
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    padding: '12px 16px',
+                    backgroundColor: openSuggestionsAccordion ? '#f8f9fa' : '#ffffff',
+                    borderBottom: openSuggestionsAccordion ? '1px solid #e9ecef' : 'none',
+                    transition: 'all 0.3s ease'
+                  }}
+                >
+                  <div className="suggestions-header-left" >
+                    <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '600' }}>
+                      Personalized Suggestions
+                    </h2>
+                    <span style={{
+                      fontSize: '12px',
+                      color: '#6c757d',
+                      marginLeft: '8px',
+                      fontStyle: 'italic'
+                    }}>
+                      Click to {openSuggestionsAccordion ? 'hide' : 'show'}
+                    </span>
                   </div>
-                ) : (
-                  <div className="suggestions-text">
-                    {(() => {
-                      // Show both meal and workout suggestions if both exist
-                      const hasMealSuggestion = endOfPlanSuggestion && endOfPlanSuggestion.trim() !== '';
-                      const hasWorkoutSuggestion = workoutPlanSuggestion && workoutPlanSuggestion.trim() !== '';
+                  <i
+                    className="fas fa-chevron-right accordion-arrow"
+                    style={{
+                      transform: openSuggestionsAccordion ? 'rotate(90deg)' : 'rotate(0deg)',
+                      transition: 'transform 0.3s ease',
+                      fontSize: '14px',
+                      color: '#6c757d'
+                    }}
+                  ></i>
+                </div>
+                <div
+                  className="suggestions-content accordion-content"
+                  style={{
+                    display: openSuggestionsAccordion ? 'block' : 'none',
+                    maxHeight: openSuggestionsAccordion ? '1000px' : '0px',
+                    overflow: 'hidden',
+                    transition: 'max-height 0.3s ease, opacity 0.3s ease',
+                    opacity: openSuggestionsAccordion ? 1 : 0,
+                    padding: openSuggestionsAccordion ? '16px' : '0px'
+                  }}
+                  ref={(el) => {
+                    if (el) {
+                      console.log('DEBUG: Suggestions content element display style:', el.style.display);
+                      console.log('DEBUG: Suggestions content element computed display:', window.getComputedStyle(el).display);
+                      console.log('DEBUG: Suggestions content element height:', el.offsetHeight);
+                      console.log('DEBUG: Suggestions content element innerHTML length:', el.innerHTML.length);
+                    }
+                  }}
+                >
+                  {isLoadingSuggestions ? (
+                    <div className="suggestions-loading">
+                      <div className="loading-spinner"></div>
+                      <span className="loading-text">Generating personalized suggestions...</span>
+                    </div>
+                  ) : (
+                    <div className="suggestions-text">
+                      {(() => {
+                        // Show both meal and workout suggestions if both exist
+                        const hasMealSuggestion = endOfPlanSuggestion && endOfPlanSuggestion.trim() !== '';
+                        const hasWorkoutSuggestion = workoutPlanSuggestion && workoutPlanSuggestion.trim() !== '';
 
-                      console.log('DEBUG: Suggestions content rendering - hasMealSuggestion:', hasMealSuggestion, 'hasWorkoutSuggestion:', hasWorkoutSuggestion);
-                      console.log('DEBUG: Suggestions content rendering - endOfPlanSuggestion:', endOfPlanSuggestion);
-                      console.log('DEBUG: Suggestions content rendering - workoutPlanSuggestion:', workoutPlanSuggestion);
-                      console.log('DEBUG: Suggestions content rendering - personalizedSuggestions:', personalizedSuggestions);
-                      console.log('DEBUG: Suggestions content rendering - isLoadingSuggestions:', isLoadingSuggestions);
+                        console.log('DEBUG: Suggestions content rendering - hasMealSuggestion:', hasMealSuggestion, 'hasWorkoutSuggestion:', hasWorkoutSuggestion);
+                        console.log('DEBUG: Suggestions content rendering - endOfPlanSuggestion:', endOfPlanSuggestion);
+                        console.log('DEBUG: Suggestions content rendering - workoutPlanSuggestion:', workoutPlanSuggestion);
+                        console.log('DEBUG: Suggestions content rendering - personalizedSuggestions:', personalizedSuggestions);
+                        console.log('DEBUG: Suggestions content rendering - isLoadingSuggestions:', isLoadingSuggestions);
 
-                      const suggestions = [];
+                        const suggestions = [];
 
-                      // Add meal plan suggestion if it exists
-                      if (hasMealSuggestion) {
-                        suggestions.push(
-                          <div key="meal-suggestion" className="explanation-section meal-explanation">
-                            <div className="explanation-header">
-                              <i className="fas fa-utensils explanation-icon"></i>
-                              <h3>Meal Plan Focus</h3>
-                            </div>
-                            <p className="explanation-text">{endOfPlanSuggestion}</p>
-                          </div>
-                        );
-                      }
-
-                      // Add workout plan suggestion if it exists
-                      if (hasWorkoutSuggestion) {
-                        suggestions.push(
-                          <div key="workout-suggestion" className="explanation-section workout-explanation">
-                            <div className="explanation-header">
-                              <i className="fas fa-dumbbell explanation-icon"></i>
-                              <h3>Workout Plan Focus</h3>
-                            </div>
-                            <p className="explanation-text">{workoutPlanSuggestion}</p>
-                          </div>
-                        );
-                      }
-
-                      // Fallback to old logic if no specific suggestions
-                      if (suggestions.length === 0) {
-                        const suggestionsToShow = personalizedSuggestions || 'Follow this plan consistently to achieve your desired results.';
-                        const renderedContent = suggestionsToShow.split('\n').map((line, index) => {
-                      const trimmedLine = line.trim();
-
-                      // Handle meal plan explanation - only show if meal plan exists
-                      if (trimmedLine.startsWith('MEAL PLAN EXPLANATION:') && mealPlansByDay && mealPlansByDay.length > 0) {
-                        const explanation = trimmedLine.replace('MEAL PLAN EXPLANATION:', '').trim();
-                        return (
-                          <div key={index} className="explanation-section meal-explanation">
-                            <div className="explanation-header">
-                              <i className="fas fa-utensils explanation-icon"></i>
-                              <h3>Meal Plan Focus</h3>
-                            </div>
-                            <p className="explanation-text">{explanation}</p>
-                          </div>
-                        );
-                      }
-
-                      // Handle workout plan explanation - only show if workout plan exists
-                      if (trimmedLine.startsWith('WORKOUT PLAN EXPLANATION:') && workoutSections && workoutSections.length > 0 && !noWorkoutPlan) {
-                        const explanation = trimmedLine.replace('WORKOUT PLAN EXPLANATION:', '').trim();
-                        return (
-                          <div key={index} className="explanation-section workout-explanation">
-                            <div className="explanation-header">
-                              <i className="fas fa-dumbbell explanation-icon"></i>
-                              <h3>Workout Plan Focus</h3>
-                            </div>
-                            <p className="explanation-text">{explanation}</p>
-                          </div>
-                        );
-                      }
-
-                      // Handle recommendation section
-                      if (trimmedLine.startsWith('RECOMMENDATION:')) {
-                        const explanation = trimmedLine.replace('RECOMMENDATION:', '').trim();
-                        return (
-                          <div key={index} className="explanation-section recommendation-explanation">
-                            <div className="explanation-header">
-                              <i className="fas fa-lightbulb explanation-icon"></i>
-                              <h3>Recommendation</h3>
-                            </div>
-                            <p className="explanation-text">{explanation}</p>
-                          </div>
-                        );
-                      }
-
-                      // Handle suggestions
-                      if (trimmedLine.includes('•')) {
-                        return (
-                          <div key={index} className="suggestion-item">
-                            <i className="fas fa-star suggestion-bullet"></i>
-                            <span className="suggestion-content">{trimmedLine.replace('•', '').trim()}</span>
-                          </div>
-                        );
-                      }
-
-                      // Handle section headers
-                      if (trimmedLine === 'PERSONALIZED SUGGESTIONS:') {
-                        return (
-                          <div key={index} className="suggestions-section-header">
-                            <i className="fas fa-lightbulb section-icon"></i>
-                            <h3>Personalized Suggestions</h3>
-                          </div>
-                        );
-                      }
-
-                      // Handle regular text (fallback for any other content)
-                      if (trimmedLine && trimmedLine.length > 0) {
-                        // Check if this is a meal plan suggestion (no workout plan exists)
-                        const isMealPlanOnly = !workoutSections || workoutSections.length === 0 || noWorkoutPlan;
-
-                        if (isMealPlanOnly) {
-                          // Show as meal plan focus
-                          return (
-                            <div key={index} className="explanation-section meal-explanation">
+                        // Add meal plan suggestion if it exists
+                        if (hasMealSuggestion) {
+                          suggestions.push(
+                            <div key="meal-suggestion" className="explanation-section meal-explanation">
                               <div className="explanation-header">
                                 <i className="fas fa-utensils explanation-icon"></i>
                                 <h3>Meal Plan Focus</h3>
                               </div>
-                              <p className="explanation-text">{trimmedLine}</p>
+                              <p className="explanation-text">{endOfPlanSuggestion}</p>
                             </div>
                           );
-                        } else {
-                          // Show as general suggestion
-                          return (
-                            <p key={index} className="suggestion-text">
-                              {trimmedLine}
-                            </p>
+                        }
+
+                        // Add workout plan suggestion if it exists
+                        if (hasWorkoutSuggestion) {
+                          suggestions.push(
+                            <div key="workout-suggestion" className="explanation-section workout-explanation">
+                              <div className="explanation-header">
+                                <i className="fas fa-dumbbell explanation-icon"></i>
+                                <h3>Workout Plan Focus</h3>
+                              </div>
+                              <p className="explanation-text">{workoutPlanSuggestion}</p>
+                            </div>
                           );
                         }
-                      }
 
-                      return null;
-                    });
-                        console.log('DEBUG: Rendered content length:', renderedContent.length);
-                        console.log('DEBUG: Rendered content:', renderedContent);
-                        return renderedContent;
-                      }
+                        // Fallback to old logic if no specific suggestions
+                        if (suggestions.length === 0) {
+                          const suggestionsToShow = personalizedSuggestions || 'Follow this plan consistently to achieve your desired results.';
+                          const renderedContent = suggestionsToShow.split('\n').map((line, index) => {
+                            const trimmedLine = line.trim();
 
-                      // Return the structured suggestions
-                      console.log('DEBUG: Returning structured suggestions:', suggestions.length);
-                      return suggestions;
-                    })()}
-                  </div>
-                )}
+                            // Handle meal plan explanation - only show if meal plan exists
+                            if (trimmedLine.startsWith('MEAL PLAN EXPLANATION:') && mealPlansByDay && mealPlansByDay.length > 0) {
+                              const explanation = trimmedLine.replace('MEAL PLAN EXPLANATION:', '').trim();
+                              return (
+                                <div key={index} className="explanation-section meal-explanation">
+                                  <div className="explanation-header">
+                                    <i className="fas fa-utensils explanation-icon"></i>
+                                    <h3>Meal Plan Focus</h3>
+                                  </div>
+                                  <p className="explanation-text">{explanation}</p>
+                                </div>
+                              );
+                            }
+
+                            // Handle workout plan explanation - only show if workout plan exists
+                            if (trimmedLine.startsWith('WORKOUT PLAN EXPLANATION:') && workoutSections && workoutSections.length > 0 && !noWorkoutPlan) {
+                              const explanation = trimmedLine.replace('WORKOUT PLAN EXPLANATION:', '').trim();
+                              return (
+                                <div key={index} className="explanation-section workout-explanation">
+                                  <div className="explanation-header">
+                                    <i className="fas fa-dumbbell explanation-icon"></i>
+                                    <h3>Workout Plan Focus</h3>
+                                  </div>
+                                  <p className="explanation-text">{explanation}</p>
+                                </div>
+                              );
+                            }
+
+                            // Handle recommendation section
+                            if (trimmedLine.startsWith('RECOMMENDATION:')) {
+                              const explanation = trimmedLine.replace('RECOMMENDATION:', '').trim();
+                              return (
+                                <div key={index} className="explanation-section recommendation-explanation">
+                                  <div className="explanation-header">
+                                    <i className="fas fa-lightbulb explanation-icon"></i>
+                                    <h3>Recommendation</h3>
+                                  </div>
+                                  <p className="explanation-text">{explanation}</p>
+                                </div>
+                              );
+                            }
+
+                            // Handle suggestions
+                            if (trimmedLine.includes('•')) {
+                              return (
+                                <div key={index} className="suggestion-item">
+                                  <i className="fas fa-star suggestion-bullet"></i>
+                                  <span className="suggestion-content">{trimmedLine.replace('•', '').trim()}</span>
+                                </div>
+                              );
+                            }
+
+                            // Handle section headers
+                            if (trimmedLine === 'PERSONALIZED SUGGESTIONS:') {
+                              return (
+                                <div key={index} className="suggestions-section-header">
+                                  <i className="fas fa-lightbulb section-icon"></i>
+                                  <h3>Personalized Suggestions</h3>
+                                </div>
+                              );
+                            }
+
+                            // Handle regular text (fallback for any other content)
+                            if (trimmedLine && trimmedLine.length > 0) {
+                              // Check if this is a meal plan suggestion (no workout plan exists)
+                              const isMealPlanOnly = !workoutSections || workoutSections.length === 0 || noWorkoutPlan;
+
+                              if (isMealPlanOnly) {
+                                // Show as meal plan focus
+                                return (
+                                  <div key={index} className="explanation-section meal-explanation">
+                                    <div className="explanation-header">
+                                      <i className="fas fa-utensils explanation-icon"></i>
+                                      <h3>Meal Plan Focus</h3>
+                                    </div>
+                                    <p className="explanation-text">{trimmedLine}</p>
+                                  </div>
+                                );
+                              } else {
+                                // Show as general suggestion
+                                return (
+                                  <p key={index} className="suggestion-text">
+                                    {trimmedLine}
+                                  </p>
+                                );
+                              }
+                            }
+
+                            return null;
+                          });
+                          console.log('DEBUG: Rendered content length:', renderedContent.length);
+                          console.log('DEBUG: Rendered content:', renderedContent);
+                          return renderedContent;
+                        }
+
+                        // Return the structured suggestions
+                        console.log('DEBUG: Returning structured suggestions:', suggestions.length);
+                        return suggestions;
+                      })()}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
       )}
 
@@ -7792,8 +7792,8 @@ const AIFitnessCoach = () => {
                 className="popup-button save"
                 onClick={handleUpdateProfile}
                 style={{
-                  backgroundColor:'#BCCE32',
-                  color:'black',
+                  backgroundColor: '#BCCE32',
+                  color: 'black',
                 }}
               >
                 {useExistingProfile ? 'Update Profile' : 'Save Profile'}
@@ -7982,7 +7982,7 @@ const AIFitnessCoach = () => {
           zIndex: 10000
         }}>
           <div className="popup-content" style={{
-              backgroundColor: 'white',
+            backgroundColor: 'white',
             padding: window.innerWidth < 768 ? '20px' : '40px',
             borderRadius: '20px',
             maxWidth: '600px',
@@ -8037,7 +8037,7 @@ const AIFitnessCoach = () => {
           zIndex: 10000
         }}>
           <div className="popup-content" style={{
-           backgroundColor: 'white',
+            backgroundColor: 'white',
             padding: window.innerWidth < 768 ? '20px' : '32px',
             borderRadius: '16px',
             maxWidth: '600px',
@@ -8068,33 +8068,33 @@ const AIFitnessCoach = () => {
                   <input
                     type="number"
                     id="profileAge"
-                     min="13"
-                     max="120"
+                    min="13"
+                    max="120"
                     required
                     value={profileFormData.age}
-                     onChange={(e) => {
-                       const newAge = e.target.value;
-                       const newFormData = {...profileFormData, age: newAge};
-                       setProfileFormData(newFormData);
-                       validateProfileAge(newAge);
-                     }}
-                     onBlur={(e) => {
-                       validateProfileAge(e.target.value);
-                     }}
-                     style={{
-                       border: profileAgeError ? '1px solid #ef4444' : '1px solid #d1d5db'
-                     }}
-                   />
-                   {profileAgeError && (
-                     <div style={{
-                       color: '#ef4444',
-                       fontSize: '12px',
-                       marginTop: '4px',
-                       fontWeight: '500'
-                     }}>
-                       {profileAgeError}
-                     </div>
-                   )}
+                    onChange={(e) => {
+                      const newAge = e.target.value;
+                      const newFormData = { ...profileFormData, age: newAge };
+                      setProfileFormData(newFormData);
+                      validateProfileAge(newAge);
+                    }}
+                    onBlur={(e) => {
+                      validateProfileAge(e.target.value);
+                    }}
+                    style={{
+                      border: profileAgeError ? '1px solid #ef4444' : '1px solid #d1d5db'
+                    }}
+                  />
+                  {profileAgeError && (
+                    <div style={{
+                      color: '#ef4444',
+                      fontSize: '12px',
+                      marginTop: '4px',
+                      fontWeight: '500'
+                    }}>
+                      {profileAgeError}
+                    </div>
+                  )}
                 </div>
                 <div className="form-group">
                   <label htmlFor="profileGender">Gender <span className="required-asterisk">*</span></label>
@@ -8102,7 +8102,7 @@ const AIFitnessCoach = () => {
                     id="profileGender"
                     required
                     value={profileFormData.gender}
-                    onChange={(e) => setProfileFormData({...profileFormData, gender: e.target.value})}
+                    onChange={(e) => setProfileFormData({ ...profileFormData, gender: e.target.value })}
                   >
                     <option value="">Select gender</option>
                     <option value="male">Male</option>
@@ -8121,90 +8121,90 @@ const AIFitnessCoach = () => {
                 <div className="form-group">
                   <label htmlFor="profileHeight">Height <span className="required-asterisk">*</span></label>
                   <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
-                  <input
-                    type="number"
-                    id="profileHeight"
-                     min={profileFormData.heightUnit === 'ft' ? '3' : '90'}
-                    max={profileFormData.heightUnit === 'ft' ? '8' : '250'}
-                    step={profileFormData.heightUnit === 'ft' ? '0.01' : '1'}
-                    required
-                    value={profileFormData.height}
-                    onChange={(e) => {
-                       const newHeight = e.target.value;
-                       const newFormData = {...profileFormData, height: newHeight};
-                       setProfileFormData(newFormData);
-                       validateProfileHeight(newHeight, newFormData.heightUnit);
-                     }}
-                     onBlur={(e) => {
-                       validateProfileHeight(e.target.value, profileFormData.heightUnit);
-                    }}
-                    placeholder="Enter height"
-                    style={{
-                       flex: '1 1 65%',
-                      padding: '12px 16px',
-                       border: profileHeightError ? '1px solid #ef4444' : '1px solid #d1d5db',
-                      borderRadius: '8px',
-                      fontSize: '16px',
-                      color: '#374151',
-                      background: '#ffffff',
-                      transition: 'all 0.2s ease',
-                      boxSizing: 'border-box',
-                       width: '65%'
-                    }}
-                  />
-                  <select
-                    value={profileFormData.heightUnit || 'cm'}
-                    onChange={(e) => {
-                      const newUnit = e.target.value;
-                      const newFormData = {...profileFormData, heightUnit: newUnit};
-                      setProfileFormData(newFormData);
-                      validateProfileHeight(newFormData.height, newUnit);
-                    }}
-                    style={{
-                      flex: '0 0 35%',
-                      padding: '12px 16px',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '8px',
-                      fontSize: '16px',
-                      color: '#374151',
-                      background: '#ffffff',
-                      transition: 'all 0.2s ease',
-                      boxSizing: 'border-box',
-                      width: '35%',
-                      fontWeight: '500',
-                      textAlign: 'left',
-                      minWidth: '60px'
-                    }}
-                  >
-                    <option value="cm">cm</option>
-                    <option value="ft">ft</option>
-                  </select>
-                </div>
-                {profileHeightError && (
-                  <div style={{
-                    color: '#ef4444',
-                    fontSize: '12px',
-                    marginTop: '4px',
-                    fontWeight: '500'
-                  }}>
-                    {profileHeightError}
+                    <input
+                      type="number"
+                      id="profileHeight"
+                      min={profileFormData.heightUnit === 'ft' ? '3' : '90'}
+                      max={profileFormData.heightUnit === 'ft' ? '8' : '250'}
+                      step={profileFormData.heightUnit === 'ft' ? '0.01' : '1'}
+                      required
+                      value={profileFormData.height}
+                      onChange={(e) => {
+                        const newHeight = e.target.value;
+                        const newFormData = { ...profileFormData, height: newHeight };
+                        setProfileFormData(newFormData);
+                        validateProfileHeight(newHeight, newFormData.heightUnit);
+                      }}
+                      onBlur={(e) => {
+                        validateProfileHeight(e.target.value, profileFormData.heightUnit);
+                      }}
+                      placeholder="Enter height"
+                      style={{
+                        flex: '1 1 65%',
+                        padding: '12px 16px',
+                        border: profileHeightError ? '1px solid #ef4444' : '1px solid #d1d5db',
+                        borderRadius: '8px',
+                        fontSize: '16px',
+                        color: '#374151',
+                        background: '#ffffff',
+                        transition: 'all 0.2s ease',
+                        boxSizing: 'border-box',
+                        width: '65%'
+                      }}
+                    />
+                    <select
+                      value={profileFormData.heightUnit || 'cm'}
+                      onChange={(e) => {
+                        const newUnit = e.target.value;
+                        const newFormData = { ...profileFormData, heightUnit: newUnit };
+                        setProfileFormData(newFormData);
+                        validateProfileHeight(newFormData.height, newUnit);
+                      }}
+                      style={{
+                        flex: '0 0 35%',
+                        padding: '12px 16px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '8px',
+                        fontSize: '16px',
+                        color: '#374151',
+                        background: '#ffffff',
+                        transition: 'all 0.2s ease',
+                        boxSizing: 'border-box',
+                        width: '35%',
+                        fontWeight: '500',
+                        textAlign: 'left',
+                        minWidth: '60px'
+                      }}
+                    >
+                      <option value="cm">cm</option>
+                      <option value="ft">ft</option>
+                    </select>
                   </div>
-                )}
+                  {profileHeightError && (
+                    <div style={{
+                      color: '#ef4444',
+                      fontSize: '12px',
+                      marginTop: '4px',
+                      fontWeight: '500'
+                    }}>
+                      {profileHeightError}
+                    </div>
+                  )}
                 </div>
                 <div className="form-group">
                   <label htmlFor="profileCurrentWeight">Current Weight <span className="required-asterisk">*</span></label>
                   <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
-                  <input
-                    type="number"
-                    id="profileCurrentWeight"
-                    min="30"
-                    max="650"
-                    step="0.1"
-                    required
-                    value={profileFormData.currentWeight}
+                    <input
+                      type="number"
+                      id="profileCurrentWeight"
+                      min="30"
+                      max="650"
+                      step="0.1"
+                      required
+                      value={profileFormData.currentWeight}
                       onChange={(e) => {
                         const newWeight = e.target.value;
-                        const newFormData = {...profileFormData, currentWeight: newWeight};
+                        const newFormData = { ...profileFormData, currentWeight: newWeight };
                         setProfileFormData(newFormData);
                         validateProfileCurrentWeight(newWeight, newFormData.currentWeightUnit);
                         validateProfileWeights(newWeight, newFormData.targetWeight, newFormData.currentWeightUnit, newFormData.targetWeightUnit);
@@ -8230,7 +8230,7 @@ const AIFitnessCoach = () => {
                       value={profileFormData.currentWeightUnit || 'kg'}
                       onChange={(e) => {
                         const newUnit = e.target.value;
-                        const newFormData = {...profileFormData, currentWeightUnit: newUnit};
+                        const newFormData = { ...profileFormData, currentWeightUnit: newUnit };
                         setProfileFormData(newFormData);
                         validateProfileCurrentWeight(newFormData.currentWeight, newUnit);
                         validateProfileWeights(newFormData.currentWeight, newFormData.targetWeight, newUnit, newFormData.targetWeightUnit);
@@ -8267,168 +8267,168 @@ const AIFitnessCoach = () => {
                 </div>
               </div>
 
-                             <div className="form-row" style={{
+              <div className="form-row" style={{
                 display: 'grid',
                 gridTemplateColumns: window.innerWidth < 768 ? '1fr' : '1fr 1fr',
                 gap: '16px',
                 marginBottom: '20px'
               }}>
-                 <div className="form-group">
-                   <label htmlFor="profileTargetWeight">Target Weight <span className="required-asterisk">*</span></label>
-                   <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
-                   <input
-                     type="number"
-                     id="profileTargetWeight"
-                     min="30"
-                     max="650"
-                     step="0.1"
-                     required
-                     value={profileFormData.targetWeight}
-                     onChange={(e) => {
-                       const newWeight = e.target.value;
-                       const newFormData = {...profileFormData, targetWeight: newWeight};
-                       setProfileFormData(newFormData);
-                       validateProfileTargetWeight(newWeight, newFormData.targetWeightUnit);
-                       validateProfileWeights(newFormData.currentWeight, newWeight, newFormData.currentWeightUnit, newFormData.targetWeightUnit);
-                     }}
-                     onBlur={(e) => {
-                       validateProfileTargetWeight(e.target.value, profileFormData.targetWeightUnit);
-                       validateProfileWeights(profileFormData.currentWeight, e.target.value, profileFormData.currentWeightUnit, profileFormData.targetWeightUnit);
-                     }}
-                     placeholder="Enter target weight"
-                     style={{
-                       flex: '1 1 65%',
-                       padding: '12px 16px',
-                       border: profileTargetWeightError ? '1px solid #ef4444' : '1px solid #d1d5db',
-                       borderRadius: '8px',
-                       fontSize: '16px',
-                       color: '#374151',
-                       background: '#ffffff',
-                       transition: 'all 0.2s ease',
-                       boxSizing: 'border-box',
-                       width: '65%'
-                     }}
-                   />
-                   <select
-                     value={profileFormData.targetWeightUnit || 'kg'}
-                     onChange={(e) => {
-                       const newUnit = e.target.value;
-                       const newFormData = {...profileFormData, targetWeightUnit: newUnit};
-                       setProfileFormData(newFormData);
-                       validateProfileTargetWeight(newFormData.targetWeight, newUnit);
-                       validateProfileWeights(newFormData.currentWeight, newFormData.targetWeight, newFormData.currentWeightUnit, newUnit);
-                     }}
-                     style={{
-                       flex: '0 0 35%',
-                       padding: '12px 16px',
-                       border: '1px solid #d1d5db',
-                       borderRadius: '8px',
-                       fontSize: '16px',
-                       color: '#374151',
-                       background: '#ffffff',
-                       transition: 'all 0.2s ease',
-                       boxSizing: 'border-box',
-                       width: '35%',
-                       fontWeight: '500',
-                       textAlign: 'left',
-                       minWidth: '60px'
-                     }}
-                   >
-                     <option value="kg">kg</option>
-                     <option value="lbs">lbs</option>
-                   </select>
-                 </div>
-                   {profileTargetWeightError && (
-                     <div style={{
-                       color: '#ef4444',
-                       fontSize: '12px',
-                       marginTop: '4px',
-                       fontWeight: '500'
-                     }}>
-                       {profileTargetWeightError}
-                     </div>
-                   )}
-                   {profileWeightError && (
-                     <div style={{
-                       color: '#ef4444',
-                       fontSize: '14px',
-                       marginTop: '8px',
-                       fontWeight: '500'
-                     }}>
-                       {profileWeightError}
-                     </div>
-                   )}
-                 </div>
-                 <div className="form-group">
-                   <label htmlFor="profileActivityLevel">Activity Level <span className="required-asterisk">*</span></label>
-                   <select
-                     id="profileActivityLevel"
-                     required
-                     value={profileFormData.activityLevel}
-                     onChange={(e) => setProfileFormData({...profileFormData, activityLevel: e.target.value})}
-                   >
-                     <option value="">Select activity level</option>
-                     <option value="sedentary">Sedentary (little or no exercise)</option>
-                     <option value="light">Lightly active (light exercise 1-3 days/week)</option>
-                     <option value="moderate">Moderately active (moderate exercise 3-5 days/week)</option>
-                     <option value="active">Very active (hard exercise 6-7 days/week)</option>
-                     <option value="very-active">Extra active (very hard exercise & physical job)</option>
-                   </select>
-                 </div>
-               </div>
+                <div className="form-group">
+                  <label htmlFor="profileTargetWeight">Target Weight <span className="required-asterisk">*</span></label>
+                  <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+                    <input
+                      type="number"
+                      id="profileTargetWeight"
+                      min="30"
+                      max="650"
+                      step="0.1"
+                      required
+                      value={profileFormData.targetWeight}
+                      onChange={(e) => {
+                        const newWeight = e.target.value;
+                        const newFormData = { ...profileFormData, targetWeight: newWeight };
+                        setProfileFormData(newFormData);
+                        validateProfileTargetWeight(newWeight, newFormData.targetWeightUnit);
+                        validateProfileWeights(newFormData.currentWeight, newWeight, newFormData.currentWeightUnit, newFormData.targetWeightUnit);
+                      }}
+                      onBlur={(e) => {
+                        validateProfileTargetWeight(e.target.value, profileFormData.targetWeightUnit);
+                        validateProfileWeights(profileFormData.currentWeight, e.target.value, profileFormData.currentWeightUnit, profileFormData.targetWeightUnit);
+                      }}
+                      placeholder="Enter target weight"
+                      style={{
+                        flex: '1 1 65%',
+                        padding: '12px 16px',
+                        border: profileTargetWeightError ? '1px solid #ef4444' : '1px solid #d1d5db',
+                        borderRadius: '8px',
+                        fontSize: '16px',
+                        color: '#374151',
+                        background: '#ffffff',
+                        transition: 'all 0.2s ease',
+                        boxSizing: 'border-box',
+                        width: '65%'
+                      }}
+                    />
+                    <select
+                      value={profileFormData.targetWeightUnit || 'kg'}
+                      onChange={(e) => {
+                        const newUnit = e.target.value;
+                        const newFormData = { ...profileFormData, targetWeightUnit: newUnit };
+                        setProfileFormData(newFormData);
+                        validateProfileTargetWeight(newFormData.targetWeight, newUnit);
+                        validateProfileWeights(newFormData.currentWeight, newFormData.targetWeight, newFormData.currentWeightUnit, newUnit);
+                      }}
+                      style={{
+                        flex: '0 0 35%',
+                        padding: '12px 16px',
+                        border: '1px solid #d1d5db',
+                        borderRadius: '8px',
+                        fontSize: '16px',
+                        color: '#374151',
+                        background: '#ffffff',
+                        transition: 'all 0.2s ease',
+                        boxSizing: 'border-box',
+                        width: '35%',
+                        fontWeight: '500',
+                        textAlign: 'left',
+                        minWidth: '60px'
+                      }}
+                    >
+                      <option value="kg">kg</option>
+                      <option value="lbs">lbs</option>
+                    </select>
+                  </div>
+                  {profileTargetWeightError && (
+                    <div style={{
+                      color: '#ef4444',
+                      fontSize: '12px',
+                      marginTop: '4px',
+                      fontWeight: '500'
+                    }}>
+                      {profileTargetWeightError}
+                    </div>
+                  )}
+                  {profileWeightError && (
+                    <div style={{
+                      color: '#ef4444',
+                      fontSize: '14px',
+                      marginTop: '8px',
+                      fontWeight: '500'
+                    }}>
+                      {profileWeightError}
+                    </div>
+                  )}
+                </div>
+                <div className="form-group">
+                  <label htmlFor="profileActivityLevel">Activity Level <span className="required-asterisk">*</span></label>
+                  <select
+                    id="profileActivityLevel"
+                    required
+                    value={profileFormData.activityLevel}
+                    onChange={(e) => setProfileFormData({ ...profileFormData, activityLevel: e.target.value })}
+                  >
+                    <option value="">Select activity level</option>
+                    <option value="sedentary">Sedentary (little or no exercise)</option>
+                    <option value="light">Lightly active (light exercise 1-3 days/week)</option>
+                    <option value="moderate">Moderately active (moderate exercise 3-5 days/week)</option>
+                    <option value="active">Very active (hard exercise 6-7 days/week)</option>
+                    <option value="very-active">Extra active (very hard exercise & physical job)</option>
+                  </select>
+                </div>
+              </div>
 
-               <div className="form-row">
-                 <div className="form-group">
-                   <label htmlFor="profileWorkoutDays">Workout Days Per Week <span className="required-asterisk">*</span></label>
-                   <select
-                     id="profileWorkoutDays"
-                     required
-                     value={profileFormData.workoutDays}
-                     onChange={(e) => setProfileFormData({...profileFormData, workoutDays: e.target.value})}
-                   >
-                     <option value="1">1 day per week</option>
-                     <option value="2">2 days per week</option>
-                     <option value="3">3 days per week</option>
-                     <option value="4">4 days per week</option>
-                     <option value="5">5 days per week</option>
-                     <option value="6">6 days per week</option>
-                     <option value="7">7 days per week</option>
-                   </select>
-                 </div>
-                 <div className="form-group">
-                   <label htmlFor="profileTimeline">Target Timeline (months) <span className="required-asterisk">*</span></label>
-                   <input
-                     type="range"
-                     id="profileTimeline"
-                     min="1"
-                     max="12"
-                     step="1"
-                     required
-                     value={profileFormData.targetTimeline}
-                     onChange={(e) => setProfileFormData({...profileFormData, targetTimeline: e.target.value})}
-                     style={{
-                       width: '100%',
-                       padding: '8px 0',
-                       background: 'transparent',
-                       outline: 'none',
-                       marginBottom: '8px'
-                     }}
-                   />
-                   <div style={{
-                     fontSize: '14px',
-                     color: '#6b7280',
-                     fontWeight: '500',
-                     textAlign: 'center',
-                     padding: '4px 8px',
-                     background: '#f3f4f6',
-                     borderRadius: '6px',
-                     border: '1px solid #e5e7eb',
-                     marginTop: '8px'
-                   }}>
-                     {profileFormData.targetTimeline} months
-                   </div>
-                 </div>
-               </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="profileWorkoutDays">Workout Days Per Week <span className="required-asterisk">*</span></label>
+                  <select
+                    id="profileWorkoutDays"
+                    required
+                    value={profileFormData.workoutDays}
+                    onChange={(e) => setProfileFormData({ ...profileFormData, workoutDays: e.target.value })}
+                  >
+                    <option value="1">1 day per week</option>
+                    <option value="2">2 days per week</option>
+                    <option value="3">3 days per week</option>
+                    <option value="4">4 days per week</option>
+                    <option value="5">5 days per week</option>
+                    <option value="6">6 days per week</option>
+                    <option value="7">7 days per week</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="profileTimeline">Target Timeline (months) <span className="required-asterisk">*</span></label>
+                  <input
+                    type="range"
+                    id="profileTimeline"
+                    min="1"
+                    max="12"
+                    step="1"
+                    required
+                    value={profileFormData.targetTimeline}
+                    onChange={(e) => setProfileFormData({ ...profileFormData, targetTimeline: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '8px 0',
+                      background: 'transparent',
+                      outline: 'none',
+                      marginBottom: '8px'
+                    }}
+                  />
+                  <div style={{
+                    fontSize: '14px',
+                    color: '#6b7280',
+                    fontWeight: '500',
+                    textAlign: 'center',
+                    padding: '4px 8px',
+                    background: '#f3f4f6',
+                    borderRadius: '6px',
+                    border: '1px solid #e5e7eb',
+                    marginTop: '8px'
+                  }}>
+                    {profileFormData.targetTimeline} months
+                  </div>
+                </div>
+              </div>
 
               <div className="form-group">
                 <label htmlFor="profileGoal">Goal</label>
@@ -8436,7 +8436,7 @@ const AIFitnessCoach = () => {
                   type="text"
                   id="profileGoal"
                   value={profileFormData.goal}
-                  onChange={(e) => setProfileFormData({...profileFormData, goal: e.target.value})}
+                  onChange={(e) => setProfileFormData({ ...profileFormData, goal: e.target.value })}
                   placeholder="Your fitness goal"
                 />
               </div>
@@ -8446,15 +8446,15 @@ const AIFitnessCoach = () => {
                   type="button"
                   onClick={() => setShowProfileForm(false)}
                   style={{
-                      padding: '10px 24px',
-                      borderRadius: '8px',
+                    padding: '10px 24px',
+                    borderRadius: '8px',
                     backgroundColor: '#e8e8e8',
                     color: '#666',
                     border: 'none',
-                      fontSize: '14px',
+                    fontSize: '14px',
                     fontWeight: '500',
-                      cursor: 'pointer',
-                      minWidth: '80px'
+                    cursor: 'pointer',
+                    minWidth: '80px'
                   }}
                 >
                   Cancel
@@ -8462,15 +8462,15 @@ const AIFitnessCoach = () => {
                 <button
                   type="submit"
                   style={{
-                      padding: '10px 24px',
+                    padding: '10px 24px',
                     border: 'none',
-                      borderRadius: '8px',
+                    borderRadius: '8px',
                     backgroundColor: '#BCCE32',
                     color: 'black',
-                      fontSize: '14px',
+                    fontSize: '14px',
                     fontWeight: '500',
-                      cursor: 'pointer',
-                      minWidth: '120px'
+                    cursor: 'pointer',
+                    minWidth: '120px'
                   }}
                 >
                   Calculate Calories
