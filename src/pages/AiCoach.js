@@ -2513,7 +2513,7 @@ const AIFitnessCoach = () => {
             heightUnit: userData.heightUnit || 'cm',
             currentWeight: userData.weight || '',
             currentWeightUnit: userData.weightUnit || 'kg',
-            targetWeight: userData.weight || '', // Default to current weight
+            targetWeight: userData.targetWeight || userData.weight || '', // Use target weight if available
             targetWeightUnit: userData.targetWeightUnit || userData.weightUnit || 'kg',
             activityLevel: userData.activityLevel || '',
             targetTimeline: '3', // Default
@@ -6485,7 +6485,7 @@ const AIFitnessCoach = () => {
           />
           {/* Generate Prompt Button - Inside the input */}
           <Tooltip
-            title="Click me to Creates a personalized prompt using your profile information (age, weight, height, goals, etc.)"
+            title="Click me to create a personalized prompt using your profile information (age, weight, height, goals, etc.)"
             placement="top"
             arrow
           >
@@ -6500,7 +6500,7 @@ const AIFitnessCoach = () => {
             </span>
           </Tooltip>
           <div className="mobile-prompt-description">
-            Click me to Creates a personalized prompt using your profile information (age, weight, height, goals, etc.)
+            Click me to create a personalized prompt using your profile information (age, weight, height, goals, etc.)
           </div>
         </div>
 

@@ -6,22 +6,22 @@ export class PromptParser {
         // Shorthand formats like "28M", "25F", "M40", "F22"
         /\b(\d{1,3})\s*[mf]\b/gi,
         /\b[mf]\s*(\d{1,3})\b/gi,
-        
+
         // Standard age patterns
         /(\d{1,3})\s*(?:years?|yrs?|yo|y\.?o\.?|y\/o)(?:\s*old)?/gi,
         /(\d{1,3})[-–~]?year[-–~]old/gi,
         /age\s*[:=]?\s*(\d{1,3})/gi,
-        
+
         // "I am X" patterns - enhanced for natural language
         /i\s+(?:am|'m)\s+(\d{1,3})(?:\s|$|\.|,|;|\s+[mf]\b)/gi,
         /i'm\s+(\d{1,3})(?:\s|$|\.|,|;|\s+[mf]\b)/gi,
-        
+
         // "I am X m/f" patterns (age followed by gender)
         /i\s+(?:am|'m)\s+(\d{1,3})\s+([mf])\b/gi,
-        
+
         // Standalone age at beginning or after punctuation
         /(?:^|[.!?,]\s*)(\d{1,3})(?:\s*,|\s+(?:years?|yrs?|y\.?o\.?))/gi,
-        
+
         // Just the number followed by comma (common in shorthand)
         /(?:^|\s)(\d{1,3})\s*,(?:\s|$)/gi
       ],
@@ -29,19 +29,19 @@ export class PromptParser {
         // Shorthand at beginning like "M40", "F22"
         /^\s*([mf])\d+/gi,
         /\b([mf])(\d{1,3})\b/gi,
-        
+
         // Standard gender patterns
         /\b(male|female|man|woman|boy|girl)\b/gi,
-        
+
         // Single letter M/F - enhanced to catch "I am 35 m"
         /\b([mf])\b(?!t\b|eet\b|onths?\b)/gi, // Avoid matching "ft", "feet", "months"
-        
+
         // Gender with colon/equals
         /gender\s*[:=]?\s*(male|female|m|f)/gi,
-        
+
         // "I am a" patterns
         /i\s+(?:am|'m)\s+(?:a\s+)?(man|woman|boy|girl|male|female)/gi,
-        
+
         // "I am X m/f" patterns (age followed by gender)
         /i\s+(?:am|'m)\s+\d{1,3}\s+([mf])\b/gi
       ],
@@ -50,21 +50,21 @@ export class PromptParser {
         /(\d+)\s*[''`]\s*(\d+)\s*[""]?/gi, // 5'9" or 5'9 or 5'9" format
         /(\d+)\s*[''`]\s*(\d+)\s*(?:inches?|in)?/gi, // 5'9in or 5'9 inches
         /(\d+)\s*(?:ft|feet|foot)\s*(\d+)\s*(?:inches?|in)?/gi, // 5 ft 9 in
-        
+
         // Decimal feet patterns - enhanced for "having weight 5.5ft"
         /(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)/gi, // 5.4 ft
         /(\d+)\.(\d+)\s*(?:ft|feet|foot)?/gi, // 5.10 (treated as 5'10")
-        
+
         // "having weight" patterns that might be height (context-dependent)
         /having\s*weight\s*(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)/gi,
-        
+
         // Apostrophe only patterns (feet only)
         /(\d+)\s*[''`](?:\s*|$)/gi, // 5' format
-        
+
         // Metric patterns
         /(\d{3})\s*(?:cm|centimeters?)?/gi, // 170 cm or just 170 (3 digits likely cm)
         /(\d{2,3})\s*cm/gi, // explicit cm
-        
+
         // Height with label
         /height\s*[:=]?\s*(\d+(?:\.\d+)?)\s*(?:ft|feet|cm)?/gi
       ],
@@ -72,19 +72,19 @@ export class PromptParser {
         // Explicit unit patterns
         /(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?)\b/gi,
         /(\d+(?:\.\d+)?)\s*(?:lbs?|pounds?|lb)\b/gi,
-        
+
         // Shorthand without space: "165lb", "80kg"
         /(\d+)(?:kg|lbs?)\b/gi,
-        
+
         // Weight with label - enhanced for "having weight"
         /weight\s*[:=]?\s*(\d+(?:\.\d+)?)\s*(?:kg|lbs?)?/gi,
         /my\s*weight\s*is\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)?/gi,
         /having\s*weight\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)?/gi,
-        
+
         // "weighing" patterns - enhanced
         /weighing\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)?/gi,
         /weigh\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)?/gi,
-        
+
         // Standalone numbers that might be weight (context-dependent)
         // Will be handled in extractWeight logic
       ],
@@ -97,7 +97,7 @@ export class PromptParser {
         /\b(endurance|stamina|cardiovascular|cardio)\b/gi,
         /\b(fitness|health|healthy|wellness|overall\s*health)\b/gi,
         /\b(body\s*recomposition|recomp)\b/gi,
-        
+
         // Enhanced patterns for "want muscle" type phrases
         /\b(want|wanna|need|desire|looking\s+to|aim\s+to|try(?:ing)?\s+to)\s+(?:to\s+)?(muscle|bulk|gain\s+muscle)\b/gi,
         /\b(want|wanna|need|desire|looking\s+to|aim\s+to|try(?:ing)?\s+to)\s+(?:to\s+)?(lose\s+weight|slim\s+down|drop\s+weight|cut\s+fat)\b/gi
@@ -114,11 +114,11 @@ export class PromptParser {
         /\b(home\s*workouts|bodyweight|calisthenics)\b/gi
       ],
       activityLevel: [
-        /\b(sedentary|inactive|not\s*active|desk\s*job|office\s*work)\b/gi,
-        /\b(lightly\s*active|light\s*activity|somewhat\s*active|occasionally\s*active|light)\b/gi,
-        /\b(moderately\s*active|moderate\s*activity|fairly\s*active|regularly\s*active|generally\s*active|moderate)\b/gi,
-        /\b(very\s*active|highly\s*active|extremely\s*active|very\s*fit|very)\b/gi,
-        /\b(extra\s*active|super\s*active|athlete|athletic|extra)\b/gi,
+        /\b(sedentary|inactive|not[\s-]*active|desk[\s-]*job|office[\s-]*work)\b/gi,
+        /\b(lightly[\s-]*active|light[\s-]*activity|somewhat[\s-]*active|occasionally[\s-]*active|light)\b/gi,
+        /\b(moderately[\s-]*active|moderate[\s-]*activity|fairly[\s-]*active|regularly[\s-]*active|generally[\s-]*active|moderate)\b/gi,
+        /\b(very[\s-]*active|highly[\s-]*active|extremely[\s-]*active|very[\s-]*fit|very)\b/gi,
+        /\b(extra[\s-]*active|super[\s-]*active|athlete|athletic|extra)\b/gi,
         /\b(activity\s*level\s*[:=]?\s*(sedentary|lightly\s*active|moderately\s*active|very\s*active|extra\s*active|light|moderate|very|extra))\b/gi,
         // Enhanced patterns for "I do prefer activity moderate"
         /i\s+do\s+prefer\s+activity\s+(sedentary|light|moderate|very|extra)\b/gi,
@@ -252,49 +252,49 @@ export class PromptParser {
 
     // Store original prompt for reference
     const originalPrompt = prompt.toLowerCase();
-    
+
     // Extract age
     result.age = this.extractAge(originalPrompt);
-    
+
     // Extract gender
     result.gender = this.extractGender(originalPrompt);
-    
+
     // Extract height and detect units
     const heightResult = this.extractHeight(originalPrompt);
     result.height = heightResult.value;
     result.units.height = heightResult.unit;
-    
+
     // Extract weight and detect units
     const weightResult = this.extractWeight(originalPrompt);
     result.weight = weightResult.value;
     result.units.weight = weightResult.unit;
-    
+
     // Extract goal
     result.goal = this.extractGoal(originalPrompt);
-    
+
     // Extract activity
     result.activity = this.extractActivity(originalPrompt);
-    
+
     // Extract activity level
     result.activityLevel = this.extractActivityLevel(originalPrompt);
-    
+
     // Extract frequency
     result.frequency = this.extractFrequency(originalPrompt);
-    
+
     // Extract target weight
     result.targetWeight = this.extractTargetWeight(originalPrompt);
-    
+
     // Extract weight change (relative changes like "lose 5kg")
     result.weightChange = this.extractWeightChange(originalPrompt);
-    
+
     // Calculate target weight from current weight + weight change if no explicit target weight
     if (!result.targetWeight && result.weightChange && result.weight) {
       result.targetWeight = this.calculateTargetWeightFromChange(result.weight, result.weightChange);
     }
-    
+
     // Extract timeline
     result.timeline = this.extractTimeline(originalPrompt);
-    
+
     // Convert timeline to weeks and set timelineWeeks for backend compatibility
     if (result.timeline && result.timeline.value) {
       result.timelineWeeks = result.timeline.value;
@@ -302,7 +302,7 @@ export class PromptParser {
       // Don't set a default timeline - let backend handle this
       result.timelineWeeks = null;
     }
-    
+
     console.log('DEBUG: Final parsed result:', result);
 
     return result;
@@ -335,7 +335,7 @@ export class PromptParser {
       if (gender === 'm') return 'male';
       if (gender === 'f') return 'female';
     }
-    
+
     // Check reverse shorthand "M40", "F22"
     const reverseShorthandPattern = /\b([mf])(\d{1,3})\b/gi;
     const reverseMatches = [...text.matchAll(reverseShorthandPattern)];
@@ -344,7 +344,7 @@ export class PromptParser {
       if (gender === 'm') return 'male';
       if (gender === 'f') return 'female';
     }
-    
+
     // Then check standard patterns
     for (const pattern of this.patterns.gender) {
       const matches = [...text.matchAll(pattern)];
@@ -362,7 +362,7 @@ export class PromptParser {
 
   extractHeight(text) {
     console.log('DEBUG: Extracting height from text:', text);
-    
+
     // First check for explicit cm patterns (highest priority)
     const explicitCmPattern = /(\d{2,3})\s*(?:cm|centimeters?)/gi;
     const explicitCmMatches = [...text.matchAll(explicitCmPattern)];
@@ -373,7 +373,7 @@ export class PromptParser {
         return { value, unit: 'cm' };
       }
     }
-    
+
     // Check for "having weight X ft" patterns that might actually be height
     const havingWeightFeetPattern = /having\s*weight\s*(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)/gi;
     const havingWeightFeetMatches = [...text.matchAll(havingWeightFeetPattern)];
@@ -384,14 +384,14 @@ export class PromptParser {
         return { value: this.feetToCm(value), unit: 'cm' };
       }
     }
-    
+
     // Enhanced feet and inches patterns with various quote styles
     const feetInchesPatterns = [
       /(\d+)\s*[''`]\s*(\d+)\s*[""]?/gi, // 5'9" or 5'9 or 5'9" format
       /(\d+)\s*[''`]\s*(\d+)\s*(?:inches?|in)?/gi, // 5'9in or 5'9 inches
       /(\d+)\s*(?:ft|feet|foot)\s*(\d+)\s*(?:inches?|in)?/gi, // 5 ft 9 in
     ];
-    
+
     for (const pattern of feetInchesPatterns) {
       const matches = [...text.matchAll(pattern)];
       for (const match of matches) {
@@ -402,14 +402,14 @@ export class PromptParser {
         }
       }
     }
-    
+
     // Check for decimal feet patterns like 5.4 ft, 5.10 ft, 5.11 ft
     const decimalFeetPattern = /(\d+)\.(\d+)\s*(?:ft|feet|foot)?/gi;
     let matches = [...text.matchAll(decimalFeetPattern)];
     for (const match of matches) {
       const wholeFeet = parseInt(match[1]);
       const decimal = match[2];
-      
+
       // Check if it's in the context of height (4-7 feet range)
       if (wholeFeet >= 4 && wholeFeet <= 7) {
         // Check if decimal represents inches (like 5.10 = 5'10", 5.11 = 5'11")
@@ -425,7 +425,7 @@ export class PromptParser {
         return { value: this.feetInchesToCm(wholeFeet, fractionalInches), unit: 'cm' };
       }
     }
-    
+
     // Check for feet with explicit ft/feet
     const feetPattern = /(\d+)\s*(?:ft|feet|foot)(?:\s+(\d+)\s*(?:in|inches?))?/gi;
     matches = [...text.matchAll(feetPattern)];
@@ -436,7 +436,7 @@ export class PromptParser {
         return { value: this.feetInchesToCm(feet, inches), unit: 'cm' };
       }
     }
-    
+
     // Check for cm patterns (already checked above, but keeping as fallback)
     const cmPattern = /(\d{2,3})\s*(?:cm|centimeters?)/gi;
     matches = [...text.matchAll(cmPattern)];
@@ -447,21 +447,21 @@ export class PromptParser {
         return { value, unit: 'cm' };
       }
     }
-    
+
     // Check for standalone 3-digit numbers (likely cm)
     const threeDigitPattern = /\b(1[0-9]\d|2[0-2]\d)\b(?!\s*(?:lbs?|pounds?|kg|kilos?))/gi;
     matches = [...text.matchAll(threeDigitPattern)];
     for (const match of matches) {
       const value = parseInt(match[1]);
-        if (value >= 100 && value <= 250) {
-          // Check it's not weight by looking at context
-          const beforeMatch = text.substring(Math.max(0, match.index - 10), match.index);
-          if (!/weight|weigh|kg|lbs?|pounds?/.test(beforeMatch)) {
-            return { value, unit: 'cm' };
-          }
+      if (value >= 100 && value <= 250) {
+        // Check it's not weight by looking at context
+        const beforeMatch = text.substring(Math.max(0, match.index - 10), match.index);
+        if (!/weight|weigh|kg|lbs?|pounds?/.test(beforeMatch)) {
+          return { value, unit: 'cm' };
         }
+      }
     }
-    
+
     // Check for feet with apostrophe (like 5'3)
     const apostrophePattern = /(\d+)\s*['’`](?:\s*|$)/gi;
     matches = [...text.matchAll(apostrophePattern)];
@@ -472,7 +472,7 @@ export class PromptParser {
         return { value: this.feetToCm(feet), unit: 'cm' };
       }
     }
-    
+
     // Enhanced parsing for feet/inches with space
     const feetInchesSpacePattern = /(\d+)\s*(?:ft|feet|foot)\s*(\d+)\s*(?:in|inches?)?/gi;
     matches = [...text.matchAll(feetInchesSpacePattern)];
@@ -483,13 +483,13 @@ export class PromptParser {
         return { value: this.feetInchesToCm(feet, inches), unit: 'cm' };
       }
     }
-    
+
     return { value: null, unit: 'cm' };
   }
 
   extractWeight(text) {
     console.log('DEBUG: Extracting weight from text:', text);
-    
+
     // First try explicit patterns with units
     for (const pattern of this.patterns.weight) {
       const matches = [...text.matchAll(pattern)];
@@ -500,13 +500,13 @@ export class PromptParser {
         if (value) {
           const fullMatch = match[0].toLowerCase();
           console.log('DEBUG: Full match text:', fullMatch);
-          
+
           // Skip if this looks like height (feet pattern with reasonable height range)
           if (/ft|feet|foot/.test(fullMatch) && value >= 4 && value <= 7) {
             console.log('DEBUG: Skipping weight match that looks like height:', fullMatch);
             continue;
           }
-          
+
           // Check for explicit units
           if (/lbs?|pounds?|lb/.test(fullMatch)) {
             console.log('DEBUG: Found weight in lbs, converting to kg:', value);
@@ -524,12 +524,12 @@ export class PromptParser {
         }
       }
     }
-    
+
     // If no explicit unit found, look for standalone numbers that could be weight
     // This handles cases like "28M, 5.8, 160, want muscle"
     const numberPattern = /\b(\d{2,3})\b(?!\s*(?:cm|years?|yrs?|old|[mf]\b))/gi;
     const matches = [...text.matchAll(numberPattern)];
-    
+
     for (const match of matches) {
       const value = parseFloat(match[1]);
       if (value) {
@@ -538,13 +538,13 @@ export class PromptParser {
           // Could be cm height, check context
           const beforeMatch = text.substring(Math.max(0, match.index - 10), match.index);
           const afterMatch = text.substring(match.index + match[0].length, Math.min(text.length, match.index + match[0].length + 10));
-          
+
           // Skip if surrounded by height indicators
           if (/height|tall|cm/.test(beforeMatch + afterMatch)) {
             continue;
           }
         }
-        
+
         // Make educated guess based on value range
         if (value >= 40 && value <= 150) {
           // Likely kg
@@ -555,37 +555,37 @@ export class PromptParser {
         }
       }
     }
-    
+
     return { value: null, unit: 'kg' };
   }
 
   extractGoal(text) {
     const lowerText = text.toLowerCase();
-    
+
     // Priority order matters - check more specific patterns first
-    
+
     // Check for relative weight changes first ("lose 5kg", "gain 5kg") - enhanced for typos
     const loseWeightChangeMatch = lowerText.match(/(?:want\s+to\s+|need\s+to\s+|trying\s+to\s+)?(?:lose|loose|losse)\s+(?:weight\s+)?(?:\d+(?:\.\d+)?\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)|weight)/i);
     const gainWeightChangeMatch = lowerText.match(/(?:want\s+to\s+|need\s+to\s+|trying\s+to\s+)?(?:gain|increase)\s+(?:weight\s+)?(?:\d+(?:\.\d+)?\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)|weight)/i);
-    
+
     if (loseWeightChangeMatch) {
       console.log('DEBUG: Detected weight loss goal from relative change:', loseWeightChangeMatch[0]);
       return 'weight_loss';
     }
-    
+
     if (gainWeightChangeMatch) {
       console.log('DEBUG: Detected weight gain goal from relative change:', gainWeightChangeMatch[0]);
       return 'weight_gain';
     }
-    
+
     // Check for weight comparison (target weight vs current weight)
     const currentWeightMatch = lowerText.match(/(?:weight|weighing)\s*(?:is|of)?\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)?/i);
     const targetWeightMatch = lowerText.match(/(?:target\s*weight|goal\s*weight|want\s*to\s*(?:be|reach|get\s*to)|achieve)\s*(?:is|of)?\s*(\d+(?:\.\d+)?)\s*(?:kg|kilos?|kilograms?|lbs?|pounds?)?/i);
-    
+
     if (currentWeightMatch && targetWeightMatch) {
       const currentWeight = parseFloat(currentWeightMatch[1]);
       const targetWeight = parseFloat(targetWeightMatch[1]);
-      
+
       if (targetWeight < currentWeight) {
         console.log('DEBUG: Detected weight loss goal from weight comparison:', currentWeight, '->', targetWeight);
         return 'weight_loss';
@@ -594,65 +594,65 @@ export class PromptParser {
         return 'weight_gain';
       }
     }
-    
+
     // Weight gain patterns (must check before muscle gain)
     if (/\b(gain\s+weight|weight\s+gain|increase\s+weight|put\s+on\s+weight)\b/i.test(lowerText)) {
       return 'weight_gain';
     }
-    
+
     // Weight loss patterns - enhanced to catch more variations and typos
     if (/\b(lose\s+weight|loose\s+weight|losse\s+weight|weight\s+loss|slim\s+down|fat\s+loss|reduce\s+fat|cut\s+fat|drop\s+weight|lose\s+fat|loose\s+fat|reduce\s+belly|slim\s+waist|fat\s+reduction|lose\s+belly\s+fat|loose\s+belly\s+fat|cutting\s+fat)\b/i.test(lowerText) ||
-        (/\bcut\b/i.test(lowerText) && /\b(fat|weight)\b/i.test(lowerText)) ||
-        (/\bslim\b/i.test(lowerText) && !(/\bmuscle\b/i.test(lowerText))) ||
-        /\bi\s+want\s+to\s+lose\b/i.test(lowerText) ||
-        /\bwant\s+to\s+lose\s+weight\b/i.test(lowerText) ||
-        /\bwant\s+to\s+losse\s+weight\b/i.test(lowerText) ||
-        /\bwant\s+to\s+loose\s+weight\b/i.test(lowerText)) {
+      (/\bcut\b/i.test(lowerText) && /\b(fat|weight)\b/i.test(lowerText)) ||
+      (/\bslim\b/i.test(lowerText) && !(/\bmuscle\b/i.test(lowerText))) ||
+      /\bi\s+want\s+to\s+lose\b/i.test(lowerText) ||
+      /\bwant\s+to\s+lose\s+weight\b/i.test(lowerText) ||
+      /\bwant\s+to\s+losse\s+weight\b/i.test(lowerText) ||
+      /\bwant\s+to\s+loose\s+weight\b/i.test(lowerText)) {
       return 'weight_loss';
     }
-    
+
     // Muscle gain patterns - enhanced to catch "want muscle"
     if (/\b(gain\s+muscle|muscle\s+gain|build\s+muscle|bulk\s+up|bulk|add\s+mass|gain\s+lean\s+muscle|increase\s+muscle|muscle\s+building)\b/i.test(lowerText) ||
-        (/\bwant\s+to\s+bulk\b/i.test(lowerText)) ||
-        (/\bbulk\b/i.test(lowerText) && !(/\bweight\b/i.test(lowerText))) ||
-        (/\bwant\s+muscle\b/i.test(lowerText)) ||
-        (/\b(want|wanna|need|desire|looking\s+to|aim\s+to|try(?:ing)?\s+to)\s+(?:to\s+)?(muscle|bulk|gain\s+muscle)\b/i.test(lowerText))) {
+      (/\bwant\s+to\s+bulk\b/i.test(lowerText)) ||
+      (/\bbulk\b/i.test(lowerText) && !(/\bweight\b/i.test(lowerText))) ||
+      (/\bwant\s+muscle\b/i.test(lowerText)) ||
+      (/\b(want|wanna|need|desire|looking\s+to|aim\s+to|try(?:ing)?\s+to)\s+(?:to\s+)?(muscle|bulk|gain\s+muscle)\b/i.test(lowerText))) {
       return 'muscle_gain';
     }
-    
+
     // Toning patterns
     if (/\b(tone|toning|toned|tone\s+up|tone\s+body|tone\s+muscle|define|sculpt|get\s+toned)\b/i.test(lowerText)) {
       return 'toning';
     }
-    
+
     // Maintenance patterns
-    if (/\b(maintain|maintenance|keep|stay|remain)\b/i.test(lowerText) && 
-        /\b(weight|fitness|current|shape)\b/i.test(lowerText)) {
+    if (/\b(maintain|maintenance|keep|stay|remain)\b/i.test(lowerText) &&
+      /\b(weight|fitness|current|shape)\b/i.test(lowerText)) {
       return 'weight_maintenance';
     }
-    
+
     // Strength patterns
     if (/\b(strength|stronger|build\s+strength|powerlifting|get\s+strong|strength\s+training)\b/i.test(lowerText) &&
-        !(/\btraining\b/i.test(lowerText) && !/\bstrength\s+training\b/i.test(lowerText))) {
+      !(/\btraining\b/i.test(lowerText) && !/\bstrength\s+training\b/i.test(lowerText))) {
       return 'strength';
     }
-    
+
     // Endurance patterns
     if (/\b(endurance|stamina|cardiovascular|cardio|improve\s+stamina|build\s+endurance)\b/i.test(lowerText)) {
       return 'endurance';
     }
-    
+
     // Body recomposition patterns
     if (/\b(body\s+recomposition|recomp|recomposition)\b/i.test(lowerText)) {
       return 'body_recomposition';
     }
-    
+
     // Fitness patterns (generic) - enhanced
-    if (/\b(fitness|health|healthy|wellness|overall\s+health|get\s+fit|stay\s+fit|be\s+fit)\b/i.test(lowerText) && 
-        /\b(goal|aim|want|trying|looking)\b/i.test(lowerText)) {
+    if (/\b(fitness|health|healthy|wellness|overall\s+health|get\s+fit|stay\s+fit|be\s+fit)\b/i.test(lowerText) &&
+      /\b(goal|aim|want|trying|looking)\b/i.test(lowerText)) {
       return 'fitness';
     }
-    
+
     // Additional edge cases
     if (/\bfitness\s+goal\s*:\s*\w+/i.test(lowerText)) {
       // Extract goal after "fitness goal:"
@@ -666,7 +666,7 @@ export class PromptParser {
         if (goalWord.includes('fitness')) return 'fitness';
       }
     }
-    
+
     // Check for goals after "goal:" or "aim:"
     const goalPatternMatch = lowerText.match(/\b(?:goal|aim)\s*[:=]?\s*([\w\s]+?)(?:[,.]|$)/i);
     if (goalPatternMatch) {
@@ -680,30 +680,30 @@ export class PromptParser {
       if (goalPhrase.includes('tone') || goalPhrase.includes('toning')) return 'toning';
       if (goalPhrase.includes('fitness')) return 'fitness';
     }
-    
+
     // Handle shorthand patterns like "want muscle", "want to bulk", etc.
     if (/\b(want|wanna|need|desire|looking\s+to)\s+(?:to\s+)?(bulk|gain\s+muscle|build\s+muscle|add\s+muscle)\b/i.test(lowerText)) {
       return 'muscle_gain';
     }
-    
+
     if (/\b(want|wanna|need|desire|looking\s+to)\s+(?:to\s+)?(lose\s+weight|loose\s+weight|slim\s+down|drop\s+weight|cut\s+fat)\b/i.test(lowerText)) {
       return 'weight_loss';
     }
-    
+
     if (/\b(want|wanna|need|desire|looking\s+to)\s+(?:to\s+)?(tone|tone\s+up|get\s+toned|define)\b/i.test(lowerText)) {
       return 'toning';
     }
-    
+
     if (/\b(want|wanna|need|desire|looking\s+to)\s+(?:to\s+)?(get\s+stronger|build\s+strength|increase\s+strength)\b/i.test(lowerText)) {
       return 'strength';
     }
-    
+
     return null;
   }
 
   extractActivity(text) {
     const activities = [];
-    
+
     for (const pattern of this.patterns.activity) {
       const matches = [...text.matchAll(pattern)];
       for (const match of matches) {
@@ -713,7 +713,7 @@ export class PromptParser {
         }
       }
     }
-    
+
     return activities;
   }
 
@@ -722,22 +722,22 @@ export class PromptParser {
       const matches = [...text.matchAll(pattern)];
       for (const match of matches) {
         const activityLevel = match[0].toLowerCase();
-        
+
         // Map to standard activity levels
-        if (activityLevel.includes('sedentary') || activityLevel.includes('inactive') || activityLevel.includes('desk job') || activityLevel.includes('office work')) {
+        if (activityLevel.match(/sedentary|inactive|desk[\s-]*job|office[\s-]*work/)) {
           return 'sedentary';
-        } else if (activityLevel.includes('lightly active') || activityLevel.includes('light activity') || activityLevel.includes('somewhat active') || activityLevel.includes('occasionally active') || activityLevel === 'light') {
+        } else if (activityLevel.match(/lightly[\s-]*active|light[\s-]*activity|somewhat[\s-]*active|occasionally[\s-]*active|light/)) {
           return 'lightly active';
-        } else if (activityLevel.includes('moderately active') || activityLevel.includes('moderate activity') || activityLevel.includes('fairly active') || activityLevel.includes('regularly active') || activityLevel.includes('generally active') || activityLevel === 'moderate' || activityLevel === 'moderately') {
+        } else if (activityLevel.match(/moderately[\s-]*active|moderate[\s-]*activity|fairly[\s-]*active|regularly[\s-]*active|generally[\s-]*active|moderate/)) {
           return 'moderately active';
-        } else if (activityLevel.includes('very active') || activityLevel.includes('highly active') || activityLevel.includes('extremely active') || activityLevel.includes('very fit') || activityLevel === 'very') {
+        } else if (activityLevel.match(/very[\s-]*active|highly[\s-]*active|extremely[\s-]*active|very[\s-]*fit|very/)) {
           return 'very active';
-        } else if (activityLevel.includes('extra active') || activityLevel.includes('super active') || activityLevel.includes('athlete') || activityLevel.includes('athletic') || activityLevel === 'extra') {
+        } else if (activityLevel.match(/extra[\s-]*active|super[\s-]*active|athlete|athletic|extra/)) {
           return 'extra active';
         }
       }
     }
-    
+
     return null;
   }
 
@@ -781,7 +781,7 @@ export class PromptParser {
         if (value && value >= 30 && value <= 300) { // Reasonable weight range
           const fullMatch = match[0].toLowerCase();
           console.log('DEBUG: Full match text:', fullMatch);
-          
+
           // Check for explicit units
           if (/lbs?|pounds?|lb/.test(fullMatch)) {
             console.log('DEBUG: Found target weight in lbs, converting to kg:', value);
@@ -815,17 +815,17 @@ export class PromptParser {
         if (value && value > 0 && value <= 50) { // Reasonable weight change range
           const fullMatch = match[0].toLowerCase();
           console.log('DEBUG: Full weight change match text:', fullMatch);
-          
+
           // Determine if it's gain or loss - enhanced for typos
           const isLoss = /(?:lose|loose|losse|drop|shed)/i.test(fullMatch);
           const isGain = /(?:gain|increase|put.*on|add)/i.test(fullMatch);
-          
+
           // Convert units if needed
           let changeValue = value;
           if (/lbs?|pounds?/i.test(fullMatch)) {
             changeValue = this.lbsToKg(value);
           }
-          
+
           console.log('DEBUG: Found weight change:', isLoss ? `-${changeValue}` : `+${changeValue}`, 'kg');
           return {
             value: isLoss ? -changeValue : changeValue,
@@ -841,15 +841,15 @@ export class PromptParser {
 
   calculateTargetWeightFromChange(currentWeight, weightChange) {
     if (!currentWeight || !weightChange) return null;
-    
+
     const targetWeight = currentWeight + weightChange.value;
     console.log('DEBUG: Calculated target weight from change:', currentWeight, '+', weightChange.value, '=', targetWeight);
-    
+
     // Validate the result is reasonable
     if (targetWeight > 0 && targetWeight < 300) {
       return { value: Math.round(targetWeight * 10) / 10, unit: 'kg' };
     }
-    
+
     return null;
   }
 
@@ -872,19 +872,19 @@ export class PromptParser {
             value = parseInt(numberMatch[1]);
           }
         }
-        
+
         if (value) {
           const fullMatch = match[0].toLowerCase();
-          
+
           // Skip if this appears to be an age reference
           const beforeMatch = text.substring(Math.max(0, match.index - 5), match.index);
           const afterMatch = text.substring(match.index + match[0].length, Math.min(text.length, match.index + match[0].length + 10));
-          
+
           if (/\b(am|is|are|year|age)$/i.test(beforeMatch) || /^\s*(?:year|years)\s+old/i.test(afterMatch)) {
             console.log('DEBUG: Skipping timeline match that appears to be age-related:', fullMatch);
             continue;
           }
-          
+
           // Determine unit and convert to weeks
           if (fullMatch.includes('year') || fullMatch.includes('yr') || fullMatch.includes('y')) {
             console.log('DEBUG: Found timeline in years, converting to weeks:', value);
@@ -948,7 +948,7 @@ export const testSpecificCases = () => {
     try {
       const result = parsePrompt(testCase.input);
       console.log("Parsed result:", result);
-      
+
       // Check if it matches expected
       let passed = true;
       for (const [key, value] of Object.entries(testCase.expected)) {
@@ -957,7 +957,7 @@ export const testSpecificCases = () => {
           passed = false;
         }
       }
-      
+
       if (passed) {
         console.log("✅ Test passed!");
       } else {

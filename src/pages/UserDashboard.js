@@ -1041,7 +1041,7 @@ const UserDashboard = () => {
 
 
 
-        <div className="dashboard-section appointments-section">
+        {/* <div className="dashboard-section appointments-section">
           <div className="section-header">
             <h3>My Appointments</h3>
             <button
@@ -1169,7 +1169,7 @@ const UserDashboard = () => {
               </div>
             </>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );
