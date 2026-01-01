@@ -16,6 +16,7 @@ import GoogleAuthCallback from './pages/GoogleAuthCallback';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import NotFoundPage from './pages/NotFoundPage';
 import CommunityPage from './pages/CommunityPage';
+import ContactPage from './pages/ContactPage';
 import LoadingSpinner from './components/LoadingSpinner';
 import GroceryListProcessor from './pages/GroceryListProcessor';
 import TokenLogin from './components/TokenLogin';
@@ -38,11 +39,11 @@ import DetailsPage from './pages/DetailsPage';
 // ScrollToTop component to reset scroll on navigation
 function ScrollToTop() {
   const { pathname } = useLocation();
-  
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
-  
+
   return null;
 }
 
@@ -58,7 +59,7 @@ const ProtectedRoute = ({ children, allowedUserTypes = null }) => {
 // AdminProtectedRoute component specifically for admin routes
 const AdminProtectedRoute = ({ children }) => {
   const [adminChecked, setAdminChecked] = useState(false);
-  
+
   useEffect(() => {
     setAdminChecked(true);
   }, []);
@@ -68,7 +69,7 @@ const AdminProtectedRoute = ({ children }) => {
   }
 
   const isAdminAuthenticated = sessionStorage.getItem('adminAuthenticated') === 'true';
-  
+
   if (!isAdminAuthenticated) {
     return <Navigate to="/admin" />;
   }
@@ -126,12 +127,12 @@ const EvaCustomerRoute = ({ children }) => {
   // If EVA customer and not on allowed pages, redirect to home
   // Only restrict EVA customers, allow all other users to access all routes
   console.log('🔍 EvaCustomerRoute: Current path:', location.pathname, 'isEvaCustomer:', isEvaCustomer);
-  
+
   if (isEvaCustomer && !['/', '/HomePage', '/grocery-list'].includes(location.pathname)) {
     console.log('🔄 EvaCustomerRoute: EVA customer trying to access restricted route:', location.pathname);
     return <Navigate to="/" replace />;
   }
-  
+
   console.log('✅ EvaCustomerRoute: Allowing access to route:', location.pathname);
 
   return children;
@@ -151,77 +152,78 @@ function App() {
           <div className="content">
             <EvaCustomerRoute>
               <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/HomePage" element={<HomePage />} />
-              <Route path="/community" element={
-                <ProtectedRoute>
-                  <CommunityPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/aicoach" element={
-                <ProtectedRoute>
-                  <AiCoach />
-                </ProtectedRoute>
-              } />
-              <Route path="/ai-fitness-coach" element={<AiFitnessCoach />} />
-              <Route path="/grocery-list" element={
-                <ProtectedRoute>
-                  <GroceryListProcessor />
-                </ProtectedRoute>
-              } />
-              <Route path="/thank-you" element={
-                <ProtectedRoute>
-                  <ThankYouPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/details" element={
-                <ProtectedRoute>
-                  <DetailsPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/experts" element={<ExpertsPage />} />
-              <Route path="/expert/:id" element={<ExpertDetailPage />} />
-              <Route path="/register" element={<RegistrationPage />} />
-              <Route path="/auth" element={
-                <NonAuthRoute>
-                  <AuthPage />
-                </NonAuthRoute>
-              } />
-              <Route path="/auth/token" element={<TokenLogin />} />
-              <Route path="/auth/customer" element={<CustomerAuth />} />
-              <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
-              <Route path="/expert-profile-setup" element={<ExpertProfileSetup />} />
-              <Route path="/expert-dashboard" element={
-                <ProtectedRoute allowedUserTypes={['expert']}>
-                  <ExpertDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/user-dashboard" element={
-                <ProtectedRoute>
-                  <UserDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/apply-as-expert" element={<ExpertApplicationForm />} />
-              <Route path="/admin" element={<AdminLogin />} />
-              <Route path="/admin/panel" element={
-                <AdminProtectedRoute>
-                  <AdminPanel />
-                </AdminProtectedRoute>
-              } />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/test-redirect" element={
-                <ProtectedRoute>
-                  <TestRedirect />
-                </ProtectedRoute>
-              } />
-              <Route path="/debug" element={<DebugRedirect />} />
-              <Route path="/session-test" element={<SessionTransferTest />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </EvaCustomerRoute>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/HomePage" element={<HomePage />} />
+                <Route path="/community" element={
+                  <ProtectedRoute>
+                    <CommunityPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/aicoach" element={
+                  <ProtectedRoute>
+                    <AiCoach />
+                  </ProtectedRoute>
+                } />
+                <Route path="/ai-fitness-coach" element={<AiFitnessCoach />} />
+                <Route path="/grocery-list" element={
+                  <ProtectedRoute>
+                    <GroceryListProcessor />
+                  </ProtectedRoute>
+                } />
+                <Route path="/thank-you" element={
+                  <ProtectedRoute>
+                    <ThankYouPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/details" element={
+                  <ProtectedRoute>
+                    <DetailsPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/experts" element={<ExpertsPage />} />
+                <Route path="/expert/:id" element={<ExpertDetailPage />} />
+                <Route path="/register" element={<RegistrationPage />} />
+                <Route path="/auth" element={
+                  <NonAuthRoute>
+                    <AuthPage />
+                  </NonAuthRoute>
+                } />
+                <Route path="/auth/token" element={<TokenLogin />} />
+                <Route path="/auth/customer" element={<CustomerAuth />} />
+                <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
+                <Route path="/expert-profile-setup" element={<ExpertProfileSetup />} />
+                <Route path="/expert-dashboard" element={
+                  <ProtectedRoute allowedUserTypes={['expert']}>
+                    <ExpertDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/user-dashboard" element={
+                  <ProtectedRoute>
+                    <UserDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/apply-as-expert" element={<ExpertApplicationForm />} />
+                <Route path="/admin" element={<AdminLogin />} />
+                <Route path="/admin/panel" element={
+                  <AdminProtectedRoute>
+                    <AdminPanel />
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/test-redirect" element={
+                  <ProtectedRoute>
+                    <TestRedirect />
+                  </ProtectedRoute>
+                } />
+                <Route path="/debug" element={<DebugRedirect />} />
+                <Route path="/session-test" element={<SessionTransferTest />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </EvaCustomerRoute>
+          </div>
         </div>
-      </div>
-    </Router>
+      </Router>
     </AuthProvider>
   );
 }

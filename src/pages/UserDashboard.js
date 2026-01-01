@@ -85,10 +85,10 @@ const UserDashboard = () => {
               weight: data.weight || '',
               weightUnit: data.weightUnit || 'kg',
               activityLevel: data.activityLevel || '',
-              targetWeight: '',
-              targetWeightUnit: 'kg',
-              targetTimeline: '',
-              targetTimelineUnit: 'weeks',
+              targetWeight: data.targetWeight || '',
+              targetWeightUnit: data.targetWeightUnit || 'kg',
+              targetTimeline: data.targetTimeline || '',
+              targetTimelineUnit: data.targetTimelineUnit || 'weeks',
               healthGoals: data.healthGoals || '',
               dietaryRestrictions: data.dietaryRestrictions || '',
               allergies: data.allergies || ''
@@ -163,16 +163,16 @@ const UserDashboard = () => {
     try {
       const userRef = doc(db, 'users', userId);
       const userSnapshot = await getDoc(userRef);
-      
+
       if (userSnapshot.exists()) {
         const data = userSnapshot.data();
-        
+
         // Check if user is an expert - if so, redirect to expert dashboard
         if (data.userType === 'expert') {
           navigate('/expert-dashboard');
           return;
         }
-        
+
         setUserData(data);
         // Initialize form data with user data
         setFormData({
@@ -223,7 +223,7 @@ const UserDashboard = () => {
         // Try to get image from cache first
         const cachedImageKey = `profileImage_${currentUser.uid}`;
         const cachedData = localStorage.getItem(cachedImageKey);
-        
+
         if (cachedData) {
           try {
             const { url, timestamp } = JSON.parse(cachedData);
@@ -241,13 +241,13 @@ const UserDashboard = () => {
             console.error('Error parsing cached profile image:', error);
           }
         }
-        
+
         // If not in cache or expired, fetch from storage
         console.log('Fetching profile image from storage in UserDashboard');
         const imageUrl = await getProfileImageURL(currentUser.uid);
         if (imageUrl) {
           setProfileImageUrl(imageUrl);
-          
+
           // Save to cache
           try {
             localStorage.setItem(cachedImageKey, JSON.stringify({
@@ -279,10 +279,10 @@ const UserDashboard = () => {
     try {
       await bookingService.cancelBooking(bookingId);
       // Update bookings state
-      setBookings(prevBookings => 
-        prevBookings.map(booking => 
-          booking.id === bookingId 
-            ? { ...booking, status: 'cancelled' } 
+      setBookings(prevBookings =>
+        prevBookings.map(booking =>
+          booking.id === bookingId
+            ? { ...booking, status: 'cancelled' }
             : booking
         )
       );
@@ -296,10 +296,10 @@ const UserDashboard = () => {
     try {
       // Clear verified customer session
       localStorage.removeItem('verifiedCustomerSession');
-      
+
       // Use the logout function from AuthContext
       const result = await logout();
-      
+
       if (result.success) {
         console.log('Logout successful');
         navigate('/auth');
@@ -344,10 +344,10 @@ const UserDashboard = () => {
         weight: userData.weight || '',
         weightUnit: userData.weightUnit || 'kg',
         activityLevel: userData.activityLevel || '',
-        targetWeight: '',
-        targetWeightUnit: 'kg',
-        targetTimeline: '',
-        targetTimelineUnit: 'weeks',
+        targetWeight: userData.targetWeight || '',
+        targetWeightUnit: userData.targetWeightUnit || 'kg',
+        targetTimeline: userData.targetTimeline || '',
+        targetTimelineUnit: userData.targetTimelineUnit || 'weeks',
         healthGoals: userData.healthGoals || '',
         dietaryRestrictions: userData.dietaryRestrictions || '',
         allergies: userData.allergies || ''
@@ -360,43 +360,43 @@ const UserDashboard = () => {
   // Validation functions
   const validateAge = (age) => {
     const ageNum = parseFloat(age);
-    
+
     if (!age || age === '') {
       setFormErrors(prev => ({ ...prev, age: '' }));
       return;
     }
-    
+
     if (isNaN(ageNum)) {
       setFormErrors(prev => ({ ...prev, age: 'Please enter a valid age' }));
       return;
     }
-    
+
     if (ageNum < 13) {
       setFormErrors(prev => ({ ...prev, age: 'Age must be at least 13 years' }));
       return;
     }
-    
+
     if (ageNum > 120) {
       setFormErrors(prev => ({ ...prev, age: 'Age must be less than 120 years' }));
       return;
     }
-    
+
     setFormErrors(prev => ({ ...prev, age: '' }));
   };
 
   const validateHeight = (height, unit) => {
     const heightNum = parseFloat(height);
-    
+
     if (!height || height === '') {
       setFormErrors(prev => ({ ...prev, height: '' }));
       return;
     }
-    
+
     if (isNaN(heightNum)) {
       setFormErrors(prev => ({ ...prev, height: 'Please enter a valid height' }));
       return;
     }
-    
+
     if (unit === 'cm') {
       if (heightNum < 90) {
         setFormErrors(prev => ({ ...prev, height: 'Height must be at least 90 cm' }));
@@ -416,28 +416,28 @@ const UserDashboard = () => {
         return;
       }
     }
-    
+
     setFormErrors(prev => ({ ...prev, height: '' }));
   };
 
   const validateWeight = (weight, unit) => {
     const weightNum = parseFloat(weight);
-    
+
     if (!weight || weight === '') {
       setFormErrors(prev => ({ ...prev, weight: '' }));
       return;
     }
-    
+
     if (isNaN(weightNum)) {
       setFormErrors(prev => ({ ...prev, weight: 'Please enter a valid weight' }));
       return;
     }
-    
+
     if (weightNum <= 0) {
       setFormErrors(prev => ({ ...prev, weight: 'Weight must be greater than 0' }));
       return;
     }
-    
+
     if (unit === 'kg') {
       if (weightNum < 30) {
         setFormErrors(prev => ({ ...prev, weight: 'Weight must be at least 30 kg' }));
@@ -457,7 +457,7 @@ const UserDashboard = () => {
         return;
       }
     }
-    
+
     setFormErrors(prev => ({ ...prev, weight: '' }));
   };
 
@@ -507,7 +507,7 @@ const UserDashboard = () => {
     console.log('Phone verification status:', verification);
     setPhoneVerificationStatus(verification);
     setPhoneVerified(verification.isVerified);
-    
+
     // Update form data with verified phone number while preserving email
     if (verification.isVerified && verification.phoneNumber) {
       setFormData(prev => ({
@@ -526,25 +526,25 @@ const UserDashboard = () => {
             phoneVerified: true,
             phoneVerificationDate: new Date()
           }));
-          
+
           console.log('User phone verification status updated locally');
-          
+
           // Show success message
-          setMessage({ 
-            text: 'Phone number verified successfully! Your profile has been updated.', 
-            type: 'success' 
+          setMessage({
+            text: 'Phone number verified successfully! Your profile has been updated.',
+            type: 'success'
           });
-          
+
           // Clear message after 3 seconds
           setTimeout(() => {
             setMessage({ text: '', type: '' });
           }, 3000);
-          
+
         } catch (error) {
           console.error('Error updating user phone verification status:', error);
-          setMessage({ 
-            text: 'Phone verified but failed to update profile. Please refresh the page.', 
-            type: 'error' 
+          setMessage({
+            text: 'Phone verified but failed to update profile. Please refresh the page.',
+            type: 'error'
           });
         }
       }
@@ -554,7 +554,7 @@ const UserDashboard = () => {
   const handleSaveProfile = async () => {
     setIsSaving(true);
     setMessage({ text: '', type: '' });
-  
+
     try {
       // Validate all fields before saving
       validateAge(formData.age);
@@ -566,7 +566,7 @@ const UserDashboard = () => {
         setIsSaving(false);
         return;
       }
-  
+
       // Sanitize phoneVerificationResult to remove UserImpl objects
       let sanitizedVerificationResult = null;
       if (phoneVerificationStatus.verificationResult) {
@@ -579,8 +579,8 @@ const UserDashboard = () => {
       }
 
       const userRef = doc(db, 'users', currentUser.uid);
-      // Exclude target weight, timeline, and workout days from being saved
-      const { targetWeight, targetWeightUnit, targetTimeline, targetTimelineUnit, workoutDays, ...dataToSave } = formData;
+      // Exclude timeline and workout days from being saved (keeping target weight)
+      const { targetTimeline, targetTimelineUnit, workoutDays, ...dataToSave } = formData;
       await updateDoc(userRef, {
         ...dataToSave,
         email: currentUser.email, // Always preserve the email from Firebase Auth
@@ -588,16 +588,16 @@ const UserDashboard = () => {
         phoneVerificationResult: sanitizedVerificationResult,
         updatedAt: new Date()
       });
-  
+
       // ✅ Update userData in state
-      setUserData({ 
-        ...userData, 
+      setUserData({
+        ...userData,
         ...dataToSave,
         email: currentUser.email, // Always preserve the email from Firebase Auth
         phoneVerified: phoneVerificationStatus.isVerified,
         phoneVerificationResult: sanitizedVerificationResult
       });
-  
+
       setMessage({ text: 'Profile updated successfully!', type: 'success' });
       setIsEditing(false);
     } catch (error) {
@@ -607,7 +607,7 @@ const UserDashboard = () => {
       setIsSaving(false);
     }
   };
-  
+
 
   const handlePhoneVerification = (success) => {
     setPhoneVerified(success);
@@ -619,10 +619,10 @@ const UserDashboard = () => {
   const getActivityLevelDisplayName = (level) => {
     const activityLevels = {
       'sedentary': 'Sedentary',
-      'light': 'Light',
-      'moderate': 'Moderate',
-      'active': 'Active',
-      'very-active': 'Extra Active'
+      'lightly-active': 'Lightly Active',
+      'moderately-active': 'Moderately Active',
+      'very-active': 'Very Active',
+      'extra-active': 'Extra Active'
     };
     return activityLevels[level] || 'Not provided';
   };
@@ -636,17 +636,17 @@ const UserDashboard = () => {
       <div className="dashboard-header">
         <h1>User Dashboard</h1>
       </div>
-      
+
       {message.text && (
         <div className={`message ${message.type}`}>
           {message.text}
         </div>
       )}
-      
+
       <div className="dashboard-content">
         <div className="profile-card">
           <div className="profile-image-container">
-            <ProfileImageUploader 
+            <ProfileImageUploader
               currentImageUrl={profileImageUrl}
               email={currentUser?.email}
               userId={currentUser?.uid}
@@ -655,7 +655,7 @@ const UserDashboard = () => {
               size="large"
             />
           </div>
-          
+
           <div className="profile-header">
             <div className="profile-info">
               <h2>{userData?.firstName} {userData?.lastName}</h2>
@@ -670,13 +670,13 @@ const UserDashboard = () => {
           {showPhoneVerification && (
             <div className="phone-verification-modal">
               <div className="modal-content">
-                <button 
+                <button
                   className="close-modal"
                   onClick={() => setShowPhoneVerification(false)}
                 >
                   ×
                 </button>
-                <PhoneVerification 
+                <PhoneVerification
                   currentUser={currentUser}
                   onVerificationComplete={handlePhoneVerification}
                 />
@@ -685,16 +685,16 @@ const UserDashboard = () => {
           )}
 
           <div className="dashboard-actions">
-           
-          {!isEditing && (
-  <button
-    className="action-button"
-    onClick={() => setIsEditing(true)}
-  >
-    <i className="fas fa-edit"></i>
-    Edit Profile
-  </button>
-)}
+
+            {!isEditing && (
+              <button
+                className="action-button"
+                onClick={() => setIsEditing(true)}
+              >
+                <i className="fas fa-edit"></i>
+                Edit Profile
+              </button>
+            )}
 
           </div>
 
@@ -746,6 +746,10 @@ const UserDashboard = () => {
                       <div className="info-item">
                         <label>Activity Level:</label>
                         <span>{getActivityLevelDisplayName(userData?.activityLevel)}</span>
+                      </div>
+                      <div className="info-item">
+                        <label>Target Weight:</label>
+                        <span>{userData?.targetWeight ? `${userData.targetWeight} ${userData.targetWeightUnit || 'kg'}` : 'Not provided'}</span>
                       </div>
                     </div>
                     <div className="info-item full-width">
@@ -929,18 +933,53 @@ const UserDashboard = () => {
                     </div>
                     <div className="form-row">
                       <div className="form-group">
+                        <label>Target Weight</label>
+                        <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+                          <input
+                            type="number"
+                            name="targetWeight"
+                            value={formData.targetWeight}
+                            onChange={handleInputChange}
+                            placeholder="Enter target weight"
+                            style={{
+                              flex: '1 1 70%',
+                              width: '70%'
+                            }}
+                          />
+                          <select
+                            name="targetWeightUnit"
+                            value={formData.targetWeightUnit || 'kg'}
+                            onChange={handleInputChange}
+                            style={{
+                              flex: '0 0 30%',
+                              width: '30%',
+                              padding: '12px 8px',
+                              border: '1px solid #d1d5db',
+                              borderRadius: '8px',
+                              fontSize: '16px',
+                              color: '#374151',
+                              background: '#ffffff',
+                              boxSizing: 'border-box'
+                            }}
+                          >
+                            <option value="kg">kg</option>
+                            <option value="lbs">lbs</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="form-group">
                         <label>Activity Level</label>
-                        <select 
-                          name="activityLevel" 
-                          value={formData.activityLevel} 
+                        <select
+                          name="activityLevel"
+                          value={formData.activityLevel}
                           onChange={handleInputChange}
                         >
                           <option value="">Select activity level</option>
                           <option value="sedentary">Sedentary</option>
-                          <option value="lightly active">Lightly Active</option>
-                          <option value="moderately active">Moderately Active</option>
-                          <option value="very active">Very Active</option>
-                          <option value="extra active">Extra Active</option>
+                          <option value="lightly-active">Lightly Active</option>
+                          <option value="moderately-active">Moderately Active</option>
+                          <option value="very-active">Very Active</option>
+                          <option value="extra-active">Extra Active</option>
                         </select>
                       </div>
                     </div>
@@ -987,8 +1026,8 @@ const UserDashboard = () => {
                   <button className="cancel-button" onClick={handleCancelEdit}>
                     Cancel
                   </button>
-                  <button 
-                    className="cancel-button " style={{backgroundColor: '#C8DA2B', color: 'black'}} 
+                  <button
+                    className="cancel-button " style={{ backgroundColor: '#C8DA2B', color: 'black' }}
                     onClick={handleSaveProfile}
                     disabled={isSaving || formErrors.age || formErrors.height || formErrors.weight || formErrors.phone}
                   >
@@ -1000,26 +1039,26 @@ const UserDashboard = () => {
           </div>
         </div>
 
-      
-        
+
+
         <div className="dashboard-section appointments-section">
           <div className="section-header">
             <h3>My Appointments</h3>
-            <button 
-              className="refresh-button" 
+            <button
+              className="refresh-button"
               onClick={refreshBookings}
               disabled={loadingBookings}
             >
               {loadingBookings ? 'Refreshing...' : 'Refresh'}
             </button>
           </div>
-          
+
           {loadingBookings ? (
             <div className="loading-bookings">Loading your appointments...</div>
           ) : bookings.length === 0 ? (
             <div className="empty-state">
               <p className="no-appointments">You don't have any upcoming appointments.</p>
-              <button 
+              <button
                 className="action-button"
                 onClick={() => navigate('/experts')}
               >
@@ -1069,17 +1108,17 @@ const UserDashboard = () => {
                               <p><strong>Time:</strong> {booking.slotTime}</p>
                               <p><strong>Confirmed:</strong> {formatDate(booking.updatedAt)}</p>
                               {booking.meetingLink && (
-                                <a 
-                                  href={booking.meetingLink} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer" 
+                                <a
+                                  href={booking.meetingLink}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
                                   className="meeting-link"
                                 >
                                   Join Meeting
                                 </a>
                               )}
-                              <button 
-                                className="meeting-link" style={{backgroundColor: 'red', color: 'white',marginTop:'10px'}}
+                              <button
+                                className="meeting-link" style={{ backgroundColor: 'red', color: 'white', marginTop: '10px' }}
                                 onClick={() => handleCancelBooking(booking.id)}
                               >
                                 Cancel Appointment
@@ -1121,7 +1160,7 @@ const UserDashboard = () => {
               </div>
 
               <div className="booking-cta">
-                <button 
+                <button
                   className="action-button"
                   onClick={() => navigate('/experts')}
                 >

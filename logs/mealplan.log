@@ -1,0 +1,568 @@
+2025-12-23 20:51:57 [MEALPLAN] INFO: [DIETARY_EXTRACTION] Explicit: [], Extracted from prompt: [], Merged: []
+2025-12-23 20:51:57 [MEALPLAN] INFO: 
+================================================================================
+2025-12-23 20:51:57 [MEALPLAN] INFO: [USER_PROMPT] Request ID: d2758b67-1766503317
+2025-12-23 20:51:57 [MEALPLAN] INFO: User Prompt from Frontend: get fit
+2025-12-23 20:51:57 [MEALPLAN] INFO: Target Calories: 2118
+2025-12-23 20:51:57 [MEALPLAN] INFO: Dietary Restrictions: []
+2025-12-23 20:51:57 [MEALPLAN] INFO: Allergies: []
+2025-12-23 20:51:57 [MEALPLAN] INFO: Macros: Protein=185g, Fat=82g, Carbs=159g
+2025-12-23 20:51:57 [MEALPLAN] INFO: ================================================================================
+
+2025-12-23 20:51:57 [MEALPLAN] INFO: [AI_EXTRACTION] Completed in 0ms
+2025-12-23 20:51:58 [MEALPLAN] INFO: [RAW_INPUT] Length=702, PotentialItems=13, KcalMentions=18
+2025-12-23 20:51:58 [MEALPLAN] INFO: [MEALS_FOUND] Day 1: 4 meals - ['Breakfast', 'Lunch', 'Snack', 'Dinner']
+2025-12-23 20:51:58 [MEALPLAN] INFO: [MEAL_SCALE] Lunch: Items=385kcal, Stated=743kcal, Scaling by 1.93x
+2025-12-23 20:51:58 [MEALPLAN] INFO: [MEAL_SCALE] Dinner: Items=334kcal, Stated=635kcal, Scaling by 1.90x
+2025-12-23 20:51:58 [MEALPLAN] INFO: [PARSE_RESULT] Parsed 2018 kcal (95% of target 2118)
+2025-12-23 20:51:58 [MEALPLAN] WARNING: [POST-PROCESS] Could not meet calorie target within constraints. Target: 2118, Actual: 1924, Diff: 194. Adjustable items: 10. This preserves realistic portions over exact calories.
+2025-12-23 20:51:58 [MEALPLAN] INFO: [MACRO_CHECK] Day 1: Calories - Target: 2118 | Actual: 1925 | Diff: -193 kcal
+2025-12-23 20:51:58 [MEALPLAN] INFO: [MACRO_CHECK] Day 1: Protein  - Target: 185g | Actual: 170g | Diff: -15g (8%)
+2025-12-23 20:51:58 [MEALPLAN] INFO: [MACRO_CHECK] Day 1: Fat      - Target: 82g | Actual: 56g | Diff: -26g (32%)
+2025-12-23 20:51:58 [MEALPLAN] INFO: [MACRO_CHECK] Day 1: Carbs    - Target: 159g | Actual: 194g | Diff: +36g (22%)
+2025-12-23 20:51:58 [MEALPLAN] INFO: [POST_PROCESS_FAILED] Day 1: Even after quantity adjustments, still off - triggering regeneration
+2025-12-23 20:51:58 [MEALPLAN] WARNING: [ANOMALY_DETECTED] Day 1: Calories off by 193 kcal (target: 2118, actual: 1925) - REGENERATING
+2025-12-23 20:51:58 [MEALPLAN] INFO: 
+===== BATCH TRANSFORMATIONS START =====
+2025-12-23 20:51:58 [MEALPLAN] INFO: [DAY] Day 1:  -->  Day 1:
+2025-12-23 20:51:58 [MEALPLAN] INFO: [MEAL] - Breakfast (529 kcal):  -->  - Breakfast (575 kcal):
+2025-12-23 20:51:58 [MEALPLAN] INFO: [ITEM] 1. Oats - 150g - 150 kcal - 5p/2f/30c  -->    1. Oats — 225 g — 225 kcal
+2025-12-23 20:51:58 [MEALPLAN] INFO: [ITEM] 2. Banana - 1 medium - 105 kcal - 1p/0f/26c  -->    2. Banana — 1 medium — 105 kcal
+2025-12-23 20:51:58 [MEALPLAN] INFO: [ITEM] 3. Almond Milk - 1 cup - 30 kcal - 1p/2f/4c  -->    3. Almond Milk — 1 cup — 30 kcal
+2025-12-23 20:51:58 [MEALPLAN] INFO: [ITEM] 4. Egg Whites - 120g - 144 kcal - 28p/0f/0c  -->    4. Egg Whites — 180 g — 215 kcal
+2025-12-23 20:51:58 [MEALPLAN] INFO: [MEAL] - Lunch (743 kcal):  -->  - Lunch (580 kcal):
+2025-12-23 20:51:58 [MEALPLAN] INFO: [ITEM] 1. Brown Rice - 150g - 110 kcal - 2p/1f/25c  -->    1. Brown Rice — 225 g — 165 kcal
+2025-12-23 20:51:58 [MEALPLAN] INFO: [ITEM] 2. Chicken Breast - 120g - 140 kcal - 30p/3f/0c  -->    2. Chicken Breast — 180 g — 210 kcal
+2025-12-23 20:51:58 [MEALPLAN] INFO: [ITEM] 3. Mixed Vegetables - 100g - 25 kcal - 1p/0f/5c  -->    3. Mixed Vegetables — 150 g — 40 kcal
+2025-12-23 20:51:58 [MEALPLAN] INFO: [ITEM] 4. Avocado - 50g - 110 kcal - 1p/10f/2c  -->    4. Avocado — 75 g — 165 kcal
+2025-12-23 20:51:58 [MEALPLAN] INFO: [MEAL] - Snack (211 kcal):  -->  - Snack (270 kcal):
+2025-12-23 20:51:58 [MEALPLAN] INFO: [ITEM] 1. Apple - 1 medium - 95 kcal - 0p/0f/25c  -->    1. Apple — 1 medium — 95 kcal
+2025-12-23 20:51:58 [MEALPLAN] INFO: [ITEM] 2. Peanut Butter - 20g - 116 kcal - 4p/8f/4c  -->    2. Peanut Butter — 30 g — 175 kcal
+2025-12-23 20:51:58 [MEALPLAN] INFO: [MEAL] - Dinner (635 kcal):  -->  - Dinner (500 kcal):
+2025-12-23 20:51:58 [MEALPLAN] INFO: [ITEM] 1. Quinoa - 100g - 120 kcal - 4p/2f/20c  -->    1. Quinoa — 150 g — 180 kcal
+2025-12-23 20:51:58 [MEALPLAN] INFO: [ITEM] 2. Grilled Salmon - 120g - 180 kcal - 35p/10f/0c  -->    2. Grilled Salmon — 180 g — 270 kcal
+2025-12-23 20:51:58 [MEALPLAN] INFO: [ITEM] 3. Broccoli - 100g - 34 kcal - 2p/0f/7c  -->    3. Broccoli — 150 g — 50 kcal
+2025-12-23 20:51:58 [MEALPLAN] INFO: ===== BATCH TRANSFORMATIONS END =====
+
+2025-12-23 20:51:58 [MEALPLAN] INFO: [PROCESS_SINGLE_DAY TIME][MODE=B] 4.79 ms
+2025-12-23 20:51:58 [MEALPLAN] WARNING: [ANOMALY] Day 1 has calorie deficit. Regenerating...
+2025-12-23 20:51:58 [MEALPLAN] INFO: [REGENERATE] Using variety instructions for attempt #1
+2025-12-23 20:51:58 [MEALPLAN] INFO: [REGENERATE] ========== CORRECTION CALL FOR DAY 1 ==========
+2025-12-23 20:51:58 [MEALPLAN] INFO: [REGENERATE] Target: 2118 kcal | Actual: 1925 kcal | Deficit: +193 kcal
+2025-12-23 20:51:58 [MEALPLAN] INFO: [REGENERATE] Protein - Target: 185g | Actual: 170g | Deficit: +15g
+2025-12-23 20:51:58 [MEALPLAN] INFO: [REGENERATE] Fat - Target: 82g | Actual: 56g | Deficit: +26g
+2025-12-23 20:51:58 [MEALPLAN] INFO: [REGENERATE] Carbs - Target: 159g | Actual: 194g | Deficit: -35g
+2025-12-23 20:51:58 [MEALPLAN] INFO: [REGENERATE] Problems: ['Calories off by 193 kcal (target: 2118, actual: 1925)']
+2025-12-23 20:51:58 [MEALPLAN] INFO: [REGENERATE] Dietary (merged): []
+2025-12-23 20:51:58 [MEALPLAN] INFO: [REGENERATE] Allergies (merged): []
+2025-12-23 20:51:58 [MEALPLAN] INFO: [REGENERATE] ======================================================
+2025-12-23 20:52:00 [MEALPLAN] INFO: [REGENERATE] Isolated Day 1 content: 1155 chars from 1155 total
+2025-12-23 20:52:00 [MEALPLAN] INFO: [RAW_INPUT] Length=1155, PotentialItems=16, KcalMentions=21
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MEALS_FOUND] Day 1: 4 meals - ['Breakfast', 'Lunch', 'Snack', 'Dinner']
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MEAL_SCALE] Lunch: Items=541kcal, Stated=741kcal, Scaling by 1.37x
+2025-12-23 20:52:00 [MEALPLAN] INFO: [PARSE_RESULT] Parsed 1986 kcal (94% of target 2118)
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MACRO_CHECK] Day 1: Calories - Target: 2118 | Actual: 2075 | Diff: -43 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MACRO_CHECK] Day 1: Protein  - Target: 185g | Actual: 166g | Diff: -19g (10%)
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MACRO_CHECK] Day 1: Fat      - Target: 82g | Actual: 63g | Diff: -19g (24%)
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MACRO_CHECK] Day 1: Carbs    - Target: 159g | Actual: 202g | Diff: +43g (27%)
+2025-12-23 20:52:00 [MEALPLAN] INFO: 
+===== BATCH TRANSFORMATIONS START =====
+2025-12-23 20:52:00 [MEALPLAN] INFO: [DAY] Day 1:  -->  Day 1:
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MEAL] - Breakfast (529 kcal):  -->  - Breakfast (615 kcal):
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 1. Egg white bhurji - 200g - 260 kcal - 50p/1f/0c  -->    1. Egg white bhurji — 300 g — 390 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 2. Oatmeal - 150g - 150 kcal - 5p/2f/30c  -->    2. Oatmeal — 105 g — 105 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 3. Banana - 1 medium - 105 kcal - 1p/0f/25c  -->    3. Banana — 1 medium — 105 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 4. Almonds - 10g - 14 kcal - 1p/1f/2c  -->    4. Almonds — 10 g — 15 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MEAL] - Lunch (741 kcal):  -->  - Lunch (600 kcal):
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 1. Chole - 150g - 225 kcal - 15p/10f/20c  -->    1. Chole — 220 g — 330 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 2. Brown rice - 150g - 110 kcal - 2p/1f/25c  -->    2. Brown rice — 110 g — 80 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 3. Mixed vegetables - 100g - 50 kcal - 2p/0f/10c  -->    3. Mixed vegetables — 90 g — 45 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 4. Raita - 100g - 100 kcal - 5p/5f/10c  -->    4. Raita — 75 g — 75 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 5. Papadum - 20g - 56 kcal - 2p/0f/12c  -->    5. Papadum — 25 g — 70 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MEAL] - Snack (211 kcal):  -->  - Snack (215 kcal):
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 1. Apple - 1 medium - 95 kcal - 0p/0f/25c  -->    1. Apple — 1 medium — 95 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 2. Peanut butter - 15g - 95 kcal - 4p/8f/4c  -->    2. Peanut butter — 15 g — 95 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 3. Greek yogurt - 50g - 21 kcal - 3p/0f/4c  -->    3. Greek yogurt — 65 g — 25 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MEAL] - Dinner (635 kcal):  -->  - Dinner (645 kcal):
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 1. Paneer bhurji - 200g - 320 kcal - 25p/20f/5c  -->    1. Paneer bhurji — 300 g — 480 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 2. Quinoa - 100g - 120 kcal - 4p/2f/25c  -->    2. Quinoa — 75 g — 90 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 3. Sauteed spinach - 100g - 20 kcal - 3p/0f/3c  -->    3. Sauteed spinach — 150 g — 30 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 4. Grilled bell peppers - 100g - 45 kcal - 1p/0f/10c  -->    4. Grilled bell peppers — 95 g — 45 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: ===== BATCH TRANSFORMATIONS END =====
+
+2025-12-23 20:52:00 [MEALPLAN] INFO: [PROCESS_SINGLE_DAY TIME][MODE=B] 3.03 ms
+2025-12-23 20:52:00 [MEALPLAN] INFO: [REGENERATE] Day 1 successfully corrected
+2025-12-23 20:52:00 [MEALPLAN] INFO: [RAW_INPUT] Length=705, PotentialItems=12, KcalMentions=17
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MEALS_FOUND] Day 2: 4 meals - ['Breakfast', 'Lunch', 'Snack', 'Dinner']
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MEAL_SCALE] Breakfast: Items=391kcal, Stated=531kcal, Scaling by 1.36x
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MEAL_SCALE] Lunch: Items=420kcal, Stated=751kcal, Scaling by 1.79x
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MEAL_SCALE] Snack: Items=145kcal, Stated=214kcal, Scaling by 1.48x
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MEAL_SCALE] Dinner: Items=281kcal, Stated=622kcal, Scaling by 2.00x
+2025-12-23 20:52:00 [MEALPLAN] INFO: [PARSE_RESULT] Parsed 2058 kcal (97% of target 2118)
+2025-12-23 20:52:00 [MEALPLAN] WARNING: [POST-PROCESS] Could not meet calorie target within constraints. Target: 2118, Actual: 1839, Diff: 279. Adjustable items: 9. This preserves realistic portions over exact calories.
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MACRO_CHECK] Day 2: Calories - Target: 2118 | Actual: 1840 | Diff: -278 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MACRO_CHECK] Day 2: Protein  - Target: 185g | Actual: 160g | Diff: -25g (13%)
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MACRO_CHECK] Day 2: Fat      - Target: 82g | Actual: 59g | Diff: -23g (29%)
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MACRO_CHECK] Day 2: Carbs    - Target: 159g | Actual: 216g | Diff: +57g (36%)
+2025-12-23 20:52:00 [MEALPLAN] INFO: [POST_PROCESS_FAILED] Day 2: Even after quantity adjustments, still off - triggering regeneration
+2025-12-23 20:52:00 [MEALPLAN] WARNING: [ANOMALY_DETECTED] Day 2: Calories off by 278 kcal (target: 2118, actual: 1840) - REGENERATING
+2025-12-23 20:52:00 [MEALPLAN] INFO: 
+===== BATCH TRANSFORMATIONS START =====
+2025-12-23 20:52:00 [MEALPLAN] INFO: [DAY] Day 2:  -->  Day 2:
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MEAL] - Breakfast (531 kcal):  -->  - Breakfast (545 kcal):
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 1. Whole Wheat Toast - 2 slices - 140 kcal - 4p/2f/30c  -->    1. Whole Wheat Toast — 2 slice — 190 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 2. Scrambled Eggs - 2 eggs - 140 kcal - 12p/10f/0c  -->    2. Scrambled Eggs — 2 egg — 190 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 3. Mixed Berries - 100g - 60 kcal - 1p/1f/15c  -->    3. Mixed Berries — 150 g — 90 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 4. Greek Yogurt - 100g - 51 kcal - 10p/0f/7c  -->    4. Greek Yogurt — 150 g — 75 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MEAL] - Lunch (751 kcal):  -->  - Lunch (655 kcal):
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 1. Lentil Soup - 200g - 230 kcal - 18p/9f/30c  -->    1. Lentil Soup — 300 g — 345 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 2. Grilled Chicken - 100g - 110 kcal - 25p/3f/0c  -->    2. Grilled Chicken — 150 g — 165 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 3. Whole Wheat Roti - 1 piece - 80 kcal - 2p/1f/15c  -->    3. Whole Wheat Roti — 1 piece — 145 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MEAL] - Snack (214 kcal):  -->  - Snack (220 kcal):
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 1. Carrot Sticks - 100g - 45 kcal - 1p/0f/10c  -->    1. Carrot Sticks — 150 g — 70 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 2. Hummus - 50g - 100 kcal - 2p/10f/6c  -->    2. Hummus — 75 g — 150 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [MEAL] - Dinner (622 kcal):  -->  - Dinner (420 kcal):
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 1. Brown Rice - 150g - 110 kcal - 2p/1f/25c  -->    1. Brown Rice — 225 g — 165 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 2. Grilled Turkey Breast - 120g - 140 kcal - 30p/3f/0c  -->    2. Grilled Turkey Breast — 180 g — 210 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [ITEM] 3. Green Beans - 100g - 31 kcal - 1p/0f/6c  -->    3. Green Beans — 150 g — 45 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: ===== BATCH TRANSFORMATIONS END =====
+
+2025-12-23 20:52:00 [MEALPLAN] INFO: [PROCESS_SINGLE_DAY TIME][MODE=B] 3.05 ms
+2025-12-23 20:52:00 [MEALPLAN] WARNING: [ANOMALY] Day 2 has calorie deficit. Regenerating...
+2025-12-23 20:52:00 [MEALPLAN] INFO: [REGENERATE] Using variety instructions for attempt #1
+2025-12-23 20:52:00 [MEALPLAN] INFO: [REGENERATE] ========== CORRECTION CALL FOR DAY 2 ==========
+2025-12-23 20:52:00 [MEALPLAN] INFO: [REGENERATE] Target: 2118 kcal | Actual: 1840 kcal | Deficit: +278 kcal
+2025-12-23 20:52:00 [MEALPLAN] INFO: [REGENERATE] Protein - Target: 185g | Actual: 160g | Deficit: +25g
+2025-12-23 20:52:00 [MEALPLAN] INFO: [REGENERATE] Fat - Target: 82g | Actual: 59g | Deficit: +23g
+2025-12-23 20:52:00 [MEALPLAN] INFO: [REGENERATE] Carbs - Target: 159g | Actual: 216g | Deficit: -57g
+2025-12-23 20:52:00 [MEALPLAN] INFO: [REGENERATE] Problems: ['Calories off by 278 kcal (target: 2118, actual: 1840)']
+2025-12-23 20:52:00 [MEALPLAN] INFO: [REGENERATE] Dietary (merged): []
+2025-12-23 20:52:00 [MEALPLAN] INFO: [REGENERATE] Allergies (merged): []
+2025-12-23 20:52:00 [MEALPLAN] INFO: [REGENERATE] ======================================================
+2025-12-23 20:52:01 [MEALPLAN] INFO: [REGENERATE] Isolated Day 2 content: 691 chars from 691 total
+2025-12-23 20:52:01 [MEALPLAN] INFO: [RAW_INPUT] Length=691, PotentialItems=12, KcalMentions=17
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MEALS_FOUND] Day 2: 4 meals - ['Breakfast', 'Lunch', 'Snack', 'Dinner']
+2025-12-23 20:52:01 [MEALPLAN] INFO: [PARSE_RESULT] Parsed 2076 kcal (98% of target 2118)
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MACRO_CHECK] Day 2: Calories - Target: 2118 | Actual: 2085 | Diff: -33 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MACRO_CHECK] Day 2: Protein  - Target: 185g | Actual: 195g | Diff: +10g (6%)
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MACRO_CHECK] Day 2: Fat      - Target: 82g | Actual: 43g | Diff: -39g (48%)
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MACRO_CHECK] Day 2: Carbs    - Target: 159g | Actual: 186g | Diff: +27g (17%)
+2025-12-23 20:52:01 [MEALPLAN] INFO: 
+===== BATCH TRANSFORMATIONS START =====
+2025-12-23 20:52:01 [MEALPLAN] INFO: [DAY] Day 2:  -->  Day 2:
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MEAL] - Breakfast (529 kcal):  -->  - Breakfast (445 kcal):
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 1. Masala egg whites - 4 eggs - 168 kcal - 32p/0f/0c  -->    1. Masala egg whites — 4 egg — 170 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 2. Quinoa upma - 150g - 250 kcal - 5p/2f/40c  -->    2. Quinoa upma — 100 g — 165 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 3. Mixed berries - 1 cup - 111 kcal - 1p/1f/25c  -->    3. Mixed berries — 1 cup — 110 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MEAL] - Lunch (741 kcal):  -->  - Lunch (835 kcal):
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 1. Paneer tikka - 200g - 360 kcal - 50p/20f/0c  -->    1. Paneer tikka — 300 g — 540 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 2. Tamarind rice - 200g - 300 kcal - 5p/2f/60c  -->    2. Tamarind rice — 135 g — 200 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 3. Sauteed spinach - 100g - 20 kcal - 3p/0f/1c  -->    3. Sauteed spinach — 150 g — 30 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 4. Cucumber raita - 1 cup - 61 kcal - 5p/0f/10c  -->    4. Cucumber raita — 1 cup — 60 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MEAL] - Snack (211 kcal):  -->  - Snack (210 kcal):
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 1. Apple - 1 medium - 95 kcal - 0p/0f/25c  -->    1. Apple — 1 medium — 95 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 2. Peanut butter - 2 tbsp - 116 kcal - 8p/8f/8c  -->    2. Peanut butter — 2 tbsp — 115 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MEAL] - Dinner (635 kcal):  -->  - Dinner (595 kcal):
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 1. Grilled fish - 200g - 240 kcal - 40p/0f/0c  -->    1. Grilled fish — 290 g — 350 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 2. Pulao - 200g - 300 kcal - 5p/2f/60c  -->    2. Pulao — 135 g — 200 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 3. Steamed broccoli - 100g - 55 kcal - 2p/0f/10c  -->    3. Steamed broccoli — 85 g — 45 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: ===== BATCH TRANSFORMATIONS END =====
+
+2025-12-23 20:52:01 [MEALPLAN] INFO: [PROCESS_SINGLE_DAY TIME][MODE=B] 5.71 ms
+2025-12-23 20:52:01 [MEALPLAN] INFO: [REGENERATE] Day 2 successfully corrected
+2025-12-23 20:52:01 [MEALPLAN] INFO: [RAW_INPUT] Length=639, PotentialItems=11, KcalMentions=16
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MEALS_FOUND] Day 3: 4 meals - ['Breakfast', 'Lunch', 'Snack', 'Dinner']
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MEAL_SCALE] Breakfast: Items=360kcal, Stated=542kcal, Scaling by 1.51x
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MEAL_SCALE] Lunch: Items=295kcal, Stated=759kcal, Scaling by 2.00x
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MEAL_SCALE] Dinner: Items=285kcal, Stated=610kcal, Scaling by 2.00x
+2025-12-23 20:52:01 [MEALPLAN] INFO: [PARSE_RESULT] Parsed 1872 kcal (88% of target 2118)
+2025-12-23 20:52:01 [MEALPLAN] WARNING: [POST-PROCESS] Could not meet calorie target within constraints. Target: 2118, Actual: 1666, Diff: 452. Adjustable items: 10. This preserves realistic portions over exact calories.
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MACRO_CHECK] Day 3: Calories - Target: 2118 | Actual: 1665 | Diff: -453 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MACRO_CHECK] Day 3: Protein  - Target: 185g | Actual: 90g | Diff: -95g (51%)
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MACRO_CHECK] Day 3: Fat      - Target: 82g | Actual: 68g | Diff: -14g (18%)
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MACRO_CHECK] Day 3: Carbs    - Target: 159g | Actual: 180g | Diff: +21g (13%)
+2025-12-23 20:52:01 [MEALPLAN] INFO: [POST_PROCESS_FAILED] Day 3: Even after quantity adjustments, still off - triggering regeneration
+2025-12-23 20:52:01 [MEALPLAN] WARNING: [ANOMALY_DETECTED] Day 3: Calories off by 453 kcal (target: 2118, actual: 1665); Protein off by 51% (target: 185g, actual: 90g) - REGENERATING
+2025-12-23 20:52:01 [MEALPLAN] INFO: 
+===== BATCH TRANSFORMATIONS START =====
+2025-12-23 20:52:01 [MEALPLAN] INFO: [DAY] Day 3:  -->  Day 3:
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MEAL] - Breakfast (542 kcal):  -->  - Breakfast (540 kcal):
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 1. Idli - 2 pieces - 160 kcal - 4p/2f/30c  -->    1. Idli — 2 piece — 240 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 2. Coconut Chutney - 50g - 100 kcal - 1p/10f/6c  -->    2. Coconut Chutney — 75 g — 150 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 3. Mixed Nuts - 20g - 100 kcal - 2p/8f/4c  -->    3. Mixed Nuts — 30 g — 150 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MEAL] - Lunch (759 kcal):  -->  - Lunch (440 kcal):
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 1. Whole Wheat Pasta - 100g - 150 kcal - 4p/2f/30c  -->    1. Whole Wheat Pasta — 150 g — 225 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 2. Grilled Shrimp - 120g - 120 kcal - 20p/2f/0c  -->    2. Grilled Shrimp — 180 g — 180 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 3. Marinara Sauce - 50g - 25 kcal - 1p/0f/6c  -->    3. Marinara Sauce — 75 g — 40 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MEAL] - Snack (207 kcal):  -->  - Snack (255 kcal):
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 1. Rice Cakes - 20g - 70 kcal - 1p/1f/15c  -->    1. Rice Cakes — 30 g — 105 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 2. Almond Butter - 20g - 100 kcal - 2p/8f/4c  -->    2. Almond Butter — 30 g — 150 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [MEAL] - Dinner (610 kcal):  -->  - Dinner (430 kcal):
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 1. Quinoa - 100g - 120 kcal - 4p/2f/20c  -->    1. Quinoa — 150 g — 180 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 2. Roasted Chicken Thigh - 120g - 140 kcal - 20p/10f/0c  -->    2. Roasted Chicken Thigh — 180 g — 210 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [ITEM] 3. Mixed Vegetables - 100g - 25 kcal - 1p/0f/5c  -->    3. Mixed Vegetables — 150 g — 40 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: ===== BATCH TRANSFORMATIONS END =====
+
+2025-12-23 20:52:01 [MEALPLAN] INFO: [PROCESS_SINGLE_DAY TIME][MODE=B] 2.40 ms
+2025-12-23 20:52:01 [MEALPLAN] WARNING: [ANOMALY] Day 3 has calorie deficit. Regenerating...
+2025-12-23 20:52:01 [MEALPLAN] INFO: [REGENERATE] Using variety instructions for attempt #1
+2025-12-23 20:52:01 [MEALPLAN] INFO: [REGENERATE] ========== CORRECTION CALL FOR DAY 3 ==========
+2025-12-23 20:52:01 [MEALPLAN] INFO: [REGENERATE] Target: 2118 kcal | Actual: 1665 kcal | Deficit: +453 kcal
+2025-12-23 20:52:01 [MEALPLAN] INFO: [REGENERATE] Protein - Target: 185g | Actual: 90g | Deficit: +95g
+2025-12-23 20:52:01 [MEALPLAN] INFO: [REGENERATE] Fat - Target: 82g | Actual: 68g | Deficit: +14g
+2025-12-23 20:52:01 [MEALPLAN] INFO: [REGENERATE] Carbs - Target: 159g | Actual: 180g | Deficit: -21g
+2025-12-23 20:52:01 [MEALPLAN] INFO: [REGENERATE] Problems: ['Calories off by 453 kcal (target: 2118, actual: 1665)', 'Protein off by 51% (target: 185g, actual: 90g)']
+2025-12-23 20:52:01 [MEALPLAN] INFO: [REGENERATE] Dietary (merged): []
+2025-12-23 20:52:01 [MEALPLAN] INFO: [REGENERATE] Allergies (merged): []
+2025-12-23 20:52:01 [MEALPLAN] INFO: [REGENERATE] ======================================================
+2025-12-23 20:52:02 [MEALPLAN] INFO: [REGENERATE] Isolated Day 3 content: 810 chars from 810 total
+2025-12-23 20:52:02 [MEALPLAN] INFO: [RAW_INPUT] Length=810, PotentialItems=15, KcalMentions=20
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MEALS_FOUND] Day 3: 4 meals - ['Breakfast', 'Lunch', 'Snack', 'Dinner']
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MEAL_SCALE] Lunch: Items=440kcal, Stated=741kcal, Scaling by 1.68x
+2025-12-23 20:52:02 [MEALPLAN] INFO: [PARSE_RESULT] Parsed 2016 kcal (95% of target 2118)
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MACRO_CHECK] Day 3: Calories - Target: 2118 | Actual: 2030 | Diff: -88 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MACRO_CHECK] Day 3: Protein  - Target: 185g | Actual: 186g | Diff: +1g (1%)
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MACRO_CHECK] Day 3: Fat      - Target: 82g | Actual: 56g | Diff: -26g (32%)
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MACRO_CHECK] Day 3: Carbs    - Target: 159g | Actual: 259g | Diff: +100g (63%)
+2025-12-23 20:52:02 [MEALPLAN] INFO: 
+===== BATCH TRANSFORMATIONS START =====
+2025-12-23 20:52:02 [MEALPLAN] INFO: [DAY] Day 3:  -->  Day 3:
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MEAL] - Breakfast (529 kcal):  -->  - Breakfast (630 kcal):
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 1. Masala egg whites - 200g - 260 kcal - 45p/10f/5c  -->    1. Masala egg whites — 300 g — 390 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 2. Idli - 150g - 170 kcal - 5p/2f/35c  -->    2. Idli — 120 g — 135 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 3. Mixed berries - 100g - 60 kcal - 1p/1f/15c  -->    3. Mixed berries — 90 g — 55 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 4. Almonds - 20g - 39 kcal - 2p/3f/2c  -->    4. Almonds — 25 g — 50 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MEAL] - Lunch (741 kcal):  -->  - Lunch (600 kcal):
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 1. Rajma - 150g - 225 kcal - 20p/10f/30c  -->    1. Rajma — 225 g — 340 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 2. Quinoa - 150g - 150 kcal - 4p/2f/30c  -->    2. Quinoa — 185 g — 185 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 3. Sauteed spinach - 100g - 20 kcal - 3p/0f/3c  -->    3. Sauteed spinach — 150 g — 30 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 4. Roasted bell peppers - 100g - 45 kcal - 1p/0f/10c  -->    4. Roasted bell peppers — 105 g — 45 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MEAL] - Snack (211 kcal):  -->  - Snack (280 kcal):
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 1. Cottage cheese - 150g - 100 kcal - 20p/0f/5c  -->    1. Cottage cheese — 225 g — 150 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 2. Sliced peaches - 150g - 65 kcal - 1p/0f/15c  -->    2. Sliced peaches — 135 g — 60 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 3. Walnuts - 20g - 46 kcal - 2p/4f/2c  -->    3. Walnuts — 30 g — 70 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MEAL] - Dinner (635 kcal):  -->  - Dinner (525 kcal):
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 1. Mixed dal - 200g - 320 kcal - 25p/10f/50c  -->    1. Mixed dal — 195 g — 310 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 2. Millet rice - 150g - 150 kcal - 3p/2f/30c  -->    2. Millet rice — 115 g — 115 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 3. Grilled zucchini - 100g - 25 kcal - 2p/0f/5c  -->    3. Grilled zucchini — 150 g — 40 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 4. Cucumber raita - 100g - 40 kcal - 5p/0f/5c  -->    4. Cucumber raita — 150 g — 60 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: ===== BATCH TRANSFORMATIONS END =====
+
+2025-12-23 20:52:02 [MEALPLAN] INFO: [PROCESS_SINGLE_DAY TIME][MODE=B] 2.40 ms
+2025-12-23 20:52:02 [MEALPLAN] INFO: [REGENERATE] Day 3 successfully corrected
+2025-12-23 20:52:02 [MEALPLAN] INFO: [RAW_INPUT] Length=661, PotentialItems=11, KcalMentions=16
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MEALS_FOUND] Day 4: 4 meals - ['Breakfast', 'Lunch', 'Snack', 'Dinner']
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MEAL_SCALE] Breakfast: Items=340kcal, Stated=548kcal, Scaling by 1.61x
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MEAL_SCALE] Lunch: Items=275kcal, Stated=767kcal, Scaling by 2.00x
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MEAL_SCALE] Dinner: Items=334kcal, Stated=602kcal, Scaling by 1.80x
+2025-12-23 20:52:02 [MEALPLAN] INFO: [PARSE_RESULT] Parsed 1885 kcal (89% of target 2118)
+2025-12-23 20:52:02 [MEALPLAN] WARNING: [POST-PROCESS] Could not meet calorie target within constraints. Target: 2118, Actual: 1688, Diff: 430. Adjustable items: 6. This preserves realistic portions over exact calories.
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MACRO_CHECK] Day 4: Calories - Target: 2118 | Actual: 1690 | Diff: -428 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MACRO_CHECK] Day 4: Protein  - Target: 185g | Actual: 135g | Diff: -50g (27%)
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MACRO_CHECK] Day 4: Fat      - Target: 82g | Actual: 43g | Diff: -39g (48%)
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MACRO_CHECK] Day 4: Carbs    - Target: 159g | Actual: 209g | Diff: +50g (32%)
+2025-12-23 20:52:02 [MEALPLAN] INFO: [POST_PROCESS_FAILED] Day 4: Even after quantity adjustments, still off - triggering regeneration
+2025-12-23 20:52:02 [MEALPLAN] WARNING: [ANOMALY_DETECTED] Day 4: Calories off by 428 kcal (target: 2118, actual: 1690); Protein off by 27% (target: 185g, actual: 135g) - REGENERATING
+2025-12-23 20:52:02 [MEALPLAN] INFO: 
+===== BATCH TRANSFORMATIONS START =====
+2025-12-23 20:52:02 [MEALPLAN] INFO: [DAY] Day 4:  -->  Day 4:
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MEAL] - Breakfast (548 kcal):  -->  - Breakfast (540 kcal):
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 1. Omelette - 2 eggs - 140 kcal - 12p/10f/0c  -->    1. Omelette — 2 egg — 225 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 2. Whole Wheat Toast - 2 slices - 140 kcal - 4p/2f/30c  -->    2. Whole Wheat Toast — 2 slice — 225 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 3. Mixed Berries - 100g - 60 kcal - 1p/1f/15c  -->    3. Mixed Berries — 150 g — 90 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MEAL] - Lunch (767 kcal):  -->  - Lunch (410 kcal):
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 1. Brown Rice - 150g - 110 kcal - 2p/1f/25c  -->    1. Brown Rice — 225 g — 165 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 2. Grilled Chicken Breast - 120g - 140 kcal - 30p/3f/0c  -->    2. Grilled Chicken Breast — 180 g — 210 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 3. Mixed Vegetables - 100g - 25 kcal - 1p/0f/5c  -->    3. Mixed Vegetables — 150 g — 40 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MEAL] - Snack (201 kcal):  -->  - Snack (185 kcal):
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 1. Apple - 1 medium - 95 kcal - 0p/0f/25c  -->    1. Apple — 1 medium — 95 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 2. Peanut Butter - 15g - 90 kcal - 3p/8f/4c  -->    2. Peanut Butter — 15 g — 90 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [MEAL] - Dinner (602 kcal):  -->  - Dinner (550 kcal):
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 1. Whole Wheat Roti - 2 pieces - 160 kcal - 4p/2f/30c  -->    1. Whole Wheat Roti — 2 piece — 290 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 2. Grilled Turkey Breast - 120g - 140 kcal - 30p/3f/0c  -->    2. Grilled Turkey Breast — 180 g — 210 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [ITEM] 3. Broccoli - 100g - 34 kcal - 2p/0f/7c  -->    3. Broccoli — 150 g — 50 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: ===== BATCH TRANSFORMATIONS END =====
+
+2025-12-23 20:52:02 [MEALPLAN] INFO: [PROCESS_SINGLE_DAY TIME][MODE=B] 3.81 ms
+2025-12-23 20:52:02 [MEALPLAN] WARNING: [ANOMALY] Day 4 has calorie deficit. Regenerating...
+2025-12-23 20:52:02 [MEALPLAN] INFO: [REGENERATE] Using variety instructions for attempt #1
+2025-12-23 20:52:02 [MEALPLAN] INFO: [REGENERATE] ========== CORRECTION CALL FOR DAY 4 ==========
+2025-12-23 20:52:02 [MEALPLAN] INFO: [REGENERATE] Target: 2118 kcal | Actual: 1690 kcal | Deficit: +428 kcal
+2025-12-23 20:52:02 [MEALPLAN] INFO: [REGENERATE] Protein - Target: 185g | Actual: 135g | Deficit: +50g
+2025-12-23 20:52:02 [MEALPLAN] INFO: [REGENERATE] Fat - Target: 82g | Actual: 43g | Deficit: +39g
+2025-12-23 20:52:02 [MEALPLAN] INFO: [REGENERATE] Carbs - Target: 159g | Actual: 209g | Deficit: -50g
+2025-12-23 20:52:02 [MEALPLAN] INFO: [REGENERATE] Problems: ['Calories off by 428 kcal (target: 2118, actual: 1690)', 'Protein off by 27% (target: 185g, actual: 135g)']
+2025-12-23 20:52:02 [MEALPLAN] INFO: [REGENERATE] Dietary (merged): []
+2025-12-23 20:52:02 [MEALPLAN] INFO: [REGENERATE] Allergies (merged): []
+2025-12-23 20:52:02 [MEALPLAN] INFO: [REGENERATE] ======================================================
+2025-12-23 20:52:04 [MEALPLAN] INFO: [REGENERATE] Isolated Day 4 content: 704 chars from 704 total
+2025-12-23 20:52:04 [MEALPLAN] INFO: [RAW_INPUT] Length=704, PotentialItems=12, KcalMentions=17
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MEALS_FOUND] Day 4: 4 meals - ['Breakfast', 'Lunch', 'Snack', 'Dinner']
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MEAL_SCALE] Dinner: Items=410kcal, Stated=635kcal, Scaling by 1.55x
+2025-12-23 20:52:04 [MEALPLAN] INFO: [PARSE_RESULT] Parsed 2116 kcal (100% of target 2118)
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MACRO_CHECK] Day 4: Calories - Target: 2118 | Actual: 2115 | Diff: -3 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MACRO_CHECK] Day 4: Protein  - Target: 185g | Actual: 185g | Diff: +0g (0%)
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MACRO_CHECK] Day 4: Fat      - Target: 82g | Actual: 82g | Diff: +0g (0%)
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MACRO_CHECK] Day 4: Carbs    - Target: 159g | Actual: 159g | Diff: -0g (0%)
+2025-12-23 20:52:04 [MEALPLAN] INFO: 
+===== BATCH TRANSFORMATIONS START =====
+2025-12-23 20:52:04 [MEALPLAN] INFO: [DAY] Day 4:  -->  Day 4:
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MEAL] - Breakfast (529 kcal):  -->  - Breakfast (530 kcal):
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 1. Scrambled eggs - 4 eggs - 280 kcal - 24g/18g/0g  -->    1. Scrambled eggs — 4 egg — 280 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 2. Oatmeal - 150g - 150 kcal - 5g/2g/25g  -->    2. Oatmeal — 150 g — 150 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 3. Banana - 1 medium - 99 kcal - 1g/0g/25g  -->    3. Banana — 1 medium — 100 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MEAL] - Lunch (741 kcal):  -->  - Lunch (740 kcal):
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 1. Grilled chicken breast - 150g - 165 kcal - 35g/3g/0g  -->    1. Grilled chicken breast — 150 g — 165 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 2. Jeera rice - 200g - 250 kcal - 4g/2g/45g  -->    2. Jeera rice — 200 g — 250 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 3. Mixed vegetables - 100g - 45 kcal - 2g/0g/10g  -->    3. Mixed vegetables — 100 g — 45 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 4. Dal tadka - 100g - 281 kcal - 15g/10g/30g  -->    4. Dal tadka — 100 g — 280 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MEAL] - Snack (211 kcal):  -->  - Snack (210 kcal):
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 1. Apple - 1 medium - 95 kcal - 0g/0g/25g  -->    1. Apple — 1 medium — 95 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 2. Peanut butter - 20g - 116 kcal - 4g/8g/4g  -->    2. Peanut butter — 20 g — 115 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MEAL] - Dinner (635 kcal):  -->  - Dinner (635 kcal):
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 1. Kidney beans curry - 200g - 250 kcal - 20g/10g/30g  -->    1. Kidney beans curry — 310 g — 390 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 2. Whole wheat bread - 2 slices - 140 kcal - 4g/2g/25g  -->    2. Whole wheat bread — 2 slice — 215 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 3. Sauteed spinach - 100g - 20 kcal - 3g/0g/1g  -->    3. Sauteed spinach — 155 g — 30 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: ===== BATCH TRANSFORMATIONS END =====
+
+2025-12-23 20:52:04 [MEALPLAN] INFO: [PROCESS_SINGLE_DAY TIME][MODE=B] 4.98 ms
+2025-12-23 20:52:04 [MEALPLAN] INFO: [REGENERATE] Day 4 successfully corrected
+2025-12-23 20:52:04 [MEALPLAN] INFO: [RAW_INPUT] Length=629, PotentialItems=11, KcalMentions=16
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MEALS_FOUND] Day 5: 4 meals - ['Breakfast', 'Lunch', 'Snack', 'Dinner']
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MEAL_SCALE] Breakfast: Items=305kcal, Stated=555kcal, Scaling by 1.82x
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MEAL_SCALE] Lunch: Items=325kcal, Stated=779kcal, Scaling by 2.00x
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MEAL_SCALE] Snack: Items=145kcal, Stated=195kcal, Scaling by 1.34x
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MEAL_SCALE] Dinner: Items=281kcal, Stated=589kcal, Scaling by 2.00x
+2025-12-23 20:52:04 [MEALPLAN] INFO: [PARSE_RESULT] Parsed 1962 kcal (93% of target 2118)
+2025-12-23 20:52:04 [MEALPLAN] WARNING: [POST-PROCESS] Could not meet calorie target within constraints. Target: 2118, Actual: 1618, Diff: 500. Adjustable items: 10. This preserves realistic portions over exact calories.
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MACRO_CHECK] Day 5: Calories - Target: 2118 | Actual: 1620 | Diff: -498 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MACRO_CHECK] Day 5: Protein  - Target: 185g | Actual: 149g | Diff: -36g (20%)
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MACRO_CHECK] Day 5: Fat      - Target: 82g | Actual: 51g | Diff: -31g (38%)
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MACRO_CHECK] Day 5: Carbs    - Target: 159g | Actual: 172g | Diff: +13g (8%)
+2025-12-23 20:52:04 [MEALPLAN] INFO: [POST_PROCESS_FAILED] Day 5: Even after quantity adjustments, still off - triggering regeneration
+2025-12-23 20:52:04 [MEALPLAN] WARNING: [ANOMALY_DETECTED] Day 5: Calories off by 498 kcal (target: 2118, actual: 1620) - REGENERATING
+2025-12-23 20:52:04 [MEALPLAN] INFO: 
+===== BATCH TRANSFORMATIONS START =====
+2025-12-23 20:52:04 [MEALPLAN] INFO: [DAY] Day 5:  -->  Day 5:
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MEAL] - Breakfast (555 kcal):  -->  - Breakfast (490 kcal):
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 1. Greek Yogurt - 200g - 100 kcal - 20p/0f/7c  -->    1. Greek Yogurt — 300 g — 150 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 2. Mixed Nuts - 20g - 100 kcal - 2p/8f/4c  -->    2. Mixed Nuts — 30 g — 150 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 3. Banana - 1 medium - 105 kcal - 1p/0f/26c  -->    3. Banana — 1 medium — 190 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MEAL] - Lunch (779 kcal):  -->  - Lunch (490 kcal):
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 1. Quinoa - 100g - 120 kcal - 4p/2f/20c  -->    1. Quinoa — 150 g — 180 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 2. Grilled Salmon - 120g - 180 kcal - 35p/10f/0c  -->    2. Grilled Salmon — 180 g — 270 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 3. Mixed Vegetables - 100g - 25 kcal - 1p/0f/5c  -->    3. Mixed Vegetables — 150 g — 40 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MEAL] - Snack (195 kcal):  -->  - Snack (220 kcal):
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 1. Carrot Sticks - 100g - 45 kcal - 1p/0f/10c  -->    1. Carrot Sticks — 150 g — 70 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 2. Hummus - 40g - 100 kcal - 2p/10f/6c  -->    2. Hummus — 60 g — 150 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [MEAL] - Dinner (589 kcal):  -->  - Dinner (420 kcal):
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 1. Brown Rice - 150g - 110 kcal - 2p/1f/25c  -->    1. Brown Rice — 225 g — 165 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 2. Grilled Chicken Breast - 120g - 140 kcal - 30p/3f/0c  -->    2. Grilled Chicken Breast — 180 g — 210 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [ITEM] 3. Green Beans - 100g - 31 kcal - 1p/0f/6c  -->    3. Green Beans — 150 g — 45 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: ===== BATCH TRANSFORMATIONS END =====
+
+2025-12-23 20:52:04 [MEALPLAN] INFO: [PROCESS_SINGLE_DAY TIME][MODE=B] 3.23 ms
+2025-12-23 20:52:04 [MEALPLAN] WARNING: [ANOMALY] Day 5 has calorie deficit. Regenerating...
+2025-12-23 20:52:04 [MEALPLAN] INFO: [REGENERATE] Using variety instructions for attempt #1
+2025-12-23 20:52:04 [MEALPLAN] INFO: [REGENERATE] ========== CORRECTION CALL FOR DAY 5 ==========
+2025-12-23 20:52:04 [MEALPLAN] INFO: [REGENERATE] Target: 2118 kcal | Actual: 1620 kcal | Deficit: +498 kcal
+2025-12-23 20:52:04 [MEALPLAN] INFO: [REGENERATE] Protein - Target: 185g | Actual: 149g | Deficit: +36g
+2025-12-23 20:52:04 [MEALPLAN] INFO: [REGENERATE] Fat - Target: 82g | Actual: 51g | Deficit: +31g
+2025-12-23 20:52:04 [MEALPLAN] INFO: [REGENERATE] Carbs - Target: 159g | Actual: 172g | Deficit: -13g
+2025-12-23 20:52:04 [MEALPLAN] INFO: [REGENERATE] Problems: ['Calories off by 498 kcal (target: 2118, actual: 1620)']
+2025-12-23 20:52:04 [MEALPLAN] INFO: [REGENERATE] Dietary (merged): []
+2025-12-23 20:52:04 [MEALPLAN] INFO: [REGENERATE] Allergies (merged): []
+2025-12-23 20:52:04 [MEALPLAN] INFO: [REGENERATE] ======================================================
+2025-12-23 20:52:05 [MEALPLAN] INFO: [REGENERATE] Isolated Day 5 content: 674 chars from 674 total
+2025-12-23 20:52:05 [MEALPLAN] INFO: [RAW_INPUT] Length=674, PotentialItems=12, KcalMentions=17
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MEALS_FOUND] Day 5: 4 meals - ['Breakfast', 'Lunch', 'Snack', 'Dinner']
+2025-12-23 20:52:05 [MEALPLAN] INFO: [PARSE_RESULT] Parsed 2021 kcal (95% of target 2118)
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MACRO_CHECK] Day 5: Calories - Target: 2118 | Actual: 2100 | Diff: -18 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MACRO_CHECK] Day 5: Protein  - Target: 185g | Actual: 129g | Diff: -56g (30%)
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MACRO_CHECK] Day 5: Fat      - Target: 82g | Actual: 84g | Diff: +2g (3%)
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MACRO_CHECK] Day 5: Carbs    - Target: 159g | Actual: 203g | Diff: +44g (28%)
+2025-12-23 20:52:05 [MEALPLAN] INFO: [POST_PROCESS_FAILED] Day 5: Even after quantity adjustments, still off - triggering regeneration
+2025-12-23 20:52:05 [MEALPLAN] WARNING: [ANOMALY_DETECTED] Day 5: Protein off by 30% (target: 185g, actual: 129g) - REGENERATING
+2025-12-23 20:52:05 [MEALPLAN] INFO: 
+===== BATCH TRANSFORMATIONS START =====
+2025-12-23 20:52:05 [MEALPLAN] INFO: [DAY] Day 5:  -->  Day 5:
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MEAL] - Breakfast (529 kcal):  -->  - Breakfast (485 kcal):
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 1. Scrambled eggs - 4 eggs - 240 kcal - 20p/16f/0c  -->    1. Scrambled eggs — 4 egg — 240 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 2. Ragi porridge - 200g - 170 kcal - 5p/2f/30c  -->    2. Ragi porridge — 150 g — 130 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 3. Banana - 1 medium - 119 kcal - 1p/0f/29c  -->    3. Banana — 1 medium — 120 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MEAL] - Lunch (741 kcal):  -->  - Lunch (800 kcal):
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 1. Soya keema - 150g - 210 kcal - 30p/10f/5c  -->    1. Soya keema — 220 g — 310 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 2. Khichdi - 250g - 300 kcal - 10p/10f/40c  -->    2. Khichdi — 215 g — 260 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 3. Mixed vegetables - 100g - 50 kcal - 2p/0f/10c  -->    3. Mixed vegetables — 105 g — 50 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 4. Raita - 1 cup - 181 kcal - 10p/10f/15c  -->    4. Raita — 1 cup — 180 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MEAL] - Snack (211 kcal):  -->  - Snack (270 kcal):
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 1. Apple - 1 medium - 95 kcal - 0p/0f/25c  -->    1. Apple — 1 medium — 95 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 2. Almonds - 20g - 116 kcal - 2p/10f/2c  -->    2. Almonds — 30 g — 175 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MEAL] - Dinner (635 kcal):  -->  - Dinner (545 kcal):
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 1. Chana masala - 200g - 300 kcal - 25p/15f/20c  -->    1. Chana masala — 225 g — 340 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 2. Brown rice - 200g - 220 kcal - 5p/2f/40c  -->    2. Brown rice — 160 g — 175 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 3. Sauteed spinach - 100g - 20 kcal - 3p/0f/1c  -->    3. Sauteed spinach — 150 g — 30 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: ===== BATCH TRANSFORMATIONS END =====
+
+2025-12-23 20:52:05 [MEALPLAN] INFO: [PROCESS_SINGLE_DAY TIME][MODE=B] 4.06 ms
+2025-12-23 20:52:05 [MEALPLAN] WARNING: [REGENERATE] Day 5 still has issues after correction, using corrected version anyway
+2025-12-23 20:52:05 [MEALPLAN] INFO: [RAW_INPUT] Length=659, PotentialItems=11, KcalMentions=16
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MEALS_FOUND] Day 6: 4 meals - ['Breakfast', 'Lunch', 'Snack', 'Dinner']
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MEAL_SCALE] Breakfast: Items=340kcal, Stated=562kcal, Scaling by 1.65x
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MEAL_SCALE] Lunch: Items=295kcal, Stated=793kcal, Scaling by 2.00x
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MEAL_SCALE] Dinner: Items=285kcal, Stated=572kcal, Scaling by 2.00x
+2025-12-23 20:52:05 [MEALPLAN] INFO: [PARSE_RESULT] Parsed 1892 kcal (89% of target 2118)
+2025-12-23 20:52:05 [MEALPLAN] WARNING: [POST-PROCESS] Could not meet calorie target within constraints. Target: 2118, Actual: 1678, Diff: 440. Adjustable items: 9. This preserves realistic portions over exact calories.
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MACRO_CHECK] Day 6: Calories - Target: 2118 | Actual: 1680 | Diff: -438 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MACRO_CHECK] Day 6: Protein  - Target: 185g | Actual: 107g | Diff: -78g (42%)
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MACRO_CHECK] Day 6: Fat      - Target: 82g | Actual: 59g | Diff: -23g (28%)
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MACRO_CHECK] Day 6: Carbs    - Target: 159g | Actual: 192g | Diff: +33g (21%)
+2025-12-23 20:52:05 [MEALPLAN] INFO: [POST_PROCESS_FAILED] Day 6: Even after quantity adjustments, still off - triggering regeneration
+2025-12-23 20:52:05 [MEALPLAN] WARNING: [ANOMALY_DETECTED] Day 6: Calories off by 438 kcal (target: 2118, actual: 1680); Protein off by 42% (target: 185g, actual: 107g) - REGENERATING
+2025-12-23 20:52:05 [MEALPLAN] INFO: 
+===== BATCH TRANSFORMATIONS START =====
+2025-12-23 20:52:05 [MEALPLAN] INFO: [DAY] Day 6:  -->  Day 6:
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MEAL] - Breakfast (562 kcal):  -->  - Breakfast (555 kcal):
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 1. Whole Wheat Toast - 2 slices - 140 kcal - 4p/2f/30c  -->    1. Whole Wheat Toast — 2 slice — 230 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 2. Scrambled Eggs - 2 eggs - 140 kcal - 12p/10f/0c  -->    2. Scrambled Eggs — 2 egg — 230 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 3. Mixed Berries - 100g - 60 kcal - 1p/1f/15c  -->    3. Mixed Berries — 150 g — 90 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MEAL] - Lunch (793 kcal):  -->  - Lunch (440 kcal):
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 1. Whole Wheat Pasta - 100g - 150 kcal - 4p/2f/30c  -->    1. Whole Wheat Pasta — 150 g — 225 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 2. Grilled Shrimp - 120g - 120 kcal - 20p/2f/0c  -->    2. Grilled Shrimp — 180 g — 180 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 3. Marinara Sauce - 50g - 25 kcal - 1p/0f/6c  -->    3. Marinara Sauce — 75 g — 40 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MEAL] - Snack (191 kcal):  -->  - Snack (255 kcal):
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 1. Rice Cakes - 20g - 70 kcal - 1p/1f/15c  -->    1. Rice Cakes — 30 g — 105 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 2. Almond Butter - 20g - 100 kcal - 2p/8f/4c  -->    2. Almond Butter — 30 g — 150 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [MEAL] - Dinner (572 kcal):  -->  - Dinner (430 kcal):
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 1. Quinoa - 100g - 120 kcal - 4p/2f/20c  -->    1. Quinoa — 150 g — 180 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 2. Roasted Chicken Thigh - 120g - 140 kcal - 20p/10f/0c  -->    2. Roasted Chicken Thigh — 180 g — 210 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [ITEM] 3. Mixed Vegetables - 100g - 25 kcal - 1p/0f/5c  -->    3. Mixed Vegetables — 150 g — 40 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: ===== BATCH TRANSFORMATIONS END =====
+
+2025-12-23 20:52:05 [MEALPLAN] INFO: [PROCESS_SINGLE_DAY TIME][MODE=B] 4.68 ms
+2025-12-23 20:52:05 [MEALPLAN] WARNING: [ANOMALY] Day 6 has calorie deficit. Regenerating...
+2025-12-23 20:52:05 [MEALPLAN] INFO: [REGENERATE] Using variety instructions for attempt #1
+2025-12-23 20:52:05 [MEALPLAN] INFO: [REGENERATE] ========== CORRECTION CALL FOR DAY 6 ==========
+2025-12-23 20:52:05 [MEALPLAN] INFO: [REGENERATE] Target: 2118 kcal | Actual: 1680 kcal | Deficit: +438 kcal
+2025-12-23 20:52:05 [MEALPLAN] INFO: [REGENERATE] Protein - Target: 185g | Actual: 107g | Deficit: +78g
+2025-12-23 20:52:05 [MEALPLAN] INFO: [REGENERATE] Fat - Target: 82g | Actual: 59g | Deficit: +23g
+2025-12-23 20:52:05 [MEALPLAN] INFO: [REGENERATE] Carbs - Target: 159g | Actual: 192g | Deficit: -33g
+2025-12-23 20:52:05 [MEALPLAN] INFO: [REGENERATE] Problems: ['Calories off by 438 kcal (target: 2118, actual: 1680)', 'Protein off by 42% (target: 185g, actual: 107g)']
+2025-12-23 20:52:05 [MEALPLAN] INFO: [REGENERATE] Dietary (merged): []
+2025-12-23 20:52:05 [MEALPLAN] INFO: [REGENERATE] Allergies (merged): []
+2025-12-23 20:52:05 [MEALPLAN] INFO: [REGENERATE] ======================================================
+2025-12-23 20:52:06 [MEALPLAN] INFO: [REGENERATE] Isolated Day 6 content: 801 chars from 801 total
+2025-12-23 20:52:06 [MEALPLAN] INFO: [RAW_INPUT] Length=801, PotentialItems=14, KcalMentions=19
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MEALS_FOUND] Day 6: 4 meals - ['Breakfast', 'Lunch', 'Snack', 'Dinner']
+2025-12-23 20:52:06 [MEALPLAN] INFO: [PARSE_RESULT] Parsed 2116 kcal (100% of target 2118)
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MACRO_CHECK] Day 6: Calories - Target: 2118 | Actual: 2115 | Diff: -3 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MACRO_CHECK] Day 6: Protein  - Target: 185g | Actual: 185g | Diff: +0g (0%)
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MACRO_CHECK] Day 6: Fat      - Target: 82g | Actual: 82g | Diff: +0g (0%)
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MACRO_CHECK] Day 6: Carbs    - Target: 159g | Actual: 159g | Diff: -0g (0%)
+2025-12-23 20:52:06 [MEALPLAN] INFO: 
+===== BATCH TRANSFORMATIONS START =====
+2025-12-23 20:52:06 [MEALPLAN] INFO: [DAY] Day 6:  -->  Day 6:
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MEAL] - Breakfast (529 kcal):  -->  - Breakfast (530 kcal):
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 1. Boiled eggs - 4 eggs - 224 kcal - 18g/15g/0g  -->    1. Boiled eggs — 4 egg — 225 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 2. Multigrain toast - 2 slices - 140 kcal - 4g/2g/30g  -->    2. Multigrain toast — 2 slice — 140 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 3. Mixed berries - 1 cup - 65 kcal - 1g/1g/15g  -->    3. Mixed berries — 1 cup — 65 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 4. Almond butter - 2 tbsp - 100 kcal - 2g/8g/4g  -->    4. Almond butter — 2 tbsp — 100 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MEAL] - Lunch (741 kcal):  -->  - Lunch (740 kcal):
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 1. Kadai paneer - 200g - 320 kcal - 25g/20g/5g  -->    1. Kadai paneer — 200 g — 320 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 2. Jeera rice - 150g - 210 kcal - 2g/2g/45g  -->    2. Jeera rice — 150 g — 210 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 3. Sauteed spinach - 100g - 20 kcal - 3g/0g/1g  -->    3. Sauteed spinach — 100 g — 20 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 4. Raita - 1 cup - 191 kcal - 10g/10g/10g  -->    4. Raita — 1 cup — 190 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MEAL] - Snack (211 kcal):  -->  - Snack (210 kcal):
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 1. Apple - 1 medium - 95 kcal - 0g/0g/25g  -->    1. Apple — 1 medium — 95 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 2. Peanut butter - 2 tbsp - 116 kcal - 4g/8g/4g  -->    2. Peanut butter — 2 tbsp — 115 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MEAL] - Dinner (635 kcal):  -->  - Dinner (635 kcal):
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 1. Egg white curry - 250g - 260 kcal - 40g/0g/5g  -->    1. Egg white curry — 250 g — 260 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 2. Tamarind rice - 150g - 225 kcal - 2g/2g/45g  -->    2. Tamarind rice — 150 g — 225 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 3. Roasted bell peppers - 100g - 45 kcal - 1g/0g/10g  -->    3. Roasted bell peppers — 100 g — 45 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 4. Cucumber raita - 1 cup - 105 kcal - 5g/5g/10g  -->    4. Cucumber raita — 1 cup — 105 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: ===== BATCH TRANSFORMATIONS END =====
+
+2025-12-23 20:52:06 [MEALPLAN] INFO: [PROCESS_SINGLE_DAY TIME][MODE=B] 2.22 ms
+2025-12-23 20:52:06 [MEALPLAN] INFO: [REGENERATE] Day 6 successfully corrected
+2025-12-23 20:52:06 [MEALPLAN] INFO: [RAW_INPUT] Length=647, PotentialItems=11, KcalMentions=16
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MEALS_FOUND] Day 7: 4 meals - ['Breakfast', 'Lunch', 'Snack', 'Dinner']
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MEAL_SCALE] Breakfast: Items=360kcal, Stated=575kcal, Scaling by 1.60x
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MEAL_SCALE] Lunch: Items=275kcal, Stated=809kcal, Scaling by 2.00x
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MEAL_SCALE] Dinner: Items=334kcal, Stated=561kcal, Scaling by 1.68x
+2025-12-23 20:52:06 [MEALPLAN] INFO: [PARSE_RESULT] Parsed 1871 kcal (88% of target 2118)
+2025-12-23 20:52:06 [MEALPLAN] WARNING: [POST-PROCESS] Could not meet calorie target within constraints. Target: 2118, Actual: 1683, Diff: 435. Adjustable items: 7. This preserves realistic portions over exact calories.
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MACRO_CHECK] Day 7: Calories - Target: 2118 | Actual: 1685 | Diff: -433 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MACRO_CHECK] Day 7: Protein  - Target: 185g | Actual: 118g | Diff: -67g (36%)
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MACRO_CHECK] Day 7: Fat      - Target: 82g | Actual: 52g | Diff: -30g (37%)
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MACRO_CHECK] Day 7: Carbs    - Target: 159g | Actual: 198g | Diff: +39g (24%)
+2025-12-23 20:52:06 [MEALPLAN] INFO: [POST_PROCESS_FAILED] Day 7: Even after quantity adjustments, still off - triggering regeneration
+2025-12-23 20:52:06 [MEALPLAN] WARNING: [ANOMALY_DETECTED] Day 7: Calories off by 433 kcal (target: 2118, actual: 1685); Protein off by 36% (target: 185g, actual: 118g) - REGENERATING
+2025-12-23 20:52:06 [MEALPLAN] INFO: 
+===== BATCH TRANSFORMATIONS START =====
+2025-12-23 20:52:06 [MEALPLAN] INFO: [DAY] Day 7:  -->  Day 7:
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MEAL] - Breakfast (575 kcal):  -->  - Breakfast (555 kcal):
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 1. Idli - 2 pieces - 160 kcal - 4p/2f/30c  -->    1. Idli — 2 piece — 255 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 2. Coconut Chutney - 50g - 100 kcal - 1p/10f/6c  -->    2. Coconut Chutney — 75 g — 150 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 3. Mixed Nuts - 20g - 100 kcal - 2p/8f/4c  -->    3. Mixed Nuts — 30 g — 150 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MEAL] - Lunch (809 kcal):  -->  - Lunch (410 kcal):
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 1. Brown Rice - 150g - 110 kcal - 2p/1f/25c  -->    1. Brown Rice — 225 g — 165 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 2. Grilled Chicken Breast - 120g - 140 kcal - 30p/3f/0c  -->    2. Grilled Chicken Breast — 180 g — 210 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 3. Mixed Vegetables - 100g - 25 kcal - 1p/0f/5c  -->    3. Mixed Vegetables — 150 g — 40 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MEAL] - Snack (183 kcal):  -->  - Snack (185 kcal):
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 1. Apple - 1 medium - 95 kcal - 0p/0f/25c  -->    1. Apple — 1 medium — 95 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 2. Peanut Butter - 15g - 90 kcal - 3p/8f/4c  -->    2. Peanut Butter — 15 g — 90 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [MEAL] - Dinner (561 kcal):  -->  - Dinner (530 kcal):
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 1. Whole Wheat Roti - 2 pieces - 160 kcal - 4p/2f/30c  -->    1. Whole Wheat Roti — 2 piece — 270 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 2. Grilled Turkey Breast - 120g - 140 kcal - 30p/3f/0c  -->    2. Grilled Turkey Breast — 180 g — 210 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [ITEM] 3. Broccoli - 100g - 34 kcal - 2p/0f/7c  -->    3. Broccoli — 150 g — 50 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: ===== BATCH TRANSFORMATIONS END =====
+
+2025-12-23 20:52:06 [MEALPLAN] INFO: [PROCESS_SINGLE_DAY TIME][MODE=B] 3.07 ms
+2025-12-23 20:52:06 [MEALPLAN] INFO: [REGENERATE] Using variety instructions for attempt #1
+2025-12-23 20:52:06 [MEALPLAN] INFO: [REGENERATE] ========== CORRECTION CALL FOR DAY 7 ==========
+2025-12-23 20:52:06 [MEALPLAN] INFO: [REGENERATE] Target: 2118 kcal | Actual: 1685 kcal | Deficit: +433 kcal
+2025-12-23 20:52:06 [MEALPLAN] INFO: [REGENERATE] Protein - Target: 185g | Actual: 118g | Deficit: +67g
+2025-12-23 20:52:06 [MEALPLAN] INFO: [REGENERATE] Fat - Target: 82g | Actual: 52g | Deficit: +30g
+2025-12-23 20:52:06 [MEALPLAN] INFO: [REGENERATE] Carbs - Target: 159g | Actual: 198g | Deficit: -39g
+2025-12-23 20:52:06 [MEALPLAN] INFO: [REGENERATE] Problems: ['Calories off by 433 kcal (target: 2118, actual: 1685)', 'Protein off by 36% (target: 185g, actual: 118g)']
+2025-12-23 20:52:06 [MEALPLAN] INFO: [REGENERATE] Dietary (merged): []
+2025-12-23 20:52:06 [MEALPLAN] INFO: [REGENERATE] Allergies (merged): []
+2025-12-23 20:52:06 [MEALPLAN] INFO: [REGENERATE] ======================================================
+2025-12-23 20:52:08 [MEALPLAN] INFO: [REGENERATE] Isolated Day 7 content: 1042 chars from 1042 total
+2025-12-23 20:52:08 [MEALPLAN] INFO: [RAW_INPUT] Length=1042, PotentialItems=14, KcalMentions=19
+2025-12-23 20:52:08 [MEALPLAN] INFO: [MEALS_FOUND] Day 7: 4 meals - ['Breakfast', 'Lunch', 'Snack', 'Dinner']
+2025-12-23 20:52:08 [MEALPLAN] INFO: [MEAL_SCALE] Lunch: Items=560kcal, Stated=741kcal, Scaling by 1.32x
+2025-12-23 20:52:08 [MEALPLAN] INFO: [MEAL_SCALE] Dinner: Items=435kcal, Stated=635kcal, Scaling by 1.46x
+2025-12-23 20:52:08 [MEALPLAN] INFO: [PARSE_RESULT] Parsed 2116 kcal (100% of target 2118)
+2025-12-23 20:52:08 [MEALPLAN] INFO: [MACRO_CHECK] Day 7: Calories - Target: 2118 | Actual: 2090 | Diff: -28 kcal
+2025-12-23 20:52:08 [MEALPLAN] INFO: [MACRO_CHECK] Day 7: Protein  - Target: 185g | Actual: 127g | Diff: -58g (32%)
+2025-12-23 20:52:08 [MEALPLAN] INFO: [MACRO_CHECK] Day 7: Fat      - Target: 82g | Actual: 77g | Diff: -5g (6%)
+2025-12-23 20:52:08 [MEALPLAN] INFO: [MACRO_CHECK] Day 7: Carbs    - Target: 159g | Actual: 260g | Diff: +101g (63%)
+2025-12-23 20:52:08 [MEALPLAN] INFO: [POST_PROCESS_FAILED] Day 7: Even after quantity adjustments, still off - triggering regeneration
+2025-12-23 20:52:08 [MEALPLAN] WARNING: [ANOMALY_DETECTED] Day 7: Protein off by 32% (target: 185g, actual: 127g) - REGENERATING
+2025-12-23 20:52:08 [MEALPLAN] INFO: 
+===== BATCH TRANSFORMATIONS START =====
+2025-12-23 20:52:08 [MEALPLAN] INFO: [DAY] Day 7:  -->  Day 7:
+2025-12-23 20:52:08 [MEALPLAN] INFO: [MEAL] - Breakfast (529 kcal):  -->  - Breakfast (635 kcal):
+2025-12-23 20:52:08 [MEALPLAN] INFO: [ITEM] 1. Egg white bhurji - 200g - 140 kcal - 28p/0f/0c  -->    1. Egg white bhurji — 300 g — 210 kcal
+2025-12-23 20:52:08 [MEALPLAN] INFO: [ITEM] 2. Whole wheat paratha - 2 pieces - 220 kcal - 8p/10f/30c  -->    2. Whole wheat paratha — 2 piece — 220 kcal
+2025-12-23 20:52:08 [MEALPLAN] INFO: [ITEM] 3. Mixed berries - 100g - 69 kcal - 1p/1f/17c  -->    3. Mixed berries — 80 g — 55 kcal
+2025-12-23 20:52:08 [MEALPLAN] INFO: [ITEM] 4. Almonds - 30g - 100 kcal - 4p/9f/6c  -->    4. Almonds — 45 g — 150 kcal
+2025-12-23 20:52:08 [MEALPLAN] INFO: [MEAL] - Lunch (741 kcal):  -->  - Lunch (670 kcal):
+2025-12-23 20:52:08 [MEALPLAN] INFO: [ITEM] 1. Rajma - 150g - 140 kcal - 10p/2f/20c  -->    1. Rajma — 215 g — 200 kcal
+2025-12-23 20:52:08 [MEALPLAN] INFO: [ITEM] 2. Pulao - 200g - 300 kcal - 5p/10f/45c  -->    2. Pulao — 210 g — 315 kcal
+2025-12-23 20:52:08 [MEALPLAN] INFO: [ITEM] 3. Sauteed spinach - 150g - 20 kcal - 3p/0f/3c  -->    3. Sauteed spinach — 225 g — 30 kcal
+2025-12-23 20:52:08 [MEALPLAN] INFO: [ITEM] 4. Raita - 100g - 100 kcal - 5p/10f/10c  -->    4. Raita — 125 g — 125 kcal
+2025-12-23 20:52:08 [MEALPLAN] INFO: [MEAL] - Snack (211 kcal):  -->  - Snack (270 kcal):
+2025-12-23 20:52:08 [MEALPLAN] INFO: [ITEM] 1. Apple - 1 medium - 95 kcal - 0p/0f/25c  -->    1. Apple — 1 medium — 95 kcal
+2025-12-23 20:52:08 [MEALPLAN] INFO: [ITEM] 2. Peanut butter - 30g - 116 kcal - 8p/10f/8c  -->    2. Peanut butter — 45 g — 175 kcal
+2025-12-23 20:52:08 [MEALPLAN] INFO: [MEAL] - Dinner (635 kcal):  -->  - Dinner (515 kcal):
+2025-12-23 20:52:08 [MEALPLAN] INFO: [ITEM] 1. Moth bean curry - 200g - 180 kcal - 15p/5f/20c  -->    1. Moth bean curry — 285 g — 255 kcal
+2025-12-23 20:52:08 [MEALPLAN] INFO: [ITEM] 2. Brown rice - 150g - 110 kcal - 2p/2f/25c  -->    2. Brown rice — 110 g — 80 kcal
+2025-12-23 20:52:08 [MEALPLAN] INFO: [ITEM] 3. Roasted broccoli - 150g - 55 kcal - 2p/0f/10c  -->    3. Roasted broccoli — 130 g — 50 kcal
+2025-12-23 20:52:08 [MEALPLAN] INFO: [ITEM] 4. Whole wheat roti - 1 piece - 90 kcal - 2p/2f/15c  -->    4. Whole wheat roti — 1 piece — 130 kcal
+2025-12-23 20:52:08 [MEALPLAN] INFO: ===== BATCH TRANSFORMATIONS END =====
+
+2025-12-23 20:52:08 [MEALPLAN] INFO: [PROCESS_SINGLE_DAY TIME][MODE=B] 4.90 ms
+2025-12-23 20:52:08 [MEALPLAN] WARNING: [REGENERATE] Day 7 still has issues after correction, using corrected version anyway
+2025-12-23 20:52:08 [MEALPLAN] INFO: [ENDPOINT_TOTAL_TIME]10534.41 ms

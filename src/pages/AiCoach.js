@@ -680,10 +680,10 @@ const MissingProfileFieldsForm = ({ missingFields, currentProfileData, onSave, o
           >
             <option value="">Select Activity Level</option>
             <option value="sedentary">Sedentary</option>
-            <option value="light">Lightly Active</option>
-            <option value="moderate">Moderately Active</option>
-            <option value="active">Very Active</option>
-            <option value="very-active">Extra Active</option>
+            <option value="lightly-active">Lightly Active</option>
+            <option value="moderately-active">Moderately Active</option>
+            <option value="very-active">Very Active</option>
+            <option value="extra-active">Extra Active</option>
           </select>
         </div>
 
@@ -1027,6 +1027,7 @@ const AIFitnessCoach = () => {
   const [fitnessGoal, setFitnessGoal] = useState('');
   const [showPlans, setShowPlans] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showMealAnimation, setShowMealAnimation] = useState(false);
   const [lastProcessedGoal, setLastProcessedGoal] = useState('');
   const [openMealAccordion, setOpenMealAccordion] = useState('');
   const [openMealSubAccordion, setOpenMealSubAccordion] = useState('');
@@ -1914,13 +1915,13 @@ const AIFitnessCoach = () => {
     } else if (parsedData.frequency) {
       // Fallback: Map activity frequency to activity level
       if (parsedData.frequency <= 2) {
-        data.activityLevel = 'lightly active';
+        data.activityLevel = 'lightly-active';
       } else if (parsedData.frequency <= 4) {
-        data.activityLevel = 'moderately active';
+        data.activityLevel = 'moderately-active';
       } else if (parsedData.frequency <= 6) {
-        data.activityLevel = 'very active';
+        data.activityLevel = 'very-active';
       } else {
-        data.activityLevel = 'extra active';
+        data.activityLevel = 'extra-active';
       }
     }
 
@@ -2127,7 +2128,7 @@ const AIFitnessCoach = () => {
         weight: data.weight,
         age: data.age || '',
         gender: data.gender || '',
-        activityLevel: data.activityLevel || 'moderate',
+        activityLevel: data.activityLevel || 'moderately-active',
         dietaryRestrictions: data.dietaryRestrictions || [],
         allergies: data.allergies || [],
         healthGoals: data.healthGoals || '',
@@ -2161,7 +2162,7 @@ const AIFitnessCoach = () => {
           weight: extractedData.weight || "",
           age: extractedData.age || "",
           gender: extractedData.gender || "",
-          activityLevel: extractedData.activityLevel || "moderate",
+          activityLevel: extractedData.activityLevel || "moderately-active",
           healthGoals: extractedData.healthGoals || "",
           dietaryRestrictions: extractedData.dietaryRestrictions || [],
           allergies: extractedData.allergies || []
@@ -2314,6 +2315,7 @@ const AIFitnessCoach = () => {
       age: userData.age,
       gender: userData.gender,
       activityLevel: userData.activityLevel,
+      targetWeight: userData.targetWeight,
       healthGoals: userData.healthGoals,
       dietaryRestrictions: userData.dietaryRestrictions || [],
       allergies: userData.allergies || []
@@ -2670,6 +2672,10 @@ const AIFitnessCoach = () => {
       navigate('/thank-you');
       return;
     }
+
+    // Show 4-second loading animation
+    setShowMealAnimation(true);
+    setTimeout(() => setShowMealAnimation(false), 4000);
 
     // Generate meal plan with streaming and live accordion updates
     setIsStreamingMeal(true);
@@ -5187,14 +5193,17 @@ const AIFitnessCoach = () => {
       if (userProfileData.weight) {
         initialFormData.currentWeight = userProfileData.weight.toString();
       }
+      if (userProfileData.targetWeight) {
+        initialFormData.targetWeight = userProfileData.targetWeight.toString();
+      }
       if (userProfileData.activityLevel) {
         // Map activity level to form values
         const activityLevelMap = {
           'sedentary': 'sedentary',
-          'light': 'light',
-          'moderate': 'moderate',
-          'very': 'very',
-          'extra': 'extra'
+          'lightly-active': 'lightly-active',
+          'moderately-active': 'moderately-active',
+          'very-active': 'very-active',
+          'extra-active': 'extra-active'
         };
         initialFormData.activityLevel = activityLevelMap[userProfileData.activityLevel] || userProfileData.activityLevel;
       }
@@ -6476,7 +6485,7 @@ const AIFitnessCoach = () => {
           />
           {/* Generate Prompt Button - Inside the input */}
           <Tooltip
-            title="Creates a personalized prompt using your profile information (age, weight, height, goals, etc.)"
+            title="Click me to Creates a personalized prompt using your profile information (age, weight, height, goals, etc.)"
             placement="top"
             arrow
           >
@@ -6490,6 +6499,9 @@ const AIFitnessCoach = () => {
               </button>
             </span>
           </Tooltip>
+          <div className="mobile-prompt-description">
+            Click me to Creates a personalized prompt using your profile information (age, weight, height, goals, etc.)
+          </div>
         </div>
 
         {/* Get Recommendations Button - Below the input */}
@@ -6666,10 +6678,10 @@ const AIFitnessCoach = () => {
                         >
                           <option value="">Select activity level</option>
                           <option value="sedentary">Sedentary (little or no exercise)</option>
-                          <option value="light">Lightly active (light exercise 1-3 days/week)</option>
-                          <option value="moderate">Moderately active (moderate exercise 3-5 days/week)</option>
-                          <option value="very">Very active (hard exercise 6-7 days/week)</option>
-                          <option value="extra">Extra active (very hard exercise & physical job)</option>
+                          <option value="lightly-active">Lightly active (light exercise 1-3 days/week)</option>
+                          <option value="moderately-active">Moderately active (moderate exercise 3-5 days/week)</option>
+                          <option value="very-active">Very active (hard exercise 6-7 days/week)</option>
+                          <option value="extra-active">Extra active (very hard exercise & physical job)</option>
                         </select>
                       </div>
                     </div>
@@ -6729,7 +6741,7 @@ const AIFitnessCoach = () => {
           </div>
         )}
       </div>
-      {isLoading && (
+      {showMealAnimation && (
         <div className="loading-video-overlay">
           <div className="loading-video-container">
             <div className="loading-header">
@@ -7072,10 +7084,8 @@ const AIFitnessCoach = () => {
       {showPlans && (
         <div className="plans-container" id="plansContainer" ref={plansContainerRef}>
           {plansComplete && (
-            <div style={{
+            <div className="hide-on-mobile PDF-download-container" style={{
               width: '100%',
-              display: 'flex',
-              justifyContent: 'center',
               marginBottom: '24px'
             }}>
               <PDFDownloadLink
@@ -7532,6 +7542,28 @@ const AIFitnessCoach = () => {
               </div>
             </div>
           </div>
+
+          {plansComplete && (
+            <div className="show-on-mobile PDF-download-container" style={{
+              width: '100%',
+              marginTop: '40px',
+              marginBottom: '24px'
+            }}>
+              <PDFDownloadLink
+                document={<PlanPDFDocument fitnessGoal={fitnessGoal} mealPlansByDay={mealPlansByDay} workoutSections={workoutSections} endOfPlanSuggestion={endOfPlanSuggestion} workoutPlanSuggestion={workoutPlanSuggestion} />}
+                fileName="AI_Fitness_Plan.pdf"
+                style={{ textDecoration: 'none' }}
+              >
+                {({ loading }) => (
+                  <button className="pdf-download-button">
+                    <i className="fas fa-file-pdf"></i>
+                    <span>{loading ? 'Preparing PDF...' : 'Download PDF'}</span>
+                    {!loading && <i className="fas fa-download"></i>}
+                  </button>
+                )}
+              </PDFDownloadLink>
+            </div>
+          )}
 
           {/* Suggestions Section - Only show when we have plans */}
           {(() => {
@@ -8369,10 +8401,10 @@ const AIFitnessCoach = () => {
                   >
                     <option value="">Select activity level</option>
                     <option value="sedentary">Sedentary (little or no exercise)</option>
-                    <option value="light">Lightly active (light exercise 1-3 days/week)</option>
-                    <option value="moderate">Moderately active (moderate exercise 3-5 days/week)</option>
-                    <option value="active">Very active (hard exercise 6-7 days/week)</option>
-                    <option value="very-active">Extra active (very hard exercise & physical job)</option>
+                    <option value="lightly-active">Lightly active (light exercise 1-3 days/week)</option>
+                    <option value="moderately-active">Moderately active (moderate exercise 3-5 days/week)</option>
+                    <option value="very-active">Very active (hard exercise 6-7 days/week)</option>
+                    <option value="extra-active">Extra active (very hard exercise & physical job)</option>
                   </select>
                 </div>
               </div>

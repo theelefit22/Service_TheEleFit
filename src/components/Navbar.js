@@ -124,7 +124,7 @@ const Navbar = () => {
     } else {
       document.body.classList.remove('menu-open');
     }
-    
+
     return () => {
       document.body.style.overflow = 'auto';
       document.body.classList.remove('menu-open');
@@ -135,10 +135,10 @@ const Navbar = () => {
     try {
       // Clear verified customer session
       localStorage.removeItem('verifiedCustomerSession');
-      
+
       // Use the logout function from AuthContext
       const result = await logout();
-      
+
       if (result.success) {
         console.log('Logout successful');
         navigate('/');
@@ -180,18 +180,18 @@ const Navbar = () => {
       <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
         <div className="navbar-container">
           <Link to="/grocery-list" className="navbar-logo">
-            <img 
-              src="https://theelefit.com/cdn/shop/files/freepik_br_3e6ca94d-018d-4329-8cd3-828c77c68075_1.svg?v=1737707946&width=700" 
-              alt="The Elefit Logo" 
+            <img
+              src="https://theelefit.com/cdn/shop/files/freepik_br_3e6ca94d-018d-4329-8cd3-828c77c68075_1.svg?v=1737707946&width=700"
+              alt="The Elefit Logo"
               className="logo-image"
             />
           </Link>
-          
+
           <ul className="nav-menu">
             <li className="nav-item">
               <NavLink
                 to="/grocery-list"
-                className={({isActive}) => isActive ? "nav-link active" : "nav-link"}
+                className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
               >
                 Grocery List
               </NavLink>
@@ -212,14 +212,14 @@ const Navbar = () => {
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
-          <img 
-            src="https://theelefit.com/cdn/shop/files/freepik_br_3e6ca94d-018d-4329-8cd3-828c77c68075_1.svg?v=1737707946&width=700" 
-            alt="The Elefit Logo" 
+          <img
+            src="https://theelefit.com/cdn/shop/files/freepik_br_3e6ca94d-018d-4329-8cd3-828c77c68075_1.svg?v=1737707946&width=700"
+            alt="The Elefit Logo"
             className="logo-image"
           />
         </Link>
-        
-        <button 
+
+        <button
           ref={toggleRef}
           className={`mobile-menu-toggle ${menuOpen ? 'open' : ''}`}
           onClick={(e) => {
@@ -233,8 +233,8 @@ const Navbar = () => {
           <span></span>
           <span></span>
         </button>
-       
-        <ul 
+
+        <ul
           ref={menuRef}
           className={`nav-menu ${menuOpen ? 'active' : ''}`}
           onClick={(e) => {
@@ -242,7 +242,7 @@ const Navbar = () => {
             // Don't close menu when clicking on it, only when clicking menu items
           }}
         >
-          <li className="nav-item">
+          {/* <li className="nav-item">
             <NavLink 
               to="/" 
               className={({isActive}) => isActive ? "nav-link active" : "nav-link"} 
@@ -250,8 +250,8 @@ const Navbar = () => {
             >
               Home
             </NavLink>
-          </li>
-          <li className="nav-item">
+          </li> */}
+          {/* <li className="nav-item">
             <NavLink 
               to="/community" 
               className={({isActive}) => isActive ? "nav-link active" : "nav-link"} 
@@ -259,8 +259,8 @@ const Navbar = () => {
             >
               Community
             </NavLink>
-          </li>
-          <li className="nav-item">
+          </li> */}
+          {/* <li className="nav-item">
             <NavLink 
               to="/experts" 
               className={({isActive}) => isActive ? "nav-link active" : "nav-link"} 
@@ -268,21 +268,30 @@ const Navbar = () => {
             >
               Find Expert
             </NavLink>
-          </li>
-          <li className="nav-item">
-            <NavLink 
-              to="/apply-as-expert" 
-              className={({isActive}) => isActive ? "nav-link active" : "nav-link"} 
+          </li> */}
+          {/* <li className="nav-item">
+            <NavLink
+              to="/apply-as-expert"
+              className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
               onClick={closeMenu}
             >
               Apply as Expert
+            </NavLink>
+          </li> */}
+          <li className="nav-item">
+            <NavLink
+              to="/contact"
+              className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+              onClick={closeMenu}
+            >
+              Get in Touch
             </NavLink>
           </li>
 
           <li className="nav-item">
             <NavLink
-              to="/ai-fitness-coach"
-              className={({isActive}) => isActive ? "nav-link active" : "nav-link"}
+              to="/aicoach"
+              className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
               onClick={closeMenu}
             >
               AI Coach
@@ -295,17 +304,17 @@ const Navbar = () => {
                 <>
                   <li className="nav-item">
                     {userType === 'expert' ? (
-                      <NavLink 
-                        to="/expert-dashboard" 
-                        className={({isActive}) => isActive ? "nav-link active" : "nav-link"} 
+                      <NavLink
+                        to="/expert-dashboard"
+                        className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
                         onClick={closeMenu}
                       >
                         Dashboard
                       </NavLink>
                     ) : (
-                      <NavLink 
-                        to="/user-dashboard" 
-                        className={({isActive}) => isActive ? "nav-link active" : "nav-link"} 
+                      <NavLink
+                        to="/user-dashboard"
+                        className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
                         onClick={closeMenu}
                       >
                         My Dashboard
