@@ -6633,7 +6633,7 @@ label[for] span.required-asterisk {
   color: #C8DA2B !important;
   font-weight: 400;
   resize: none;
-  overflow: hidden;
+  overflow-y: auto;
   height: 50px;
   min-height: 50px;
   max-height: 200px;
@@ -6749,7 +6749,13 @@ label[for] span.required-asterisk {
   background: rgba(255, 255, 255, 0.05);
 }
 
+/* Default hidden on desktop */
 .mobile-prompt-description {
+  display: none !important;
+}
+
+/* Tooltip Arrow */
+.mobile-prompt-description::before {
   display: none;
 }
 
@@ -6899,6 +6905,51 @@ label[for] span.required-asterisk {
   .recommend-button-main {
     max-width: 90%;
   }
+
+  .mobile-prompt-description {
+    display: flex !important;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    position: relative;
+    font-size: 13px;
+    color: #C8DA2B;
+    background: #2D3325;
+    padding: 8px 12px;
+    margin: -18px auto 15px auto;
+    border-radius: 8px;
+    line-height: 1.4;
+    text-align: left;
+    border: 1px solid rgba(200, 218, 43, 0.3);
+    width: auto;
+    max-width: 95%;
+    box-sizing: border-box;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    font-weight: 500;
+    z-index: 10;
+  }
+
+  /* Tooltip Arrow - Visible on mobile */
+  .mobile-prompt-description::before {
+    display: block;
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid #2D3325;
+    z-index: 1;
+  }
+
+  .tooltip-content-wrapper {
+    width: 100%;
+  }
+
+
 }
 
 @media (max-width: 480px) {
@@ -6920,52 +6971,9 @@ label[for] span.required-asterisk {
     max-width: 95%;
   }
 
-  .mobile-prompt-description {
-    display: block !important;
-    position: relative;
-    font-size: 12px;
-    color: #C8DA2B;
-    background: #2D3325;
-    padding: 12px 16px;
-    margin-top: 15px;
-    border-radius: 8px;
-    line-height: 1.4;
-    text-align: center;
-    border: 1px solid rgba(200, 218, 43, 0.3);
-    width: 100%;
-    box-sizing: border-box;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-  }
 
-  /* Tooltip Arrow */
-  .mobile-prompt-description::before {
-    content: '';
-    position: absolute;
-    top: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-bottom: 8px solid #2D3325;
-    z-index: 1;
-  }
 
-  /* Slight highlight on border arrow to match tooltip border */
-  .mobile-prompt-description::after {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid rgba(200, 218, 43, 0.3);
-    z-index: 0;
-  }
+
 }
 
 /* PDF Download Button */

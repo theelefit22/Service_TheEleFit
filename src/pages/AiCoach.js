@@ -6499,7 +6499,10 @@ const AIFitnessCoach = () => {
               </button>
             </span>
           </Tooltip>
-          <div className="mobile-prompt-description">
+        </div>
+
+        <div className="mobile-prompt-description">
+          <div className="tooltip-content-wrapper">
             Click me to create a personalized prompt using your profile information (age, weight, height, goals, etc.)
           </div>
         </div>

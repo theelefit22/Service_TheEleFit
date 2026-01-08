@@ -620,7 +620,7 @@ def process_pdf():
 client = OpenAI(api_key=api_key)
 # ---------------------- PROMPT GUARD ----------------------
 def prompt_guard(user_input: str, guard_type="prompt"):
-    try:
+e    try:
         mod_resp = client.moderations.create(
             model="omni-moderation-latest",
             input=user_input
