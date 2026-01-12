@@ -1,0 +1,492 @@
+/* Overlay */
+.calorie-results-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* New Horizontal Popup Container */
+.calorie-results-popup-new {
+  background: linear-gradient(135deg, #1a1f14 0%, #242b1a 100%);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 880px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6);
+  animation: slideUp 0.4s ease;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Close Button - Top Right */
+.popup-close-btn-new {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 20px;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.popup-close-btn-new:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+/* Main Content Layout - 3 Column Grid */
+.calorie-content-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr 200px;
+  gap: 28px;
+  margin-bottom: 24px;
+  align-items: start;
+}
+
+/* Left Section - Calorie Display */
+.calorie-left-section {
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 28px 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.calorie-left-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.02) 0%, transparent 70%);
+  animation: pulse 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+}
+
+.calorie-icon-large {
+  font-size: 48px;
+  color: #CCD853;
+  margin-bottom: 16px;
+  animation: flicker 2.5s ease-in-out infinite;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes flicker {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 15px rgba(204, 216, 83, 0.6));
+  }
+  50% {
+    opacity: 0.85;
+    filter: drop-shadow(0 0 25px rgba(204, 216, 83, 0.9));
+  }
+}
+
+.calorie-value-large {
+  font-size: 56px;
+  font-weight: 800;
+  color: #CCD853;
+  line-height: 1;
+  margin-bottom: 10px;
+  font-family: 'Poppins', sans-serif;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 2px 10px rgba(204, 216, 83, 0.3);
+}
+
+.calorie-label-text {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.tdee-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+}
+
+/* Middle Section - Description */
+.calorie-middle-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+  padding: 20px 0;
+}
+
+.calorie-description-new {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+  font-weight: 400;
+}
+
+.highlight-calories {
+  color: #CCD853;
+  font-weight: 700;
+  background: rgba(204, 216, 83, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.highlight-goal {
+  color: #CCD853;
+  font-weight: 600;
+}
+
+/* Info Buttons Inline */
+.info-buttons-inline {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.info-btn-small {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.info-btn-small:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.info-btn-small i {
+  font-size: 11px;
+}
+
+/* Right Section - Compact Macros Stacked */
+.calorie-right-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.macro-card-compact {
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px solid;
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.macro-card-compact::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: currentColor;
+  opacity: 0.3;
+}
+
+.macro-card-compact:hover {
+  transform: translateX(5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.macro-card-compact.protein {
+  border-color: rgba(255, 107, 107, 0.4);
+  color: #ff6b6b;
+}
+
+.macro-card-compact.carbs {
+  border-color: rgba(78, 205, 196, 0.4);
+  color: #4ecdc4;
+}
+
+.macro-card-compact.fats {
+  border-color: rgba(255, 195, 113, 0.4);
+  color: #ffc371;
+}
+
+.macro-card-compact.fiber {
+  border-color: rgba(129, 199, 132, 0.4);
+  color: #81c784;
+}
+
+.macro-icon-compact {
+  font-size: 24px;
+  margin-bottom: 6px;
+  opacity: 0.9;
+}
+
+.macro-value-compact {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.macro-label-compact {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.macro-percent-compact {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+/* Bottom Action Buttons */
+.calorie-bottom-actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.action-btn-bottom {
+  flex: 1;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  font-family: 'Poppins', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-no-thanks {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn-no-thanks:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-generate-meal {
+  background: linear-gradient(135deg, #CCD853 0%, #B8D843 100%);
+  color: #1A1F14;
+  box-shadow: 0 4px 20px rgba(204, 216, 83, 0.35);
+}
+
+.btn-generate-meal:hover {
+  background: linear-gradient(135deg, #B8D843 0%, #A8C833 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(204, 216, 83, 0.45);
+}
+
+.btn-generate-meal i {
+  font-size: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .calorie-content-layout {
+    grid-template-columns: 280px 1fr 200px;
+    gap: 30px;
+  }
+
+  .calorie-value-large {
+    font-size: 60px;
+  }
+
+  .calorie-icon-large {
+    font-size: 50px;
+  }
+
+  .macro-value-compact {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .calorie-results-popup-new {
+    padding: 30px 24px;
+  }
+
+  .calorie-content-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .calorie-left-section {
+    padding: 32px 24px;
+  }
+
+  .calorie-right-section {
+    grid-template-columns: repeat(2, 1fr);
+    display: grid;
+    gap: 12px;
+  }
+
+  .calorie-bottom-actions {
+    flex-direction: column;
+  }
+
+  .action-btn-bottom {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .calorie-results-popup-new {
+    padding: 24px 20px;
+  }
+
+  .popup-close-btn-new {
+    top: 15px;
+    right: 15px;
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+
+  .calorie-value-large {
+    font-size: 52px;
+  }
+
+  .calorie-icon-large {
+    font-size: 48px;
+  }
+
+  .calorie-description-new {
+    font-size: 16px;
+  }
+
+  .calorie-right-section {
+    grid-template-columns: 1fr;
+  }
+
+  .macro-card-compact {
+    padding: 14px;
+  }
+
+  .macro-value-compact {
+    font-size: 30px;
+  }
+
+  .macro-icon-compact {
+    font-size: 24px;
+  }
+
+  .info-buttons-inline {
+    flex-direction: column;
+  }
+
+  .info-btn-small {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Scrollbar */
+.calorie-results-popup-new::-webkit-scrollbar {
+  width: 8px;
+}
+
+.calorie-results-popup-new::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.calorie-results-popup-new::-webkit-scrollbar-thumb {
+  background: rgba(204, 216, 83, 0.3);
+  border-radius: 10px;
+}
+
+.calorie-results-popup-new::-webkit-scrollbar-thumb:hover {
+  background: rgba(204, 216, 83, 0.5);
+}

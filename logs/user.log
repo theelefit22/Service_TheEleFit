@@ -1,0 +1,633 @@
+2025-12-29 13:55:34 [USER] INFO: === /user endpoint called ===
+2025-12-29 13:55:34 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months.",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 13:55:34 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 13:55:34 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 13:55:34 [USER] INFO: Current weight: 73 kg
+2025-12-29 13:55:34 [USER] INFO: Target weight: 63 kg
+2025-12-29 13:55:34 [USER] INFO: TDEE: 2551
+2025-12-29 13:55:34 [USER] INFO: Weight change: -10 kg
+2025-12-29 13:55:34 [USER] INFO: Daily offset: -916
+2025-12-29 13:55:34 [USER] INFO: Target calories: 1634
+2025-12-29 13:55:34 [USER] INFO: Goal category: get_fit
+2025-12-29 13:55:34 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 13:55:34 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 13:55:34 [USER] INFO: Capped: False
+2025-12-29 13:56:05 [USER] INFO: === /user endpoint called ===
+2025-12-29 13:56:05 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months. Veg",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 13:56:05 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 13:56:05 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 13:56:05 [USER] INFO: Current weight: 73 kg
+2025-12-29 13:56:05 [USER] INFO: Target weight: 63 kg
+2025-12-29 13:56:05 [USER] INFO: TDEE: 2551
+2025-12-29 13:56:05 [USER] INFO: Weight change: -10 kg
+2025-12-29 13:56:05 [USER] INFO: Daily offset: -916
+2025-12-29 13:56:05 [USER] INFO: Target calories: 1634
+2025-12-29 13:56:05 [USER] INFO: Goal category: get_fit
+2025-12-29 13:56:05 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 13:56:05 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 13:56:05 [USER] INFO: Capped: False
+2025-12-29 14:02:17 [USER] INFO: === /user endpoint called ===
+2025-12-29 14:02:17 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months.",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 14:02:17 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 14:02:17 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 14:02:17 [USER] INFO: Current weight: 73 kg
+2025-12-29 14:02:17 [USER] INFO: Target weight: 63 kg
+2025-12-29 14:02:17 [USER] INFO: TDEE: 2551
+2025-12-29 14:02:17 [USER] INFO: Weight change: -10 kg
+2025-12-29 14:02:17 [USER] INFO: Daily offset: -916
+2025-12-29 14:02:17 [USER] INFO: Target calories: 1634
+2025-12-29 14:02:17 [USER] INFO: Goal category: get_fit
+2025-12-29 14:02:17 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 14:02:17 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 14:02:17 [USER] INFO: Capped: False
+2025-12-29 14:03:13 [USER] INFO: === /user endpoint called ===
+2025-12-29 14:03:13 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months. Veg",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 14:03:13 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 14:03:13 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 14:03:13 [USER] INFO: Current weight: 73 kg
+2025-12-29 14:03:13 [USER] INFO: Target weight: 63 kg
+2025-12-29 14:03:13 [USER] INFO: TDEE: 2551
+2025-12-29 14:03:13 [USER] INFO: Weight change: -10 kg
+2025-12-29 14:03:13 [USER] INFO: Daily offset: -916
+2025-12-29 14:03:13 [USER] INFO: Target calories: 1634
+2025-12-29 14:03:13 [USER] INFO: Goal category: get_fit
+2025-12-29 14:03:13 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 14:03:13 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 14:03:13 [USER] INFO: Capped: False
+2025-12-29 14:04:13 [USER] INFO: === /user endpoint called ===
+2025-12-29 14:04:13 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months. Veg, no dairy no tofu",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 14:04:13 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 14:04:13 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 14:04:13 [USER] INFO: Current weight: 73 kg
+2025-12-29 14:04:13 [USER] INFO: Target weight: 63 kg
+2025-12-29 14:04:13 [USER] INFO: TDEE: 2551
+2025-12-29 14:04:13 [USER] INFO: Weight change: -10 kg
+2025-12-29 14:04:13 [USER] INFO: Daily offset: -916
+2025-12-29 14:04:13 [USER] INFO: Target calories: 1634
+2025-12-29 14:04:13 [USER] INFO: Goal category: get_fit
+2025-12-29 14:04:13 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 14:04:13 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 14:04:13 [USER] INFO: Capped: False
+2025-12-29 14:05:06 [USER] INFO: === /user endpoint called ===
+2025-12-29 14:05:06 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months. Veg, no dairy no tofu, south indain cuisine",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 14:05:06 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 14:05:06 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 14:05:06 [USER] INFO: Current weight: 73 kg
+2025-12-29 14:05:06 [USER] INFO: Target weight: 63 kg
+2025-12-29 14:05:06 [USER] INFO: TDEE: 2551
+2025-12-29 14:05:06 [USER] INFO: Weight change: -10 kg
+2025-12-29 14:05:06 [USER] INFO: Daily offset: -916
+2025-12-29 14:05:06 [USER] INFO: Target calories: 1634
+2025-12-29 14:05:06 [USER] INFO: Goal category: get_fit
+2025-12-29 14:05:06 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 14:05:06 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 14:05:06 [USER] INFO: Capped: False
+2025-12-29 14:17:18 [USER] INFO: === /user endpoint called ===
+2025-12-29 14:17:18 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months.",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 14:17:18 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 14:17:18 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 14:17:18 [USER] INFO: Current weight: 73 kg
+2025-12-29 14:17:18 [USER] INFO: Target weight: 63 kg
+2025-12-29 14:17:18 [USER] INFO: TDEE: 2551
+2025-12-29 14:17:18 [USER] INFO: Weight change: -10 kg
+2025-12-29 14:17:18 [USER] INFO: Daily offset: -916
+2025-12-29 14:17:18 [USER] INFO: Target calories: 1634
+2025-12-29 14:17:18 [USER] INFO: Goal category: get_fit
+2025-12-29 14:17:18 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 14:17:18 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 14:17:18 [USER] INFO: Capped: False
+2025-12-29 14:17:51 [USER] INFO: === /user endpoint called ===
+2025-12-29 14:17:51 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months. Veg",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 14:17:51 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 14:17:51 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 14:17:51 [USER] INFO: Current weight: 73 kg
+2025-12-29 14:17:51 [USER] INFO: Target weight: 63 kg
+2025-12-29 14:17:51 [USER] INFO: TDEE: 2551
+2025-12-29 14:17:51 [USER] INFO: Weight change: -10 kg
+2025-12-29 14:17:51 [USER] INFO: Daily offset: -916
+2025-12-29 14:17:51 [USER] INFO: Target calories: 1634
+2025-12-29 14:17:51 [USER] INFO: Goal category: get_fit
+2025-12-29 14:17:51 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 14:17:51 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 14:17:51 [USER] INFO: Capped: False
+2025-12-29 14:26:58 [USER] INFO: === /user endpoint called ===
+2025-12-29 14:26:58 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months.",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 14:26:58 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 14:26:58 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 14:26:58 [USER] INFO: Current weight: 73 kg
+2025-12-29 14:26:58 [USER] INFO: Target weight: 63 kg
+2025-12-29 14:26:58 [USER] INFO: TDEE: 2551
+2025-12-29 14:26:58 [USER] INFO: Weight change: -10 kg
+2025-12-29 14:26:58 [USER] INFO: Daily offset: -916
+2025-12-29 14:26:58 [USER] INFO: Target calories: 1634
+2025-12-29 14:26:58 [USER] INFO: Goal category: get_fit
+2025-12-29 14:26:58 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 14:26:58 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 14:26:58 [USER] INFO: Capped: False
+2025-12-29 14:31:53 [USER] INFO: === /user endpoint called ===
+2025-12-29 14:31:53 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months.",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 14:31:53 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 14:31:53 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 14:31:53 [USER] INFO: Current weight: 73 kg
+2025-12-29 14:31:53 [USER] INFO: Target weight: 63 kg
+2025-12-29 14:31:53 [USER] INFO: TDEE: 2551
+2025-12-29 14:31:53 [USER] INFO: Weight change: -10 kg
+2025-12-29 14:31:53 [USER] INFO: Daily offset: -916
+2025-12-29 14:31:53 [USER] INFO: Target calories: 1634
+2025-12-29 14:31:53 [USER] INFO: Goal category: get_fit
+2025-12-29 14:31:53 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 14:31:53 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 14:31:53 [USER] INFO: Capped: False
+2025-12-29 14:32:57 [USER] INFO: === /user endpoint called ===
+2025-12-29 14:32:57 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months. Veg",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 14:32:57 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 14:32:57 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 14:32:57 [USER] INFO: Current weight: 73 kg
+2025-12-29 14:32:57 [USER] INFO: Target weight: 63 kg
+2025-12-29 14:32:57 [USER] INFO: TDEE: 2551
+2025-12-29 14:32:57 [USER] INFO: Weight change: -10 kg
+2025-12-29 14:32:57 [USER] INFO: Daily offset: -916
+2025-12-29 14:32:57 [USER] INFO: Target calories: 1634
+2025-12-29 14:32:57 [USER] INFO: Goal category: get_fit
+2025-12-29 14:32:57 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 14:32:57 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 14:32:57 [USER] INFO: Capped: False
+2025-12-29 14:50:39 [USER] INFO: === /user endpoint called ===
+2025-12-29 14:50:39 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months. Veg",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 14:50:39 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 14:50:39 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 14:50:39 [USER] INFO: Current weight: 73 kg
+2025-12-29 14:50:39 [USER] INFO: Target weight: 63 kg
+2025-12-29 14:50:39 [USER] INFO: TDEE: 2551
+2025-12-29 14:50:39 [USER] INFO: Weight change: -10 kg
+2025-12-29 14:50:39 [USER] INFO: Daily offset: -916
+2025-12-29 14:50:39 [USER] INFO: Target calories: 1634
+2025-12-29 14:50:39 [USER] INFO: Goal category: get_fit
+2025-12-29 14:50:39 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 14:50:39 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 14:50:39 [USER] INFO: Capped: False
+2025-12-29 14:52:27 [USER] INFO: === /user endpoint called ===
+2025-12-29 14:52:27 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months.",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 14:52:27 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 14:52:27 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 14:52:27 [USER] INFO: Current weight: 73 kg
+2025-12-29 14:52:27 [USER] INFO: Target weight: 63 kg
+2025-12-29 14:52:27 [USER] INFO: TDEE: 2551
+2025-12-29 14:52:27 [USER] INFO: Weight change: -10 kg
+2025-12-29 14:52:27 [USER] INFO: Daily offset: -916
+2025-12-29 14:52:27 [USER] INFO: Target calories: 1634
+2025-12-29 14:52:27 [USER] INFO: Goal category: get_fit
+2025-12-29 14:52:27 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 14:52:27 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 14:52:27 [USER] INFO: Capped: False
+2025-12-29 14:53:00 [USER] INFO: === /user endpoint called ===
+2025-12-29 14:53:00 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months. Veg",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 14:53:00 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 14:53:00 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 14:53:00 [USER] INFO: Current weight: 73 kg
+2025-12-29 14:53:00 [USER] INFO: Target weight: 63 kg
+2025-12-29 14:53:00 [USER] INFO: TDEE: 2551
+2025-12-29 14:53:00 [USER] INFO: Weight change: -10 kg
+2025-12-29 14:53:00 [USER] INFO: Daily offset: -916
+2025-12-29 14:53:00 [USER] INFO: Target calories: 1634
+2025-12-29 14:53:00 [USER] INFO: Goal category: get_fit
+2025-12-29 14:53:00 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 14:53:00 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 14:53:00 [USER] INFO: Capped: False
+2025-12-29 14:53:58 [USER] INFO: === /user endpoint called ===
+2025-12-29 14:53:58 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months. Veg, south indian cuisine",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 14:53:58 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 14:53:58 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 14:53:58 [USER] INFO: Current weight: 73 kg
+2025-12-29 14:53:58 [USER] INFO: Target weight: 63 kg
+2025-12-29 14:53:58 [USER] INFO: TDEE: 2551
+2025-12-29 14:53:58 [USER] INFO: Weight change: -10 kg
+2025-12-29 14:53:58 [USER] INFO: Daily offset: -916
+2025-12-29 14:53:58 [USER] INFO: Target calories: 1634
+2025-12-29 14:53:58 [USER] INFO: Goal category: get_fit
+2025-12-29 14:53:58 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 14:53:58 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 14:53:58 [USER] INFO: Capped: False
+2025-12-29 14:54:56 [USER] INFO: === /user endpoint called ===
+2025-12-29 14:54:56 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months. Veg, south indian cuisine, no dairy no gluten",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 14:54:56 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 14:54:56 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 14:54:56 [USER] INFO: Current weight: 73 kg
+2025-12-29 14:54:56 [USER] INFO: Target weight: 63 kg
+2025-12-29 14:54:56 [USER] INFO: TDEE: 2551
+2025-12-29 14:54:56 [USER] INFO: Weight change: -10 kg
+2025-12-29 14:54:56 [USER] INFO: Daily offset: -916
+2025-12-29 14:54:56 [USER] INFO: Target calories: 1634
+2025-12-29 14:54:56 [USER] INFO: Goal category: get_fit
+2025-12-29 14:54:56 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 14:54:56 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 14:54:56 [USER] INFO: Capped: False
+2025-12-29 15:03:17 [USER] INFO: === /user endpoint called ===
+2025-12-29 15:03:17 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months.",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 15:03:17 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 15:03:17 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 15:03:17 [USER] INFO: Current weight: 73 kg
+2025-12-29 15:03:17 [USER] INFO: Target weight: 63 kg
+2025-12-29 15:03:17 [USER] INFO: TDEE: 2551
+2025-12-29 15:03:17 [USER] INFO: Weight change: -10 kg
+2025-12-29 15:03:17 [USER] INFO: Daily offset: -916
+2025-12-29 15:03:17 [USER] INFO: Target calories: 1634
+2025-12-29 15:03:17 [USER] INFO: Goal category: get_fit
+2025-12-29 15:03:17 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 15:03:17 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 15:03:17 [USER] INFO: Capped: False
+2025-12-29 15:04:05 [USER] INFO: === /user endpoint called ===
+2025-12-29 15:04:05 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months. Veg",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 15:04:05 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 15:04:05 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 15:04:05 [USER] INFO: Current weight: 73 kg
+2025-12-29 15:04:05 [USER] INFO: Target weight: 63 kg
+2025-12-29 15:04:05 [USER] INFO: TDEE: 2551
+2025-12-29 15:04:05 [USER] INFO: Weight change: -10 kg
+2025-12-29 15:04:05 [USER] INFO: Daily offset: -916
+2025-12-29 15:04:05 [USER] INFO: Target calories: 1634
+2025-12-29 15:04:05 [USER] INFO: Goal category: get_fit
+2025-12-29 15:04:05 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 15:04:05 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 15:04:05 [USER] INFO: Capped: False
+2025-12-29 15:05:12 [USER] INFO: === /user endpoint called ===
+2025-12-29 15:05:12 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months. south indian Veg, no gluten",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 15:05:12 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 15:05:12 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 15:05:12 [USER] INFO: Current weight: 73 kg
+2025-12-29 15:05:12 [USER] INFO: Target weight: 63 kg
+2025-12-29 15:05:12 [USER] INFO: TDEE: 2551
+2025-12-29 15:05:12 [USER] INFO: Weight change: -10 kg
+2025-12-29 15:05:12 [USER] INFO: Daily offset: -916
+2025-12-29 15:05:12 [USER] INFO: Target calories: 1634
+2025-12-29 15:05:12 [USER] INFO: Goal category: get_fit
+2025-12-29 15:05:12 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 15:05:12 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 15:05:12 [USER] INFO: Capped: False
+2025-12-29 15:06:51 [USER] INFO: === /user endpoint called ===
+2025-12-29 15:06:51 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months. south indian Veg, no gluten, no dairy",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 15:06:51 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 15:06:51 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 15:06:51 [USER] INFO: Current weight: 73 kg
+2025-12-29 15:06:51 [USER] INFO: Target weight: 63 kg
+2025-12-29 15:06:51 [USER] INFO: TDEE: 2551
+2025-12-29 15:06:51 [USER] INFO: Weight change: -10 kg
+2025-12-29 15:06:51 [USER] INFO: Daily offset: -916
+2025-12-29 15:06:51 [USER] INFO: Target calories: 1634
+2025-12-29 15:06:51 [USER] INFO: Goal category: get_fit
+2025-12-29 15:06:51 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 15:06:51 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 15:06:51 [USER] INFO: Capped: False
+2025-12-29 15:07:46 [USER] INFO: === /user endpoint called ===
+2025-12-29 15:07:46 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months. south indian Veg, no gluten, no dairy",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 15:07:46 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 15:07:46 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 15:07:46 [USER] INFO: Current weight: 73 kg
+2025-12-29 15:07:46 [USER] INFO: Target weight: 63 kg
+2025-12-29 15:07:46 [USER] INFO: TDEE: 2551
+2025-12-29 15:07:46 [USER] INFO: Weight change: -10 kg
+2025-12-29 15:07:46 [USER] INFO: Daily offset: -916
+2025-12-29 15:07:46 [USER] INFO: Target calories: 1634
+2025-12-29 15:07:46 [USER] INFO: Goal category: get_fit
+2025-12-29 15:07:46 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 15:07:46 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 15:07:46 [USER] INFO: Capped: False
+2025-12-29 15:15:46 [USER] INFO: === /user endpoint called ===
+2025-12-29 15:15:46 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months. south indian Veg, no gluten, no dairy",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2025-12-29 15:15:46 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2025-12-29 15:15:46 [USER] INFO: === CALCULATION RESULTS ===
+2025-12-29 15:15:46 [USER] INFO: Current weight: 73 kg
+2025-12-29 15:15:46 [USER] INFO: Target weight: 63 kg
+2025-12-29 15:15:46 [USER] INFO: TDEE: 2551
+2025-12-29 15:15:46 [USER] INFO: Weight change: -10 kg
+2025-12-29 15:15:46 [USER] INFO: Daily offset: -916
+2025-12-29 15:15:46 [USER] INFO: Target calories: 1634
+2025-12-29 15:15:46 [USER] INFO: Goal category: get_fit
+2025-12-29 15:15:46 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2025-12-29 15:15:46 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2025-12-29 15:15:46 [USER] INFO: Capped: False
+2025-12-29 15:15:46 [USER] INFO: [PREGEN] Scheduled background generation for session 5219086f46c7-1767001546
+2025-12-29 15:15:46 [USER] INFO: [PREGEN] Starting pre-generation for session 5219086f46c7-1767001546
+2025-12-29 15:15:53 [USER] INFO: [PREGEN] Completed for session 5219086f46c7-1767001546, 7 chunks
+2026-01-12 15:26:57 [USER] INFO: === /user endpoint called ===
+2026-01-12 15:26:57 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is light. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months.",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2026-01-12 15:26:57 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2026-01-12 15:26:57 [USER] INFO: === CALCULATION RESULTS ===
+2026-01-12 15:26:57 [USER] INFO: Current weight: 73 kg
+2026-01-12 15:26:57 [USER] INFO: Target weight: 63 kg
+2026-01-12 15:26:57 [USER] INFO: TDEE: 2551
+2026-01-12 15:26:57 [USER] INFO: Weight change: -10 kg
+2026-01-12 15:26:57 [USER] INFO: Daily offset: -916
+2026-01-12 15:26:57 [USER] INFO: Target calories: 1634
+2026-01-12 15:26:57 [USER] INFO: Goal category: get_fit
+2026-01-12 15:26:57 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2026-01-12 15:26:57 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2026-01-12 15:26:57 [USER] INFO: Capped: False
+2026-01-12 15:26:57 [USER] INFO: [PREGEN] Scheduled background generation for session 5c2075f17026-1768211817
+2026-01-12 15:26:57 [USER] INFO: [PREGEN] Starting pre-generation for session 5c2075f17026-1768211817
+2026-01-12 15:27:02 [USER] INFO: [PREGEN] Completed for session 5c2075f17026-1768211817, 7 chunks
+2026-01-12 15:31:09 [USER] INFO: === /user endpoint called ===
+2026-01-12 15:31:09 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is light. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months.",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2026-01-12 15:31:09 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2026-01-12 15:31:09 [USER] INFO: === CALCULATION RESULTS ===
+2026-01-12 15:31:09 [USER] INFO: Current weight: 73 kg
+2026-01-12 15:31:09 [USER] INFO: Target weight: 63 kg
+2026-01-12 15:31:09 [USER] INFO: TDEE: 2551
+2026-01-12 15:31:09 [USER] INFO: Weight change: -10 kg
+2026-01-12 15:31:09 [USER] INFO: Daily offset: -916
+2026-01-12 15:31:09 [USER] INFO: Target calories: 1634
+2026-01-12 15:31:09 [USER] INFO: Goal category: get_fit
+2026-01-12 15:31:09 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2026-01-12 15:31:09 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2026-01-12 15:31:09 [USER] INFO: Capped: False
+2026-01-12 15:31:09 [USER] INFO: [PREGEN] Scheduled background generation for session a97f9fccd5f2-1768212069
+2026-01-12 15:31:09 [USER] INFO: [PREGEN] Starting pre-generation for session a97f9fccd5f2-1768212069
+2026-01-12 15:31:14 [USER] INFO: [PREGEN] Completed for session a97f9fccd5f2-1768212069, 7 chunks

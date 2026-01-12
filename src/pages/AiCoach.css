@@ -1,0 +1,6681 @@
+.ai-coach-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 16px;
+    min-height: 100vh;
+    align-items: center;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    position: relative;
+  background-color: #10130A !important;
+    color: #F3F3E0 !important;
+    font-family: 'Poppins', sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow: hidden;
+    line-height: 1.6;
+    text-rendering: optimizeLegibility;
+    scroll-margin-top: var(--navbar-height);
+    z-index: 1;
+    margin-top: 0;
+  }
+
+  /* Remove any potential decorative background elements */
+  .ai-coach-container::before,
+  .ai-coach-container::after {
+    display: none;
+    content: none;
+  }
+
+  /* Update base font styles */
+  /* Removed global body styles to prevent affecting other pages */
+
+  /* Container styles */
+  .main-container .ai-coach-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100% !important;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+    background: transparent;
+    border-radius: 20px;
+    border: none;
+    box-shadow: none;
+    color: #F3F3E0 !important;
+  }
+
+  /* Beautiful heading style with animation */
+  .ai-coach-title {
+    position: relative;
+
+    z-index: 2;
+    color:white !important;
+    margin-bottom: 24px;
+    text-align: center;
+    font-size: 50px !important;
+    font-weight: 700;
+    text-shadow: none;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: -0.5px;
+    /* Remove font size animation that causes layout shifting */
+    animation: floatingTitle 4s ease-in-out infinite;
+    /* Create a stable height to prevent layout shifts */
+    min-height: 51.2px;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+
+  /* Add subtle floating animation for the title */
+  @keyframes floatingTitle {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  /* Title height/size animation - REMOVED */
+  @keyframes titlePulse {
+    /* This animation is now removed to prevent shaking */
+  }
+
+  /* Improved expanding underline animation that doesn't shift layout */
+  .ai-coach-title::after {
+    content: "" !important;
+    position: absolute !important;
+    bottom: -8px;
+    left: 50% !important;
+    transform: translateX(-50%);
+    width: 0%;
+    height: 3px;
+    background: #BCCE32 !important;
+    z-index: 1;
+    border-radius: 3px;
+    /* Modified animation that doesn't cause layout shifts */
+    animation: expandLineFromMiddle 2s ease-in-out infinite alternate;
+
+  }
+  /* Expanding line animation - simplified to just start and end states for better performance */
+  @keyframes expandLineFromMiddle {
+    0% {
+      width: 0%;
+      opacity: 0.5;
+      background-position: 0% 50%;
+    }
+    100% {
+      width: 70%;
+      opacity: 1;
+      background-position: 100% 50%;
+    }
+  }
+
+  .title-icon {
+    font-size: 48px;
+    color: #ec4899;
+    filter: drop-shadow(0 4px 12px rgba(236, 72, 153, 0.5));
+  }
+
+  /* Enhanced input section styles with no background */
+  .input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 24px;
+    padding: 28.8px;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 16px;
+    box-shadow: none;
+    border: none;
+    backdrop-filter: none;
+    box-sizing: border-box;
+    z-index: 2;
+    /* Add transform isolation to prevent child animations from affecting layout */
+    transform: translateZ(0);
+    /* Prevent text content from shifting during animations */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    overflow: visible;
+    will-change: transform;
+  }
+
+  .input-section::before {
+    content: none;
+  }
+
+  /* Adjust input container for textarea */
+  .input-container {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 8px;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  /* Adjust copy prompt container when inside input-container */
+  .input-container .copy-prompt-container {
+    margin: 0;
+    width: auto;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Make copy prompt button smaller when inline */
+  .input-container .copy-prompt-button {
+    padding: 8px 12px;
+    font-size: 12px;
+    border-radius: 20px;
+  }
+
+  /* Locked input container styles */
+  .locked-input-container {
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+    padding: 12.8px 19.2px;
+    border: 2px solid rgba(236, 72, 153, 0.4);
+    border-radius: 14px;
+    background: rgba(236, 72, 153, 0.05);
+    box-shadow: 0 4px 15px rgba(236, 72, 153, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .locked-input-container:hover {
+    background: rgba(236, 72, 153, 0.1);
+    border-color: rgba(236, 72, 153, 0.6);
+    box-shadow: 0 6px 20px rgba(236, 72, 153, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .locked-input {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(236, 72, 153, 0.7);
+  }
+
+  .lock-icon {
+    font-size: 18px;
+    color: rgba(236, 72, 153, 0.8);
+    transition: all 0.3s ease;
+  }
+
+  .locked-text {
+    font-size: 16px;
+    color: rgba(236, 72, 153, 0.7);
+    font-weight: 400;
+  }
+
+  .locked-input-container:hover .lock-icon {
+    transform: scale(1.2);
+    color: #ec4899;
+  }
+
+  .locked-input-container:hover .locked-text {
+    color: #ec4899;
+  }
+
+  .custom-goal-label {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: #C8DA2B;
+    text-shadow: 0 0 10px rgba(200, 218, 43, 0.3);
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .welcome-message {
+    text-align: center;
+    float: right !important;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #C8DA2B;
+    text-shadow: 0 0 10px rgba(200, 218, 43, 0.3);
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  /* Enhanced input field styles - better single line handling */
+  .goal-input {
+    padding: 12.8px 19.2px;
+    width: 45%;
+    min-width: 200px;
+    max-width: 450px;
+    box-shadow: none !important;
+    border: 2px solid white !important;
+    border-radius: 14px;
+    font-size: 16px;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #121A16 !important;
+    color: #F3F3E0 !important;
+    font-weight: 400;
+    resize: none;
+    overflow: hidden;
+    height: 42px;
+    min-height: 42px;
+    max-height: 200px;
+    line-height: 1.2;
+    font-family: 'Poppins', sans-serif;
+    display: inline-block;
+    vertical-align: middle;
+    box-sizing: border-box;
+    letter-spacing: 0.2px;
+    position: relative;
+  }
+
+  .goal-input:focus, .goal-input:not(:placeholder-shown) {
+    width: 65% !important;
+    border-color: white !important;
+    background: #121A16 !important;
+    color: #F3F3E0 !important;
+  }
+
+  .goal-input:focus {
+    outline: none !important;
+    border-color: white !important;
+    background: #0A0F0D !important; /* Dark background for better contrast */
+    color: #F3F3E0 !important; /* Ensure text remains visible */
+    transform: translateY(-3px) scale(1.01);
+  }
+
+  @keyframes borderPulse {
+    0% {
+      border-color: #A2B522;
+      box-shadow: 0 0 0 2px rgba(162, 181, 34, 0.3),
+                  0 8px 20px rgba(162, 181, 34, 0.3);
+    }
+    100% {
+      border-color: #A2B522;
+      box-shadow: 0 0 0 3px rgba(162, 181, 34, 0.3),
+                  0 8px 20px rgba(162, 181, 34, 0.3);
+    }
+  }
+
+  .goal-input::placeholder {
+    color: #C8DA2B !important;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    line-height: 1.2;
+    font-size: 15.2px;
+  }
+
+  .goal-input:focus::placeholder {
+    opacity: 0.3;
+    transform: translateX(4px);
+  }
+
+  /* Hover effect for input */
+  .goal-input:hover:not(:focus) {
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+  }
+
+  /* Disabled state for goal input */
+  .goal-input.disabled,
+  .goal-input:disabled {
+    background: #f3f4f6 !important;
+    color: #9ca3af !important;
+    border-color: #e5e7eb !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+    transform: none !important;
+    width: 45% !important; /* keep size stable */
+  }
+
+  /* Vibrant button styles */
+  .recommend-button {
+    padding: 14.4px 28.8px;
+  background: radial-gradient(circle at 40% 40%, #CDD954 0%, #88922F 50%, #1B1F15 100%) !important;
+
+    font-size: 14.4px;
+    border-radius: 12px;
+    color: white !important;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    font-size: 14.4px !important;
+    min-width: 180px;
+    max-width: 100%;
+    flex-shrink: 0;
+    font-family: 'Poppins', sans-serif;
+    text-transform: uppercase;
+    box-shadow: 0px 0px 20px rgba(200,218,43,0.45) !important;
+  }
+
+  .recommend-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 0px 30px rgba(200,218,43,0.5) !important;
+    letter-spacing: 1px;
+    font-weight: 600;
+    color:black !important;
+    background: #CDD954 !important;
+  }
+
+  /* Disabled state for recommend button */
+  .recommend-button.disabled,
+  .recommend-button:disabled {
+    background: #e5e7eb !important;
+    color: #9ca3af !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+    animation: none !important;
+  }
+
+  .recommend-button:hover::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+    animation: pulseLight 1.5s ease-out infinite;
+  }
+
+  @keyframes pulseLight {
+    0% { transform: scale(0.5); opacity: 0.3; }
+    100% { transform: scale(1); opacity: 0; }
+  }
+
+  /* Plan header styles with vibrant icons */
+  .plan-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12.8px;
+    padding: 19.2px;
+    margin-bottom: 16px;
+    text-align: center;
+    background: transparent;
+    border-radius: 12px;
+    box-shadow: none;
+    backdrop-filter: none;
+    opacity: 0;
+    animation: smoothFadeIn 0.5s ease-out forwards;
+  }
+
+  .plan-icon {
+    font-size: 40px;
+    color: #4E3580;
+    text-shadow: 0 2px 10px rgba(139, 92, 246, 0.6);
+    filter: drop-shadow(0 4px 6px rgba(139, 92, 246, 0.4));
+  }
+
+  .plan-header h2 {
+    margin: 0;
+    color: #f8fafc !important;
+    font-size: 28px;
+    font-weight: 600;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(to right, #6366f1, #4E3580, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: -0.3px;
+  }
+
+  /* Enhanced accordion styles with vibrant gradients */
+  .accordion-item {
+    background: #121A16;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0px 6px 20px rgba(200,218,43,0.25);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 16px;
+    border: 1px solid #C8DA2B;
+    width: 100%;
+    box-sizing: border-box;
+    opacity: 0;
+    animation: smoothFadeIn 0.6s ease-out forwards;
+  }
+
+  .accordion-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+    border-color: #C8DA2B;
+  }
+
+  /* Accordion header - vibrant gradient */
+  .accordion-header {
+    position: relative;
+    padding: 16px;
+    background: #1B2420;
+    color: #C8DA2B;
+    border-radius: 12px 12px 0 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #C8DA2B;
+    border-bottom: none;
+  }
+
+  .accordion-header-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    min-width: 0; /* Allow text to shrink */
+    padding-right: 30px; /* Space for arrow */
+  }
+
+  .accordion-header-text {
+     flex: 1;
+     min-width: 0;
+     overflow: hidden;
+     font-size: 16px;
+     font-weight: 500;
+     line-height: 1.2;
+     display: -webkit-box;
+     -webkit-line-clamp: 2;
+     -webkit-box-orient: vertical;
+     padding-right: 35px;
+   }
+
+  .accordion-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .accordion-arrow {
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Accordion content styling */
+  .accordion-content {
+    background: #121A16;
+    padding: 19.2px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #C8DA2B;
+    border-top: none;
+  }
+
+  .disclaimer-container {
+    background: linear-gradient(135deg, #6366f1 0%, #4E3580 100%);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    animation: slideInUp 0.5s ease-out forwards;
+  }
+
+  .disclaimer-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .disclaimer-icon {
+    font-size: 24px;
+    color: #fff;
+    animation: pulse 2s infinite;
+  }
+
+  .disclaimer-text {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0;
+    line-height: 1.5;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .disclaimer-animation-dot {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    top: -50px;
+    right: -50px;
+    animation: float 4s ease-in-out infinite;
+  }
+
+  /* Animations */
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-20px) rotate(180deg);
+    }
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* Media Queries */
+  @media (max-width: 768px) {
+    .disclaimer-container {
+      margin: 15px 0;
+      padding: 12px;
+    }
+
+    .disclaimer-text {
+      font-size: 13px;
+    }
+
+    .disclaimer-icon {
+      font-size: 20px;
+    }
+  }
+.suggestion-text{
+   color: #C8DA2B;
+   background-attachment: fixed;
+
+}
+
+/* Container Styling */
+.end-of-plan-suggestion {
+  background: #121A16; /* Dark theme background */
+  border-radius: 8px;
+  padding: 10px 16px;
+  margin: 12px auto;
+  max-width: 92%; /* Scales with screen */
+  width: 100%; /* Full width within max-width */
+  box-shadow: 0px 4px 12px rgba(200,218,43,0.15); /* LimeTech shadow */
+  display: flex;
+  align-items: center; /* Vertical centering */
+  gap: 10px; /* Simple spacing */
+  transition: transform 0.2s ease; /* Simple hover transition */
+}
+
+/* Hover Effect */
+.end-of-plan-suggestion:hover {
+  transform: translateX(3px); /* Minimal slide on hover */
+}
+
+/* Info Icon Styling */
+.info-icon {
+  font-size: 1.1rem;
+  color: #C8DA2B; /* LimeTech primary color */
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out forwards; /* Simple fade-in */
+}
+
+/* Suggestion Content Wrapper */
+.suggestion-content {
+  flex: 1; /* Takes remaining space */
+}
+
+/* Header Styling */
+.plan-header {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #F3F3E0; /* LimeTech text primary */
+  margin-bottom: 2px;
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out forwards 0.1s; /* Delayed fade-in */
+}
+
+/* Suggestion Text Styling */
+.suggestion-text {
+  font-size: 0.9rem;
+  color: #D4DD7B; /* LimeTech text secondary */
+  line-height: 1.4;
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out forwards 0.2s; /* Delayed fade-in */
+}
+
+/* Keyframes for Simple Animation */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (min-width: 1200px) {
+  .end-of-plan-suggestion {
+    max-width: 1000px; /* Wider on large screens */
+    padding: 12px 18px;
+  }
+
+  .plan-header {
+    font-size: 1.4rem;
+  }
+
+  .suggestion-text {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .end-of-plan-suggestion {
+    padding: 8px 14px;
+    margin: 10px;
+    max-width: 95%;
+  }
+
+  .plan-header {
+    font-size: 1.1rem;
+  }
+
+  .suggestion-text {
+    font-size: 0.85rem;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .end-of-plan-suggestion {
+    padding: 6px 10px;
+    flex-direction: column; /* Stack on small screens */
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .info-icon {
+    font-size: 1rem;
+  }
+
+  .plan-header {
+    font-size: 1rem;
+  }
+
+  .suggestion-text {
+    font-size: 0.8rem;
+  }
+}
+
+Fix background decorative elements
+.ai-coach-container {
+    display: flex;
+    flex-direction: column;
+    padding: 32px 16px;
+    min-height: 100vh;
+    align-items: center;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    position: relative;
+    background-color: #0A0F0D;
+    overflow: hidden;
+  }
+
+  /* Remove any potential decorative background elements */
+  .ai-coach-container::before,
+  .ai-coach-container::after {
+    display: none;
+    content: none;
+  }
+
+  /* Update base font styles */
+  /* Removed global body styles to prevent affecting other pages */
+
+  /* Container styles */
+  .main-container .ai-coach-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100% !important;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 32px;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1;
+    background: transparent;
+    border-radius: 20px;
+    border: none;
+    box-shadow: none;
+    color: #F3F3E0 !important;
+  }
+
+  /* Beautiful heading style with animation */
+  .ai-coach-title {
+    position: relative;
+    z-index: 2;
+    color: #C8DA2B;
+    margin-bottom: 24px;
+    text-align: center;
+    font-size: 50px !important;
+    font-weight: 700;
+    text-shadow: none;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: -0.5px;
+    /* Remove font size animation that causes layout shifting */
+    animation: floatingTitle 4s ease-in-out infinite;
+    /* Create a stable height to prevent layout shifts */
+    min-height: 51.2px;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+  }
+
+  /* Add subtle floating animation for the title */
+  @keyframes floatingTitle {
+    0% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
+  /* Title height/size animation - REMOVED */
+  @keyframes titlePulse {
+    /* This animation is now removed to prevent shaking */
+  }
+
+  /* Improved expanding underline animation that doesn't shift layout */
+  .ai-coach-title::after {
+    content: "" !important;
+    position: absolute !important;
+    bottom: -8px;
+    left: 50% !important;
+    transform: translateX(-50%);
+    width: 0%;
+    height: 3px;
+    background: linear-gradient(90deg, #C8DA2B, #E5F35A, #0A0F0D);
+    background-size: 200% 100%;
+    z-index: 1;
+    border-radius: 3px;
+    box-shadow: 0 2px 10px rgba(128, 128, 128, 0.4);
+    /* Modified animation that doesn't cause layout shifts */
+    animation: expandLineFromMiddle 2s ease-in-out infinite alternate;
+  }
+
+  /* Expanding line animation - simplified to just start and end states for better performance */
+  @keyframes expandLineFromMiddle {
+    0% {
+      width: 0%;
+      opacity: 0.5;
+      background-position: 0% 50%;
+    }
+    100% {
+      width: 70%;
+      opacity: 1;
+      background-position: 100% 50%;
+    }
+  }
+
+  .title-icon {
+    font-size: 48px;
+    color: #ec4899;
+    filter: drop-shadow(0 4px 12px rgba(236, 72, 153, 0.5));
+  }
+
+  /* Enhanced input section styles with no background */
+  .input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 24px;
+    padding: 28.8px;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 16px;
+    box-shadow: none;
+    border: none;
+    backdrop-filter: none;
+    box-sizing: border-box;
+    z-index: 2;
+    /* Add transform isolation to prevent child animations from affecting layout */
+    transform: translateZ(0);
+    /* Prevent text content from shifting during animations */
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    overflow: visible;
+    will-change: transform;
+  }
+
+  .input-section::before {
+    content: none;
+  }
+
+  /* Adjust input container for textarea */
+  .input-container {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 8px;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  /* Locked input container styles */
+  .locked-input-container {
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+    padding: 12.8px 19.2px;
+    border: 2px solid rgba(200, 218, 43, 0.4);
+    border-radius: 14px;
+    background: rgba(200, 218, 43, 0.05);
+    box-shadow: 0 4px 15px rgba(200, 218, 43, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .locked-input-container:hover {
+    background: rgba(200, 218, 43, 0.1);
+    border-color: rgba(200, 218, 43, 0.6);
+    box-shadow: 0 6px 20px rgba(200, 218, 43, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .locked-input {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(200, 218, 43, 0.7);
+  }
+
+  .lock-icon {
+    font-size: 18px;
+    color: rgba(200, 218, 43, 0.8);
+    transition: all 0.3s ease;
+  }
+
+  .locked-text {
+    font-size: 16px;
+    color: rgba(200, 218, 43, 0.7);
+    font-weight: 400;
+  }
+
+  .locked-input-container:hover .lock-icon {
+    transform: scale(1.2);
+    color: #D4E63A;
+  }
+
+  .locked-input-container:hover .locked-text {
+    color: #D4E63A;
+  }
+
+  .custom-goal-label {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: #C8DA2B;
+    text-shadow: 0 0 10px rgba(200, 218, 43, 0.3);
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .welcome-message {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #C8DA2B;
+    text-shadow: 0 0 10px rgba(200, 218, 43, 0.3);
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  /* Enhanced input field styles - better single line handling */
+  .goal-input {
+    padding: 12.8px 19.2px;
+    width: 45%;
+    min-width: 200px;
+    max-width: 450px;
+    border: 2px solid #C8DA2B;
+    border-radius: 14px;
+    font-size: 16px;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #121A16;
+    box-shadow: 0 0 0 2px rgba(200, 218, 43, 0.3),
+                0 8px 20px rgba(200, 218, 43, 0.3);
+    color: #F3F3E0 !important;
+    font-weight: 400;
+    resize: none;
+    overflow: hidden;
+    height: 42px;
+    min-height: 42px;
+    max-height: 200px;
+    line-height: 1.2;
+    font-family: 'Poppins', sans-serif;
+    display: inline-block;
+    vertical-align: middle;
+    box-sizing: border-box;
+    letter-spacing: 0.2px;
+    position: relative;
+  }
+
+  .goal-input:focus, .goal-input:not(:placeholder-shown) {
+    width: 65%;
+    border-color: #C8DA2B;
+    box-shadow: 0 0 0 2px rgba(200, 218, 43, 0.3),
+                0 8px 20px rgba(200, 218, 43, 0.3);
+    background: #121A16;
+    color: #F3F3E0;
+  }
+
+  .goal-input:focus {
+    outline: none;
+    border-color: #A2B522;
+    background: #0A0F0D; /* Dark background for better contrast */
+    color: #F3F3E0; /* Ensure text remains visible */
+    transform: translateY(-3px) scale(1.01);
+  }
+
+  @keyframes borderPulse {
+    0% {
+      border-color: #A2B522;
+      box-shadow: 0 0 0 2px rgba(162, 181, 34, 0.3),
+                  0 8px 20px rgba(162, 181, 34, 0.3);
+    }
+    100% {
+      border-color: #A2B522;
+      box-shadow: 0 0 0 3px rgba(162, 181, 34, 0.3),
+                  0 8px 20px rgba(162, 181, 34, 0.3);
+    }
+  }
+
+  .goal-input::placeholder {
+    color: #C8DA2B;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    line-height: 1.2;
+    font-size: 15.2px;
+  }
+
+  .goal-input:focus::placeholder {
+    opacity: 0.3;
+    transform: translateX(4px);
+  }
+
+  /* Hover effect for input */
+  .goal-input:hover:not(:focus) {
+    border-color: rgba(200, 218, 43, 0.5);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+  }
+
+  /* Vibrant button styles */
+  .recommend-button {
+    padding: 14.4px 28.8px;
+   background: linear-gradient(160deg, #1A1F14 0%, #2C341B 30%, #CDD954 80%, #E8F773 100%) !important;
+color: #FFFFFF !important;
+
+    background-size: 200% 200%;
+    animation: gradientMove 6s ease infinite;
+    font-size: 14.4px;
+    border-radius: 12px;
+
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.5);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    font-size: 14.4px !important;
+    min-width: 180px;
+    max-width: 100%;
+    flex-shrink: 0;
+    font-family: 'Poppins', sans-serif;
+    text-transform: uppercase;
+  }
+
+  .recommend-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+    letter-spacing: 1px;
+  }
+
+  .recommend-button:hover::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 70%);
+    animation: pulseLight 1.5s ease-out infinite;
+  }
+
+  @keyframes pulseLight {
+    0% { transform: scale(0.5); opacity: 0.3; }
+    100% { transform: scale(1); opacity: 0; }
+  }
+
+  /* Plan header styles with vibrant icons */
+  .plan-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12.8px;
+    padding: 19.2px;
+    margin-bottom: 16px;
+    text-align: center;
+    background: transparent;
+    border-radius: 12px;
+    box-shadow: none;
+    backdrop-filter: none;
+    opacity: 0;
+    animation: smoothFadeIn 0.5s ease-out forwards;
+  }
+
+  .plan-icon {
+    font-size: 40px;
+    color: #4E3580;
+    text-shadow: 0 2px 10px rgba(139, 92, 246, 0.6);
+    filter: drop-shadow(0 4px 6px rgba(139, 92, 246, 0.4));
+  }
+
+  .plan-header h2 {
+    margin: 0;
+    color: #f8fafc;
+    font-size: 28px;
+    font-weight: 600;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(to right, #6366f1, #4E3580, #ec4899);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: -0.3px;
+  }
+
+  /* Enhanced accordion styles with vibrant gradients */
+  .accordion-item {
+    background: #121A16;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0px 6px 20px rgba(200,218,43,0.25);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 16px;
+    border: 1px solid #C8DA2B;
+    width: 100%;
+    box-sizing: border-box;
+    opacity: 0;
+    animation: smoothFadeIn 0.6s ease-out forwards;
+  }
+
+  .accordion-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 6px 20px rgba(200,218,43,0.25);
+    border-color: #C8DA2B;
+  }
+
+  /* Accordion header - vibrant gradient */
+  .accordion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 19.2px 22.4px;
+    background: #1B2420;
+    font-weight: 600;
+    font-size: 17.6px;
+    color: #C8DA2B;
+    border-radius: 12px 12px 0 0;
+    border-bottom: 1px solid rgba(200, 218, 43, 0.3);
+    width: 100%;
+    box-sizing: border-box;
+    height: 75px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: 0.3px;
+  }
+
+  .accordion-icon {
+    font-size: 24px;
+    margin-right: 16px;
+    color: #C8DA2B;
+    min-width: 30px;
+    text-align: center;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
+  }
+
+  .accordion-arrow {
+    color: #C8DA2B;
+    opacity: 0.9;
+    transition: transform 0.3s ease;
+    font-size: 19.2px;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 34px;
+    flex-shrink: 0;
+  }
+
+  /* Accordion content styling */
+  .accordion-content {
+    background: #121A16;
+    padding: 19.2px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #C8DA2B;
+    border-top: none;
+  }
+
+  /* Simplified numbered list with automatic counters */
+  ol.numbered-list {
+    counter-reset: listCounter;
+    list-style: none;
+    padding: 8px 0 0 0;
+    margin: 0;
+  }
+
+  ol.numbered-list li.ai-coach-numbered-item {
+    position: relative;
+    padding: 16px 19.2px 16px 56px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    background: #1B2420;
+    border-radius: 10px;
+    border: 1px solid #C8DA2B;
+    box-shadow: 0px 4px 12px rgba(200,218,43,0.15);
+    font-size: 16px;
+    color: #F3F3E0;
+    transition: all 0.2s ease;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.2px;
+    line-height: 1.5;
+    counter-increment: listCounter;
+  }
+
+  ol.numbered-list li.ai-coach-numbered-item::before {
+    content: counter(listCounter);
+    position: absolute;
+    left: 19.2px;
+    color: #4E3580;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    text-shadow: 0 0 5px rgba(139, 92, 246, 0.5);
+    font-size: 16px;
+  }
+
+  /* Reset previous counter styles */
+  .numbered-list .ai-coach-numbered-item::before {
+    content: none;
+  }
+
+  .accordion .ai-coach-numbered-item:hover {
+    background: rgba(200, 218, 43, 0.2);
+    color: #F3F3E0;
+    transform: translateX(4px) translateY(-2px);
+    border-color: #C8DA2B;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(200, 218, 43, 0.2);
+  }
+
+  /* Reset previous counter styles */
+  .numbered-list .ai-coach-numbered-item::before {
+    content: none;
+  }
+
+  .accordion .ai-coach-numbered-item:hover {
+    background: rgba(200, 218, 43, 0.2);
+    color: #f8fafc;
+    transform: translateX(4px) translateY(-2px);
+    border-color: rgba(139, 92, 246, 0.5);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(139, 92, 246, 0.2);
+  }
+
+  .accordion .numbered-list .ai-coach-numbered-item:hover::before {
+    color: #C8DA2B;
+    transform: scale(1.2);
+    text-shadow: 0 0 8px rgba(200, 218, 43, 0.7);
+  }
+
+  /* Vibrant suggestion chips */
+  .suggestion-chip {
+    display: flex;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+    gap: 8px;
+    padding: 8px 18px 8px 15px; /* Increased right padding from 15px to 18px */
+    border-radius: 50px;
+    background-color: #111;
+    border: 1px solid #333;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14.4px !important;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 0 8px rgba(0, 0, 0, 0.6);
+    animation: fadeInUp 0.5s ease forwards;
+    opacity: 0;
+    position: relative;
+    overflow: hidden;
+    min-width: max-content; /* Ensure content doesn't get cut off */
+  }
+
+  /* Improve padding for specific options with longer text */
+  .suggestion-chip[data-goal="Get Fit"] {
+    padding-right: 22px; /* Extra padding for "Improve Endurance" */
+    font-size: 14.4px !important;
+  }
+
+  .suggestion-chip[data-goal="Athletic Performance"] {
+    padding-right: 22px; /* Extra padding for "Athletic Performance" */
+    font-size: 14.4px !important;
+  }
+
+  .suggestion-chip[data-goal="Stay Flexible"] {
+    padding-right: 22px; /* Extra padding for "Increase Flexibility" */
+  }
+
+  /* Add shadow effects for each goal type */
+  .suggestion-chip[data-goal="Lose Weight"] {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 0 8px rgba(0, 0, 0, 0.6), 0 0 10px rgba(231, 76, 60, 0.2);
+    font-size: 14.4px !important;
+  }
+
+  .suggestion-chip[data-goal="Build Muscle"] {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 0 8px rgba(0, 0, 0, 0.6), 0 0 10px rgba(52, 152, 219, 0.2);
+    font-size: 14.4px !important;
+  }
+
+  .suggestion-chip[data-goal="Get Stronger"] {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 0 8px rgba(0, 0, 0, 0.6), 0 0 10px rgba(241, 196, 15, 0.2);
+    font-size: 14.4px !important;
+  }
+
+  .suggestion-chip[data-goal="Stay Flexible"] {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 0 8px rgba(0, 0, 0, 0.6), 0 0 10px rgba(155, 89, 182, 0.2);
+    font-size: 14.4px !important;
+  }
+
+  /* Enhanced hover effects */
+  .suggestion-chip:hover {
+    transform: translateY(-3px);
+    background-color: #000;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), 0 0 20px rgba(100, 100, 100, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.8);
+  }
+
+  .suggestion-chip[data-goal="Lose Weight"]:hover {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), 0 0 20px rgba(231, 76, 60, 0.3), inset 0 0 15px rgba(0, 0, 0, 0.8);
+  }
+
+  .suggestion-chip[data-goal="Build Muscle"]:hover {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), 0 0 20px rgba(52, 152, 219, 0.3), inset 0 0 15px rgba(0, 0, 0, 0.8);
+  }
+
+  .suggestion-chip[data-goal="Get Fit"]:hover {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), 0 0 20px rgba(46, 204, 113, 0.3), inset 0 0 15px rgba(0, 0, 0, 0.8);
+  }
+
+  .suggestion-chip[data-goal="Get Stronger"]:hover {
+    box-shadow: 10px 20px rgba(0, 0, 0, 0.4), 0 0 20px rgba(241, 196, 15, 0.3), inset 0 0 15px rgba(0, 0, 0, 0.8);
+  }
+
+  .suggestion-chip[data-goal="Stay Flexible"]:hover {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), 0 0 20px rgba(155, 89, 182, 0.3), inset 0 0 15px rgba(0, 0, 0, 0.8);
+  }
+
+  .suggestion-chip[data-goal="Be Athletic"]:hover {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), 0 0 20px rgba(26, 188, 156, 0.3), inset 0 0 15px rgba(0, 0, 0, 0.8);
+  }
+
+  .suggestion-chip i {
+    font-size: 17.6px;
+    transition: all 0.3s ease;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    position: relative;
+  }
+
+  .suggestions-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12.8px;
+    justify-content: center;
+    margin-top: 16px;
+    padding: 6.4px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .suggestion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12.8px;
+    justify-content: center;
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .suggestions-title {
+    width: 100%;
+    text-align: center;
+    color: #7f8c8d;
+    font-size: 14.4px !important;
+    margin-bottom: 12.8px;
+    font-weight: 500;
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+      max-height: 0;
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+      max-height: 1000px;
+    }
+  }
+
+  /* Apply enhanced animation to plan containers */
+
+  /* Apply smoother animations to accordion items */
+  .accordion-item {
+    opacity: 0;
+    animation: smoothFadeIn 0.6s ease-out forwards;
+  }
+
+  /* Stagger the animation for each accordion item */
+  .plan-section:nth-child(1) .accordion-item:nth-child(1) { animation-delay: 0.1s; }
+  .plan-section:nth-child(1) .accordion-item:nth-child(2) { animation-delay: 0.2s; }
+  .plan-section:nth-child(1) .accordion-item:nth-child(3) { animation-delay: 0.3s; }
+  .plan-section:nth-child(1) .accordion-item:nth-child(4) { animation-delay: 0.4s; }
+
+  .plan-section:nth-child(2) .accordion-item:nth-child(1) { animation-delay: 0.3s; }
+  .plan-section:nth-child(2) .accordion-item:nth-child(2) { animation-delay: 0.4s; }
+  .plan-section:nth-child(2) .accordion-item:nth-child(3) { animation-delay: 0.5s; }
+  .plan-section:nth-child(2) .accordion-item:nth-child(4) { animation-delay: 0.6s; }
+  .plan-section:nth-child(2) .accordion-item:nth-child(5) { animation-delay: 0.7s; }
+  .plan-section:nth-child(2) .accordion-item:nth-child(6) { animation-delay: 0.8s; }
+  .plan-section:nth-child(2) .accordion-item:nth-child(7) { animation-delay: 0.9s; }
+
+  /* Plan section headers animation */
+  .plan-header {
+    opacity: 0;
+    animation: smoothFadeIn 0.5s ease-out forwards;
+  }
+
+  .plan-section:nth-child(1) .plan-header { animation-delay: 0.05s; }
+  .plan-section:nth-child(2) .plan-header { animation-delay: 0.25s; }
+
+  /* Media queries - commented out duplicated/conflicting media queries */
+  @media (max-width: 1200px) {
+    .input-section {
+      max-width: 90%;
+      padding: 24px;
+    }
+
+    /* Removed duplicate plans-grid styles */
+  }
+
+  @media (min-width: 901px) and (max-width: 1024px) {
+    /* Removed duplicate plans-grid styles */
+  }
+
+  @media (max-width: 900px) {
+    .input-container {
+      gap: 48px;
+    }
+
+    .goal-input {
+      width: 65%;
+    }
+
+    .recommend-button {
+      padding: 12.8px 24px;
+      min-width: 160px;
+      font-size: 14.4px !important;
+    }
+
+    .suggestion-chips {
+      gap: 11.2px !important;
+    }
+
+    .suggestion-chip {
+      padding: 4.8px 11.2px !important;
+      font-size: 13.6px;
+    }
+
+    /* Removed duplicate plans-grid styles */
+  }
+
+  @media (max-width: 768px) {
+    .input-container {
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .goal-input {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+
+    .recommend-button {
+      width: 100% !important;
+      max-width: 400px !important;
+      font-size: 14.4px !important;
+    }
+
+    .input-container .copy-prompt-container {
+      width: 100% !important;
+      max-width: 400px !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .input-section {
+      padding: 16px 8px;
+      max-width: 100%;
+    }
+
+    .input-container {
+      width: 100%;
+    }
+
+    .goal-input {
+      width: 100%;
+      margin-right: 0;
+      margin-bottom: 12.8px;
+      padding: 11.2px 16px;
+    }
+
+    .goal-input:focus, .goal-input:not(:placeholder-shown) {
+      width: 100%;
+    }
+
+    .recommend-button {
+      width: 100%;
+      padding: 12.8px 16px;
+      font-size: 14.4px !important;
+    }
+
+    .suggestions-container {
+      margin-top: 12.8px;
+      padding: 4.8px;
+    }
+
+    .suggestion-chips {
+      gap: 9.6px;
+    }
+
+    .suggestion-chip {
+      padding: 8px 12.8px;
+      font-size: 12.8px;
+      gap: 6.4px;
+    }
+
+    .suggestion-chip i {
+      font-size: 16px;
+    }
+
+    /* Removed duplicate plans-container and plans-grid styles */
+
+    /* Fix plan headers with better icon and text alignment */
+    .plan-header {
+      padding: 24px 16px;
+      margin-bottom: 19.2px;
+    }
+
+    .plan-icon {
+      font-size: 35.2px;
+      margin-bottom: 8px;
+    }
+
+    .plan-header h2 {
+      font-size: 22.4px;
+    }
+
+    /* Improve accordion header sizing and alignment */
+    .accordion-header {
+      padding: 16px;
+      min-height: 65px;
+      height: auto;
+    }
+
+    .accordion-icon {
+      font-size: 20.8px;
+      margin-right: 12.8px;
+    }
+
+    .day-header-content {
+      gap: 8px;
+      flex: 1;
+    }
+
+    .day-header-right {
+      margin-top: 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 15px;
+    }
+
+    /* Improve nested accordion headers for meal types */
+    .nested-accordion-header {
+      padding: 8px 12px;
+      min-height: 40px;
+    }
+
+    .nested-accordion-icon {
+      font-size: 13.6px;
+    }
+
+    .meal-header-content {
+      gap: 8px;
+      flex: 1;
+    }
+
+    .meal-header-right {
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* Better container sizing */
+    .plan-section {
+      padding: 19.2px;
+      margin-bottom: 24px;
+    }
+
+    /* More readable text sizes */
+    .accordion span, .nested-accordion span {
+      font-size: 15.2px !important;
+    }
+
+    .calories-info {
+      padding: 2px 12px;
+      font-size: 12.8px;
+    }
+
+    /* Better spacing between accordion elements */
+    .accordion-item {
+      margin-bottom: 16px;
+    }
+
+    .nested-accordion-item {
+      margin-bottom: 12.8px;
+    }
+  }
+
+  @media (max-width: 350px) {
+    .suggestion-chip {
+      padding: 8px 11.2px;
+      font-size: 12px;
+    }
+
+    .accordion-content {
+      padding: 12px 8px;
+    }
+
+    .nested-accordion-content {
+      padding: 8px;
+    }
+
+    .plan-section:last-child .numbered-list .ai-coach-numbered-item {
+      padding: 10px 10px 10px 36px;
+      font-size: 13.6px;
+    }
+
+    .plan-header {
+      padding: 19.2px 12.8px;
+    }
+
+    .plan-icon {
+      font-size: 32px;
+    }
+
+    .plan-header h2 {
+      font-size: 20.8px;
+    }
+
+    .accordion-header, .nested-accordion-header {
+      padding: 12.8px;
+    }
+  }
+
+  /* Popup styles */
+  .goal-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 550px;
+    max-width: 90%;
+    max-height: 85vh;
+    background: #ffffff;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.2);
+    border-radius: 16px;
+    padding: 30px;
+    z-index: 1001;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    transform: translate(-50%, -40%) scale(0.95);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    filter: none;
+    backdrop-filter: none;
+  }
+
+  .goal-popup::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+
+  .goal-popup.active {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .goal-popup-form {
+    width: 100%;
+    max-height: calc(65vh - 80px); /* Adjust for button height */
+    overflow-y: auto;
+    padding-right: 16px;
+    margin-bottom: 80px; /* Space for buttons */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .goal-popup-icon {
+    font-size: 48px !important;
+    margin-bottom: 15px;
+    background: rgba(255, 255, 255, 0.7);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    animation: popupIcon 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+    transform: scale(0.8);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+  }
+
+  .goal-popup-title {
+    font-size: 28.8px !important;
+    font-weight: 700 !important;
+    color: #2d3748;
+    margin-bottom: 10px;
+    text-align: center;
+    line-height: 1.2;
+    background: linear-gradient(135deg, #2d3748, #4a5568);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .goal-popup-description {
+    font-size: 12.8px !important;
+    text-align: center !important;
+    color: #4a5568;
+    margin-bottom: 20px;
+    max-width: 90%;
+    line-height: 1.5;
+  }
+
+  .goal-popup-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #f3f4f6;
+    color: #4b5563;
+    border-radius: 50%;
+    width: 36px !important;
+    height: 36px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 19.2px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+  }
+
+  .goal-popup-close:hover {
+    transform: rotate(90deg);
+    background: #e5e7eb;
+    color: #1f2937;
+  }
+
+  /* Form Layout and Style Enhancements */
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+    animation: formRowAppear 0.5s ease forwards;
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 15px;
+    transition: all 0.3s ease;
+    position: relative;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  }
+
+  .form-group:hover {
+    background: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: rgba(203, 213, 224, 0.8);
+  }
+
+  .form-group:focus-within {
+    background: #ffffff;
+    box-shadow: 0 4px 15px rgba(66, 153, 225, 0.15);
+    border-color: rgba(99, 179, 237, 0.6);
+  }
+
+  .form-group label {
+    color: #2d3748;
+    font-size: 15.2px !important;
+    font-weight: 600 !important;
+    display: flex;
+    align-items: center;
+    gap: 9.6px;
+    transition: all 0.3s ease;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+    margin-bottom: 8px;
+  }
+
+  .optional-label {
+    font-size: 12.8px !important;
+    font-weight: normal;
+    color: #718096;
+    font-style: italic;
+    margin-left: 5px;
+  }
+
+  .form-group label i {
+    color: #3b82f6;
+    font-size: 17.6px;
+    transition: all 0.3s ease;
+  }
+
+  .form-group:focus-within label {
+    color: #3b82f6;
+  }
+
+  .form-group:focus-within label i {
+    color: #3b82f6;
+  }
+
+  .form-group input,
+  .form-group select {
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background-color: rgba(255, 255, 255, 0.9);
+    font-size: 13px !important;
+    color: #1a202c;
+    transition: all 0.3s ease;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    /* backdrop-filter: blur(8px); */
+    /* -webkit-backdrop-filter: blur(8px); */
+  }
+
+  .form-group input[type="number"] {
+    appearance: textfield;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+    background-color: #ffffff;
+    transform: translateY(-2px);
+  }
+
+  .form-group input:hover,
+  .form-group select:hover {
+    border-color: #7c3aed;
+    background-color: #ffffff;
+  }
+
+  /* Range slider styling */
+  .form-group input[type="range"] {
+    -webkit-appearance: none;
+    height: 8px;
+    background: linear-gradient(to right, #60a5fa, #3b82f6);
+    border-radius: 5px;
+    margin: 10px 0;
+    padding: 0;
+    cursor: pointer;
+    box-shadow: none;
+    border: none;
+  }
+
+  .form-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+  }
+
+  .form-group input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    background: #2563eb;
+  }
+
+  .range-value {
+    font-size: 14.4px;
+    color: #4b5563;
+    text-align: center;
+    margin-top: 5px;
+    font-weight: 500;
+  }
+
+  /* Submit button enhancement */
+  .popup-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 24px;
+    padding: 16px 0;
+    width: 100%;
+    position: sticky;
+    bottom: 0;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    z-index: 10;
+  }
+
+  .popup-button {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .popup-button.cancel {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    font-size: 14.4px !important;
+    border: 1px solid #e5e7eb;
+  }
+
+  .popup-button.cancel:hover {
+    background-color: #e5e7eb;
+    color: #1f2937;
+    transform: translateY(-2px);
+  }
+
+  .popup-button.submit {
+    background: #BCCE32 !important;
+    color: black !important;
+    font-size: 14.4px !important;
+    border: none;
+    box-shadow: 0 4px 6px rgba(124, 58, 237, 0.2);
+  }
+
+  .popup-button.submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(124, 58, 237, 0.3);
+    background: linear-gradient(135deg, #6d28d9, #5b21b6);
+  }
+
+  .popup-button:active {
+    transform: translateY(0);
+  }
+
+  /* Health Conditions Select Enhancement */
+  .form-group select[multiple] {
+    height: 120px;
+    padding: 8px;
+  }
+
+  .form-group select[multiple] option {
+    padding: 8px;
+    margin: 3.2px 0;
+    border-radius: 4px;
+    font-size: 14.4px !important;
+    transition: all 0.2s ease;
+  }
+
+  .form-group select[multiple] option:checked {
+    background: #3b82f6;
+    color: white;
+    font-weight: 500;
+    font-size: 14.4px !important;
+    filter: none;
+    backdrop-filter: none;
+  }
+
+  .form-group select[multiple] option:hover {
+    background: rgba(59, 130, 246, 0.1);
+  }
+
+  .popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .popup-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  @keyframes popupIcon {
+    0% {
+      transform: scale(0) rotate(-180deg);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1) rotate(0);
+      opacity: 1;
+    }
+  }
+
+  /* Add these animations for loading */
+  @keyframes bounce {
+    from {
+      transform: translateY(0) rotate(0deg);
+    }
+    to {
+      transform: translateY(-15px) rotate(360deg);
+    }
+  }
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg) scale(1);
+    }
+    50% {
+      transform: rotate(180deg) scale(1.1);
+    }
+    100% {
+      transform: rotate(360deg) scale(1);
+    }
+  }
+
+  /* Responsive styles for popup and buttons */
+  @media (max-width: 768px) {
+    .popup-buttons {
+      flex-direction: row; /* Keep buttons side by side */
+      padding: 12px;
+      gap: 12px;
+    }
+
+    .popup-button {
+      flex: 1;
+      padding: 12px 16px;
+      min-width: unset;
+    }
+
+    .goal-popup {
+      width: 95%;
+      padding: 20px;
+      max-height: 90vh;
+    }
+
+    .goal-popup-form {
+      max-height: calc(70vh - 60px);
+      margin-bottom: 60px;
+    }
+  }
+
+  /* Form field animations */
+  @keyframes focusField {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-2px); }
+  }
+
+  @keyframes blurField {
+    0% { transform: translateY(-2px); }
+    100% { transform: translateY(0); }
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    animation: focusField 0.3s ease forwards;
+  }
+
+  .form-group input:not(:focus),
+  .form-group select:not(:focus) {
+    animation: blurField 0.3s ease forwards;
+  }
+
+  /* Required field indicator styling */
+  label[for] {
+    position: relative;
+  }
+
+  label[for] span.required-asterisk {
+    color: #e74c3c;
+    margin-left: 2px;
+    font-weight: bold;
+  }
+
+  /* Add back necessary animations and styles */
+  @keyframes formRowAppear {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .form-row:nth-child(1) { animation-delay: 0.1s; }
+  .form-row:nth-child(2) { animation-delay: 0.2s; }
+  .form-row:nth-child(3) { animation-delay: 0.3s; }
+  .form-row:nth-child(4) { animation-delay: 0.4s; }
+
+  .form-group select[multiple] {
+    height: 140px;
+    padding: 10px;
+    background-image: none;
+  }
+
+  .form-group select[multiple] option {
+    padding: 8px;
+    margin: 3px 0;
+    font-size: 14.4px !important;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .form-group select[multiple] option:checked {
+    background: #3b82f6;
+    color: white;
+    font-weight: 500;
+    font-size: 14.4px !important;
+    filter: none;
+    backdrop-filter: none;
+  }
+
+  .form-group select[multiple] option:hover {
+    background: rgba(59, 130, 246, 0.1);
+  }
+
+  /* Scrollbar styling */
+  .goal-popup-form::-webkit-scrollbar {
+    width: 8px;
+    border-radius: 4px;
+  }
+
+  .goal-popup-form::-webkit-scrollbar-track {
+    background: rgba(203, 213, 224, 0.2);
+    border-radius: 4px;
+  }
+
+  .goal-popup-form::-webkit-scrollbar-thumb {
+    background-color: rgba(160, 174, 192, 0.5);
+    border-radius: 4px;
+  }
+
+  .goal-popup-form::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(113, 128, 150, 0.7);
+  }
+
+  /* Responsive styles - fix popup layout on mobile */
+  @media (max-width: 768px) {
+    .form-row {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .popup-buttons {
+      flex-direction: column;
+    }
+
+    .goal-popup {
+      padding: 20px;
+      max-height: 90vh;
+    }
+  }
+
+  /* Nested Accordion Styles - with color themes for meal types */
+  .nested-accordion {
+    margin: 8px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .nested-accordion-item {
+    background: #121A16;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid #C8DA2B;
+    margin-bottom: 10px;
+  }
+
+  .nested-accordion-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: #C8DA2B;
+  }
+
+  .nested-accordion-header {
+    padding: 10px 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    min-height: 45px;
+    height: auto;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+  }
+
+  /* Meal types color themes - Enhanced with Vibrant Gradients */
+  .nested-accordion-header[data-meal-type="breakfast"],
+  .nested-accordion-header[data-meal-type="lunch"],
+  .nested-accordion-header[data-meal-type="snack"],
+  .nested-accordion-header[data-meal-type="dinner"] {
+    background: linear-gradient(145deg, #1B1F15 0%, #3C4420 25%, #C8DA2B 80%, #E5F35A 100%);
+    color: white
+  }
+
+  /* Meal type icons - Enhanced */
+  .nested-accordion-header[data-meal-type="breakfast"] .nested-accordion-icon {
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(255, 134, 5, 0.6);
+  }
+
+  .nested-accordion-header[data-meal-type="lunch"] .nested-accordion-icon {
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(54, 209, 220, 0.6);
+  }
+
+  .nested-accordion-header[data-meal-type="snack"] .nested-accordion-icon {
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(17, 153, 142, 0.6);
+  }
+
+  .nested-accordion-header[data-meal-type="dinner"] .nested-accordion-icon {
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(131, 77, 155, 0.6);
+  }
+
+  /* Enhanced calories display */
+  /* Breakfast calories */
+  .nested-accordion-header[data-meal-type="breakfast"] .calories-info {
+    background: linear-gradient(145deg,black,gray);
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  /* Lunch calories */
+  .nested-accordion-header[data-meal-type="lunch"] .calories-info {
+  background: linear-gradient(145deg,black,gray);
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  /* Snack calories */
+  .nested-accordion-header[data-meal-type="snack"] .calories-info {
+   background: linear-gradient(145deg,black,gray);
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  /* Dinner calories */
+  .nested-accordion-header[data-meal-type="dinner"] .calories-info {
+   background: linear-gradient(145deg,black,gray);
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  /* Hover effect for calories */
+  .nested-accordion-header:hover .calories-info {
+    background:#D4E63A;
+    color:black;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+
+  /* Day header with total calories */
+  .accordion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 19.2px;
+    background: linear-gradient(135deg, #7c3aed, #4E3580);
+    font-weight: 600;
+    font-size: 17.6px;
+    color: white;
+    border-radius: 12px 12px 0 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+    box-sizing: border-box;
+    height: 70px;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: 0.3px;
+  }
+
+  .day-header-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .day-header-content span {
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+  }
+
+  .day-header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+
+  .total-calories {
+    font-size: 15.2px;
+    font-weight: 500;
+    padding: 6px 14px;
+    margin-right: 30px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    /* backdrop-filter: blur(4px); */
+    /* -webkit-backdrop-filter: blur(4px); */
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: 0.2px;
+  }
+
+  .total-calories i {
+    font-size: 14.4px;
+    opacity: 0.9;
+  }
+
+  .accordion-header:hover .total-calories {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Responsive styles for calories display */
+  @media (max-width: 480px) {
+    .total-calories {
+      font-size: 13.6px;
+      padding: 4px 10px;
+    }
+
+    .day-header-content {
+      gap: 8px;
+    }
+
+    .day-header-right {
+      gap: 12px;
+    }
+  }
+
+  .plan-overview {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .timeline-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    color: #2c3e50;
+  }
+
+  .timeline-info i {
+    color: #3498db;
+  }
+
+  .timeline-info .separator {
+    color: #bdc3c7;
+    margin: 0 5px;
+  }
+
+  .expected-results {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #2c3e50;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+  }
+
+  .expected-results i {
+    color: #27ae60;
+  }
+
+  @keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  @keyframes smoothFadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    50% {
+      opacity: 0.5;
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleUp {
+    0% {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Loading animation styles with vibrant colors */
+  .loading-animation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 240px;
+    margin: 30px 0;
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    background: rgba(15, 23, 42, 0.05);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(15, 23, 42, 0.05);
+  }
+
+  .loader-container {
+    position: relative;
+    width: 100%;
+    max-width: 350px;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+
+  .loader-icon {
+    position: absolute;
+    font-size: 40px;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+    transform-origin: center;
+    opacity: 0;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .loader-icon:nth-child(1) { left: 20%; color: #6366f1; text-shadow: none; }
+  .loader-icon:nth-child(2) { left: 40%; color: #4E3580; text-shadow: none; }
+  .loader-icon:nth-child(3) { left: 60%; color: #d946ef; text-shadow: none; }
+  .loader-icon:nth-child(4) { left: 80%; color: #ec4899; text-shadow: none; }
+  .loader-icon:nth-child(5) { left: 100%; color: #f472b6; text-shadow: none; }
+
+  /* Enhanced loading text */
+  .loading-text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: 0.5px;
+    color: #CDD954 !important;
+    margin: 0;
+    padding: 0 20px;
+    text-align: center;
+    position: relative;
+  }
+
+  .loading-subtext {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    color: #64748b;
+    margin-top: 15px;
+    text-align: center;
+    max-width: 80%;
+    line-height: 1.5;
+  }
+
+  /* Responsive styles for loading animation */
+  @media (max-width: 768px) {
+    .loading-animation {
+      min-height: 200px;
+      margin: 20px 0;
+      padding: 15px;
+    }
+
+    .loader-container {
+      max-width: 280px;
+      height: 100px;
+      margin-bottom: 20px;
+    }
+
+    .loader-icon {
+      font-size: 32px;
+    }
+
+    .loading-text {
+      font-size: 20px;
+      padding: 0 15px;
+    }
+
+    .loading-subtext {
+      font-size: 14px;
+      margin-top: 10px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .loading-animation {
+      min-height: 180px;
+      margin: 15px 0;
+      padding: 12px;
+    }
+
+    .loader-container {
+      max-width: 240px;
+      height: 80px;
+      margin-bottom: 15px;
+    }
+
+    .loader-icon {
+      font-size: 28px;
+    }
+
+    .loading-text {
+      font-size: 18px;
+      padding: 0 10px;
+    }
+
+    .loading-subtext {
+      font-size: 12px;
+      max-width: 90%;
+    }
+  }
+
+  /* Loading Video Screen Styles */
+  .loading-video-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: transparent;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 40px 20px;
+    box-sizing: border-box;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .loading-video-container {
+    border: 1px solid #CCD853;
+    border-radius: 24px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 600px;
+    width: 90%;
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 0 60px rgba(139, 90, 43, 0.1);
+    animation: scaleUp 0.4s ease-out;
+  }
+
+  .loading-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .loading-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: 0.3px;
+  }
+
+  .loading-video {
+    width: 100%;
+    max-width: 540px;
+    height: auto;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Responsive styles for loading screen */
+  @media (max-width: 1024px) {
+    .loading-video-container {
+      max-width: 550px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .loading-video-overlay {
+      padding: 20px 15px;
+    }
+
+    .loading-video-container {
+      padding: 25px 20px;
+      border-radius: 20px;
+      max-width: 500px;
+      width: 92%;
+    }
+
+    .loading-header {
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+
+    .loading-title {
+      font-size: 18px;
+    }
+
+    .loading-video {
+      max-width: 100%;
+      border-radius: 14px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .loading-video-overlay {
+      padding: 15px 10px;
+    }
+
+    .loading-video-container {
+      padding: 20px 15px;
+      border-radius: 16px;
+      max-width: 95%;
+      width: 95%;
+    }
+
+    .loading-header {
+      margin-bottom: 16px;
+      gap: 8px;
+    }
+
+    .loading-title {
+      font-size: 16px;
+    }
+
+    .loading-video {
+      border-radius: 12px;
+    }
+  }
+
+  .plans-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: 24px auto 0;
+    padding: 0 8px;
+    box-sizing: border-box;
+    animation: scaleUp 0.8s ease-out;
+    align-items: center;
+  }
+
+  .plans-grid {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  /* Center meal plan while generating and hide workout column */
+  .plans-grid.single-column {
+    align-items: center;
+  }
+
+  .plans-grid.single-column .plan-section.meal-section {
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .plan-section.workout-section.hidden-during-meal {
+    display: none;
+  }
+
+  /* Gentle nudge when showing workout panel */
+  .plan-section.meal-section.slide-left {
+    transition: transform 300ms ease;
+  }
+
+  .plans-grid.two-columns .plan-section.meal-section.slide-left {
+    transform: translateX(-12px);
+  }
+
+  .plan-section {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 16px;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    text-align: left;
+  }
+
+  /* Meal Plan Section Styling - Dark Black Glass Theme */
+  .plan-section:first-child {
+    background: #121A16;
+    border: 1px solid #C8DA2B;
+    box-shadow: 0px 6px 20px rgba(200,218,43,0.25);
+  }
+
+  .plan-section:first-child .plan-header i {
+    color: white;
+    text-shadow: 0 0 20px rgba(107, 114, 128, 0.4);
+  }
+
+  .plan-section:first-child .plan-header h2 {
+    color: white !important;
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    -webkit-text-fill-color: white !important;
+    background-clip: initial !important;
+    font-weight: 600;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Workout Plan Section Styling - Dark Black Glass Theme */
+  .plan-section:last-child {
+    background: #121A16;
+    border: 1px solid #C8DA2B;
+    box-shadow: 0px 6px 20px rgba(200,218,43,0.25);
+  }
+
+  .plan-section:last-child .plan-header i {
+    color: #D4E63A;
+    text-shadow: 0 0 20px rgba(188, 206, 50, 0.4);
+  }
+
+  .plan-section:last-child .plan-header h2 {
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    -webkit-text-fill-color: #D4E63A !important;
+    background-clip: initial !important;
+    color: #D4E63A !important;
+  }
+
+  /* Accordion content styling */
+  .accordion-content {
+    background: black;
+    padding: 19.2px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #C8DA2B;
+    border-top: none;
+  }
+
+  /* List items styling for both meal and workout plans */
+  .numbered-list .ai-coach-numbered-item {
+    background: #1B2420;
+    border: 1px solid #C8DA2B;
+    transition: all 0.3s ease;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    text-align: left;
+    line-height: 1.4;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.2px;
+    color: #F3F3E0;
+    box-shadow: 0px 4px 12px rgba(200,218,43,0.15);
+  }
+
+  .plan-section:first-child .numbered-list .ai-coach-numbered-item:hover {
+    border-color: rgba(107, 114, 128, 0.3);
+    background: rgba(107, 114, 128, 0.1);
+  }
+
+  /* Meal Plan Total Calories Display - Lime Green Theme */
+  .plan-section:first-child .total-calories {
+    background: #C8DA2B !important;
+    color: #000000 !important;
+    border: 1px solid rgba(200, 218, 43, 0.3);
+  }
+
+  .plan-section:first-child .accordion-header:hover .total-calories {
+    background: rgba(200, 218, 43, 0.9) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .plan-section:last-child .numbered-list .ai-coach-numbered-item:hover {
+    border-color: rgba(188, 206, 50, 0.3);
+    background: rgba(188, 206, 50, 0.1);
+  }
+
+  /* Meal Plan Accordion Styling - Gray theme */
+  .plan-section:first-child .accordion-item {
+    background: #1B2420;
+    border: 1px solid #C8DA2B;
+    border-radius: 12px;
+  }
+
+  .plan-section:first-child .accordion-header {
+    background: linear-gradient(135deg, black,gray);
+    color: white;
+    border: 1px solid #C8DA2B;
+    border-bottom: none;
+    border-radius: 12px 12px 0 0;
+  }
+
+  /* Workout Plan Accordion Styling - LimeTech theme */
+  .plan-section:last-child .accordion-item {
+    background: #1B2420;
+    border: 1px solid #C8DA2B;
+    box-shadow: 0px 6px 20px rgba(200,218,43,0.25);
+    transition: all 0.3s ease;
+    border-radius: 12px;
+  }
+
+  .plan-section:last-child .accordion-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(188, 206, 50, 0.15);
+    border: 1px solid #C8DA2B;
+  }
+
+  .plan-section:last-child .accordion-header {
+  background: linear-gradient(145deg, #1B1F15 0%, #3C4420 25%, #C8DA2B 80%, #E5F35A 100%);
+
+    color: white;
+    padding: 20.8px 24px;
+    border: 1px solid #C8DA2B;
+    border-bottom: none;
+    border-radius: 12px 12px 0 0;
+  }
+
+  /* Workout days styling with gray gradients */
+  .accordion-item[data-day="1"] .accordion-header {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #C8DA2B;
+    border-left: 5px solid #C8DA2B;
+  }
+  .accordion-item[data-day="2"] .accordion-header {
+    background: linear-gradient(135deg, #34495e, #2c3e50);
+    color: #C8DA2B;
+    border-left: 5px solid #C8DA2B;
+  }
+  .accordion-item[data-day="3"] .accordion-header {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #C8DA2B;
+    border-left: 5px solid #C8DA2B;
+  }
+  .accordion-item[data-day="4"] .accordion-header {
+    background: linear-gradient(135deg, #34495e, #2c3e50);
+    color: #C8DA2B;
+    border-left: 5px solid #C8DA2B;
+  }
+  .accordion-item[data-day="5"] .accordion-header {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #C8DA2B;
+    border-left: 5px solid #C8DA2B;
+  }
+  .accordion-item[data-day="6"] .accordion-header {
+    background: linear-gradient(135deg, #34495e, #2c3e50);
+    color: #C8DA2B;
+    border-left: 5px solid #C8DA2B;
+  }
+  .accordion-item[data-day="7"] .accordion-header {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #C8DA2B;
+    border-left: 5px solid #C8DA2B;
+  }
+
+  /* Workout list item styling */
+  .plan-section:last-child .accordion-content {
+    background: #121A16;
+    padding: 22.4px;
+    border-radius: 0 0 12px 12px;
+    border: 1px solid #C8DA2B;
+    border-top: none;
+  }
+
+  .plan-section:last-child .numbered-list {
+    padding-left: 0;
+    margin: 10px 0;
+    list-style-position: inside;
+    list-style-type: none;
+    counter-reset: item 0;
+    display: grid;
+    gap: 14.4px;
+  }
+
+  .plan-section:last-child .numbered-list .ai-coach-numbered-item {
+    position: relative;
+    padding: 15px 16px 15px 52px;
+    margin-bottom: 8px;
+    background: #1B2420;
+    color: #F3F3E0;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(200,218,43,0.15);
+    font-weight: 500;
+    border: 1px solid #C8DA2B;
+    transition: all 0.3s ease;
+  }
+
+  .plan-section:last-child .numbered-list .ai-coach-numbered-item::before {
+    counter-increment: item;
+    content: counter(item);
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: 700;
+    font-size: 8px;
+    background: linear-gradient(135deg, #C8DA2B, #E5F35A);
+    color: #0A0F0D;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(200, 218, 43, 0.3);
+  }
+
+  .plan-section:last-child .numbered-list .ai-coach-numbered-item:hover {
+    background: linear-gradient(135deg, rgba(188, 206, 50, 0.15), rgba(188, 206, 50, 0.08));
+    transform: translateX(5px) translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.18);
+    border-left: 3px solid #9CAF1F;
+  }
+
+  .plan-section:last-child .numbered-list .ai-coach-numbered-item:hover::before {
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 3px 10px rgba(188, 206, 50, 0.4);
+  }
+
+  /* Accordion arrows and icons color adjustment */
+  .accordion-arrow, .accordion-icon {
+    color: #ffffff !important;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .nested-accordion-header:hover {
+    filter: brightness(105%);
+  }
+
+  .nested-accordion-icon {
+    margin-right: 8px;
+    font-size: 14.4px;
+  }
+
+  .nested-accordion-arrow {
+    transition: transform 0.3s ease;
+    font-size: 12.8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .nested-accordion-content {
+    padding: 16px 20px;
+    border-radius: 0 0 10px 10px;
+    background: #121A16;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #C8DA2B;
+    border-top: none;
+  }
+
+  /* Enhanced styling for the list items in accordions - matching dark theme shown in image */
+  .nested-accordion-content .numbered-list {
+    padding-left: 0;
+    margin: 10px 0;
+    list-style-position: inside;
+    list-style-type: none;
+    counter-reset: item 0;
+  }
+
+  .nested-accordion-content .numbered-list .ai-coach-numbered-item {
+    position: relative;
+    padding: 14px 16px 14px 48px;
+    margin-bottom: 12px;
+    background: #1B2420;
+    color: #F3F3E0;
+    border-radius: 8px;
+    box-shadow: 0px 4px 12px rgba(200,218,43,0.15);
+    font-weight: 500;
+    border: 1px solid #C8DA2B;
+  }
+
+  .nested-accordion-content .numbered-list .ai-coach-numbered-item::before {
+    counter-increment: item;
+    content: counter(item) ".";
+    position: absolute;
+    left: 16px;
+    font-weight: 700;
+    font-size: 17.6px;
+    color: #C8DA2B;
+  }
+  /* Meal header with calories */
+  .nested-accordion-header {
+    padding: 10px 15px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+    min-height: 45px;
+    height: auto;
+  }
+
+  .meal-header-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .meal-header-content span {
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+  }
+
+  .meal-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .calories-info {
+    font-size: 14px;
+    font-weight: 500;
+    padding: 3px 30px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    /* backdrop-filter: blur(4px); */
+    /* -webkit-backdrop-filter: blur(4px); */
+    white-space: nowrap;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: 0.2px;
+  }
+
+  /* Increase accordion widths for better visibility */
+
+  /* Base increased width for all screens */
+  .accordion, .nested-accordion {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .accordion-item, .nested-accordion-item {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Improved alignment for all screens */
+  .plan-section {
+    text-align: left;
+  }
+
+  .plan-header {
+    text-align: center;
+  }
+
+  .accordion-header, .nested-accordion-header {
+    text-align: left;
+  }
+
+  .numbered-list .ai-coach-numbered-item {
+    text-align: left;
+    line-height: 1.4;
+  }
+
+  /* Medium screens */
+  @media (min-width: 481px) {
+    .plans-container {
+      padding: 0 16px;
+    }
+
+    .plan-section {
+      padding: 24px;
+      max-width: 500px;
+    }
+  }
+
+  /* Tablet-sized screens */
+  @media (min-width: 481px) and (max-width: 900px) {
+    .plan-section {
+      max-width: 550px;
+      width: 95%;
+    }
+  }
+
+  /* Large screens with increased widths */
+  @media (min-width: 901px) {
+    .plans-grid {
+      flex-direction: row;
+      gap: 32px;
+      max-width: 1200px;
+      align-items: flex-start;
+    }
+
+    .plan-section {
+      width: 430px;
+      align-self: flex-start;
+    }
+
+    /* Fix accordion content positioning */
+    .accordion-content {
+      position: relative;
+      overflow: visible;
+    }
+
+    /* Better text alignments */
+    .day-header-content, .meal-header-content {
+      justify-content: flex-start;
+      text-align: left;
+    }
+
+    .day-header-right, .meal-header-right {
+      justify-content: flex-end;
+      text-align: right;
+    }
+
+    /* Better text formatting */
+    .numbered-list .ai-coach-numbered-item {
+      line-height: 1.5;
+    }
+
+    /* Text wrapping for long content */
+    .accordion span, .nested-accordion span {
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      hyphens: auto;
+    }
+  }
+
+  /* Extra large screens */
+  @media (min-width: 1025px) {
+    .plan-section {
+      width: 480px;
+    }
+
+    .plans-grid {
+      gap: 40px;
+      max-width: 1300px;
+    }
+  }
+
+  /* XX-large screens */
+  @media (min-width: 1200px) {
+    .plan-section {
+      width: 520px;
+    }
+
+    .plans-grid {
+      gap: 48px;
+      max-width: 1400px;
+    }
+
+    .accordion-content, .nested-accordion-content {
+      padding: 24px;
+    }
+  }
+
+  /* Mobile screens */
+  @media (max-width: 480px) {
+    /* Wider container for plans */
+    .plans-container {
+      padding: 0 4px;
+      margin-top: 16px;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+
+    .plans-grid {
+      width: 100%;
+      padding: 0;
+      gap: 16px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Wider sections for meal and workout plans */
+    .plan-section {
+      width: 100%;
+      max-width: 100%;
+      padding: 12px 8px;
+      margin-bottom: 16px;
+      border-radius: 12px;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    /* Wider accordion items */
+    .accordion-item, .nested-accordion-item {
+      width: 100%;
+      max-width: 100%;
+      margin-left: 0;
+      margin-right: 0;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    /* Wider accordion content */
+    .accordion-content, .nested-accordion-content {
+      width: 100%;
+      max-width: 100%;
+      padding: 12px 8px;
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+
+    /* Wider numbered lists */
+    .numbered-list {
+      width: 100%;
+      padding-left: 0;
+      padding-right: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    .numbered-list .ai-coach-numbered-item {
+      width: 100%;
+      box-sizing: border-box;
+      word-break: break-word;
+      font-size: 14px;
+      padding-right: 8px;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .plan-header h2 {
+      text-align: center;
+      width: 100%;
+      font-size: 20px;
+    }
+
+    .accordion-header span, .nested-accordion-header span {
+      display: block;
+      width: 100%;
+      text-align: left;
+      font-size: 15px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding-right: 30px; /* Make room for arrow */
+    }
+
+    .day-header-content {
+      max-width: 60%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .meal-header-content {
+      max-width: 50%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .day-header-right, .meal-header-right {
+      min-width: 35%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .total-calories {
+      font-size: 12px;
+      padding: 2px 6px;
+      white-space: nowrap;
+    }
+
+    .calories-info {
+      font-size: 12px;
+      padding: 2px 6px;
+      white-space: nowrap;
+    }
+
+    /* Fix accordion arrows and icons */
+    .accordion-arrow, .accordion-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      min-width: 16px;
+    }
+
+    .nested-accordion-arrow, .nested-accordion-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      min-width: 16px;
+    }
+
+    /* Ensure accordion headers position elements properly */
+    .accordion-header, .nested-accordion-header {
+      position: relative;
+      padding-right: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  /* Very small screens */
+  @media (max-width: 350px) {
+    .plan-section {
+      padding: 13px 6px;
+    }
+
+    .accordion-content, .nested-accordion-content {
+      padding: 13px 8px;
+    }
+
+    .numbered-list .ai-coach-numbered-item {
+      font-size: 13px;
+      line-height: 1.3;
+    }
+
+    .accordion-header span, .nested-accordion-header span {
+      font-size: 14px;
+    }
+
+    .day-header-content, .meal-header-content {
+      max-width: 55%;
+    }
+
+    .day-header-right, .meal-header-right {
+      min-width: 40%;
+    }
+  }
+
+  .day-header-content span {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+
+  .meal-header-content span {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+  }
+
+  /* Enhanced loading text */
+  .loading-text {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600 !important;
+    font-size: 19px !important;
+    letter-spacing: 0.5px !important;
+    color: #CDD954 !important;
+    text-shadow: 0 0 8px rgba(200, 218, 43, 0.5);
+  }
+
+  /* Enhanced suggestion title */
+  .suggestions-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500 !important;
+    letter-spacing: 0.5px !important;
+  }
+
+  /* Custom colors for each suggestion chip icon */
+  .suggestion-chip[data-goal="Lose Weight"] i {
+    color: #e74c3c;
+
+    font-size: 20px !important;
+    filter: drop-shadow(0 2px 4px rgba(231, 76, 60, 0.4));
+  }
+
+  .suggestion-chip[data-goal="Build Muscle"] i {
+    color: #3498db;
+    font-size: 20px !important;
+    filter: drop-shadow(0 2px 4px rgba(52, 152, 219, 0.4));
+  }
+
+  .suggestion-chip[data-goal="Get Fit"] i {
+    color: #2ecc71;
+    font-size: 20px !important;
+    filter: drop-shadow(0 2px 4px rgba(46, 204, 113, 0.4));
+  }
+
+  .suggestion-chip[data-goal="Get Stronger"] i {
+    color: #f1c40f;
+    font-size: 20px !important;
+    filter: drop-shadow(0 2px 4px rgba(241, 196, 15, 0.4));
+  }
+
+  .suggestion-chip[data-goal="Stay Flexible"] i {
+    color: #9b59b6;
+    font-size: 21px !important;
+    filter: drop-shadow(0 2px 4px rgba(155, 89, 182, 0.4));
+  }
+
+  .suggestion-chip[data-goal="Be Athletic"] i {
+    color: #1abc9c;
+    font-size: 20px !important;
+    filter: drop-shadow(0 2px 4px rgba(26, 188, 156, 0.4));
+  }
+
+  /* Enhance hover effects with matching colors */
+  .suggestion-chip[data-goal="Lose Weight"]:hover {
+    border-color: #e74c3c;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 0 15px rgba(231, 76, 60, 0.3);
+  }
+
+  .suggestion-chip[data-goal="Build Muscle"]:hover {
+    border-color: #3498db;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 0 15px rgba(52, 152, 219, 0.3);
+  }
+
+  .suggestion-chip[data-goal="Get Fit"]:hover {
+    border-color: #2ecc71;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 0 15px rgba(46, 204, 113, 0.3);
+  }
+
+  .suggestion-chip[data-goal="Get Stronger"]:hover {
+    border-color: #f1c40f;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 0 15px rgba(241, 196, 15, 0.3);
+  }
+
+  .suggestion-chip[data-goal="Stay Flexible"]:hover {
+    border-color: #9b59b6;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 0 15px rgba(155, 89, 182, 0.3);
+  }
+
+  .suggestion-chip[data-goal="Be Athletic"]:hover {
+    border-color: #1abc9c;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), 0 0 15px rgba(26, 188, 156, 0.3);
+  }
+
+  /* Icon color changes on hover */
+  .suggestion-chip[data-goal="Lose Weight"]:hover i {
+    color: #e74c3c;
+    transform: scale(1.1);
+  }
+
+  .suggestion-chip[data-goal="Build Muscle"]:hover i {
+    color: #3498db;
+    transform: scale(1.1);
+  }
+
+  .suggestion-chip[data-goal="Get Fit"]:hover i {
+    color: #2ecc71;
+    transform: scale(1.1);
+  }
+
+  .suggestion-chip[data-goal="Get Stronger"]:hover i {
+    color: #f1c40f;
+    transform: scale(1.1);
+  }
+
+  .suggestion-chip[data-goal="Stay Flexible"]:hover i {
+    color: #9b59b6;
+    transform: scale(1.1);
+  }
+
+  .suggestion-chip[data-goal="Be Athletic"]:hover i {
+    color: #1abc9c;
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(26, 188, 156, 0.6);
+  }
+
+  /* Icon animation on hover */
+  @keyframes pulseBackground {
+    0% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.1); opacity: 0.9; }
+    100% { transform: scale(1); opacity: 0.7; }
+  }
+
+  /* Create circular background on hover with animation */
+  .suggestion-chip[data-goal="Lose Weight"]:hover i {
+    color: #fff;
+    background-color: #e74c3c;
+    animation: pulseBackground 1.5s infinite ease-in-out;
+    box-shadow: 0 0 10px rgba(231, 76, 60, 0.6);
+  }
+
+  .suggestion-chip[data-goal="Build Muscle"]:hover i {
+    color: #fff;
+    background-color: #3498db;
+    animation: pulseBackground 1.5s infinite ease-in-out;
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.6);
+  }
+
+  .suggestion-chip[data-goal="Get Fit"]:hover i {
+    color: #fff;
+    background-color: #2ecc71;
+    animation: pulseBackground 1.5s infinite ease-in-out;
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.6);
+  }
+
+  .suggestion-chip[data-goal="Get Stronger"]:hover i {
+    color: #fff;
+    background-color: #f1c40f;
+    animation: pulseBackground 1.5s infinite ease-in-out;
+    box-shadow: 0 0 10px rgba(241, 196, 15, 0.6);
+  }
+
+  .suggestion-chip[data-goal="Stay Flexible"]:hover i {
+    color: #fff;
+    background-color: #9b59b6;
+    animation: pulseBackground 1.5s infinite ease-in-out;
+    box-shadow: 0 0 10px rgba(155, 89, 182, 0.6);
+  }
+
+  .suggestion-chip[data-goal="Be Athletic"]:hover i {
+    color: #fff;
+    background-color: #1abc9c;
+    animation: pulseBackground 1.5s infinite ease-in-out;
+    box-shadow: 0 0 10px rgba(26, 188, 156, 0.6);
+  }
+
+  /* Responsive title sizes for different screen sizes */
+  @media (max-width: 768px) {
+    .ai-coach-title {
+      font-size: 40px !important;
+      margin-bottom: 19px;
+      min-height: 45px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .ai-coach-title {
+      font-size: 32px !important;
+      margin-bottom: 16px;
+      min-height: 38px;
+    }
+  }
+
+  @media (max-width: 350px) {
+    .ai-coach-title {
+      font-size: 29px !important;
+      letter-spacing: -0.3px;
+      min-height: 35px;
+    }
+  }
+
+  /* Desktop layout for suggestion chips */
+  @media (min-width: 901px) {
+    .suggestion-chips {
+      display: grid;
+      grid-template-rows: auto auto;
+      grid-template-columns: repeat(4, auto);
+      row-gap: 19px;
+      column-gap: 19px;
+      max-width: 900px;
+      justify-content: center;
+    }
+
+    .suggestion-chip:nth-child(5),
+    .suggestion-chip:nth-child(6) {
+      grid-row: 2;
+    }
+
+    .suggestion-chip:nth-child(5) {
+      grid-column: 2;
+    }
+
+    .suggestion-chip:nth-child(6) {
+      grid-column: 3;
+    }
+  }
+
+  /* Tablet and medium-sized screens - grid layout */
+  @media (min-width: 481px) and (max-width: 900px) {
+    .suggestion-chips {
+      display: grid !important;
+      grid-template-rows: auto auto !important;
+      grid-template-columns: repeat(4, auto) !important;
+      row-gap: 19px !important;
+      column-gap: 19px !important;
+      max-width: 800px !important;
+      justify-content: center !important;
+      width: 100% !important;
+      padding: 8px !important;
+    }
+
+    .suggestion-chip:nth-child(5),
+    .suggestion-chip:nth-child(6) {
+      grid-row: 2 !important;
+    }
+
+    .suggestion-chip:nth-child(5) {
+      grid-column: 2 !important;
+    }
+
+    .suggestion-chip:nth-child(6) {
+      grid-column: 3 !important;
+    }
+
+    .suggestion-chip {
+      width: auto !important;
+      min-width: 140px !important;
+      padding: 8px 18px !important;
+      font-size: 14px !important;
+      white-space: nowrap !important;
+      justify-content: center !important;
+    }
+
+    .suggestion-chip i {
+      font-size: 18px !important;
+      margin-right: 6px !important;
+    }
+  }
+
+  /* Mobile styles - for screens 480px and below */
+  @media (max-width: 480px) {
+    /* Container adjustments */
+    .ai-coach-container {
+      padding: 16px 8px;
+    }
+
+    /* Title adjustments */
+    .ai-coach-title {
+      font-size: 29px;
+      margin-bottom: 16px;
+      padding: 0 8px;
+    }
+
+    /* Input section adjustments */
+    .input-section {
+      padding: 16px 8px;
+      margin: 0;
+      width: 100%;
+    }
+
+    .input-container {
+      flex-direction: column;
+      gap: 13px;
+      width: 100%;
+    }
+
+    .goal-input {
+      width: 100%;
+      max-width: 100%;
+      min-width: unset;
+      padding: 11px 16px;
+      font-size: 15px;
+      height: 38px;
+      min-height: 38px;
+      max-height: 200px; /* Allow auto-resize */
+    }
+
+    .goal-input:focus,
+    .goal-input:not(:placeholder-shown) {
+      width: 100%;
+    }
+
+    /* Button adjustments */
+    .recommend-button {
+      width: 100%;
+      max-width: 100%;
+      padding: 13px 16px;
+      font-size: 14px !important;
+      min-width: unset;
+    }
+
+    /* Suggestion chips adjustments */
+    .suggestions-container {
+      padding: 8px;
+      margin-top: 13px;
+    }
+
+    .suggestion-chips {
+      gap: 10px;
+      padding: 0 5px;
+    }
+
+    .suggestion-chip {
+      padding: 6px 16px;
+      font-size: 14px;
+      gap: 6px;
+    }
+
+    .suggestion-chip i {
+      font-size: 14px;
+    }
+
+    /* Plans container adjustments */
+    .plans-container {
+      padding: 0;
+      margin-top: 16px;
+    }
+
+    .plans-grid {
+      gap: 16px;
+    }
+
+    .plan-section {
+      padding: 13px;
+      margin-bottom: 16px;
+      border-radius: 12px;
+    }
+
+    /* Plan headers */
+    .plan-header {
+      padding: 13px;
+      margin-bottom: 13px;
+    }
+
+    .plan-icon {
+      font-size: 32px;
+    }
+
+    .plan-header h2 {
+      font-size: 22px;
+    }
+
+    /* Accordion adjustments */
+    .accordion-item {
+      margin-bottom: 13px;
+    }
+
+    .accordion-header {
+      padding: 13px 16px;
+      min-height: 60px;
+      height: auto;
+      font-size: 15px;
+    }
+
+      .accordion-icon {
+      font-size: 18px;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+
+    .accordion-arrow {
+      font-size: 16px;
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+    }
+
+    .accordion-content {
+      padding: 13px;
+    }
+
+    /* Nested accordion adjustments */
+    .nested-accordion {
+      gap: 10px;
+    }
+
+    .nested-accordion-header {
+      padding: 8px 12px;
+      min-height: 40px;
+      font-size: 14px;
+    }
+
+    .nested-accordion-icon {
+      font-size: 14px;
+    }
+
+    .nested-accordion-content {
+      padding: 13px;
+    }
+
+    /* List items adjustments */
+    .numbered-list {
+      gap: 10px;
+    }
+
+    .numbered-list .ai-coach-numbered-item {
+      padding: 13px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    /* Calories info adjustments */
+    .calories-info {
+      font-size: 13px;
+      padding: 2px 8px;
+    }
+
+    .total-calories {
+      font-size: 14px;
+      padding: 3px 10px;
+    }
+
+    /* Day and meal header content */
+    .day-header-content,
+    .meal-header-content {
+      gap: 6px;
+    }
+
+    .day-header-right,
+    .meal-header-right {
+      gap: 8px;
+    }
+
+    /* Loading text adjustments */
+    .loading-text {
+      font-size: 16px !important;
+      padding: 0 16px !important;
+    }
+
+    /* Suggestions title */
+    .suggestions-title {
+      font-size: 14px !important;
+      margin-bottom: 10px !important;
+    }
+  }
+
+  /* Extra small screens */
+  @media (max-width: 350px) {
+    .ai-coach-title {
+      font-size: 26px !important;
+    }
+
+    .suggestion-chip {
+      padding: 5px 14px;
+      font-size: 13px;
+    }
+
+    .suggestion-chip i {
+      font-size: 14px;
+    }
+
+    .plan-header h2 {
+      font-size: 21px;
+    }
+
+    .accordion-header {
+      padding: 11px;
+      font-size: 14px;
+    }
+
+    .nested-accordion-header {
+      padding: 6px 10px;
+      font-size: 14px;
+    }
+
+    .numbered-list .ai-coach-numbered-item {
+      padding: 11px;
+      font-size: 14px;
+    }
+  }
+
+  /* Add styles for error state */
+  .goal-input.input-error {
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.3),
+                0 8px 20px rgba(231, 76, 60, 0.3),
+                inset 0 2px 5px rgba(231, 76, 60, 0.15) !important;
+    animation: errorPulse 1.5s infinite alternate !important;
+  }
+
+  @keyframes errorPulse {
+    0% {
+      border-color: #e74c3c;
+      box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.3),
+                  0 8px 20px rgba(231, 76, 60, 0.3);
+    }
+    100% {
+      border-color: #c0392b;
+      box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.3),
+                  0 8px 20px rgba(192, 57, 43, 0.3);
+    }
+  }
+
+  .input-error-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #e74c3c;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 5px 0;
+    padding: 8px 16px;
+    background-color: rgba(231, 76, 60, 0.1);
+    border-radius: 8px;
+    animation: fadeIn 0.3s ease;
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+  }
+
+  .input-error-message i {
+    margin-right: 8px;
+    font-size: 18px;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Responsive styles for error message */
+  @media (max-width: 768px) {
+    .input-error-message {
+      font-size: 14px;
+      padding: 6px 12px;
+      max-width: 400px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .input-error-message {
+      font-size: 13px;
+      padding: 5px 10px;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .input-error-message i {
+      font-size: 16px;
+    }
+  }
+
+  @media (max-width: 350px) {
+    .input-error-message {
+      font-size: 12px;
+      padding: 4px 8px;
+    }
+
+    .input-error-message i {
+      font-size: 14px;
+      margin-right: 5px;
+    }
+  }
+
+  /* Existing styles continue below */
+
+  /* Add conversation history button styles */
+  .conversation-history-btn {
+    background-color: #333 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.3s ease !important;
+    float: right !important;
+    padding: 8px 16px !important;
+    margin-left: 20px !important;
+  }
+
+  .conversation-history-btn:hover {
+    background-color: #555 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* Update refresh button styles in conversation history */
+  .conversation-history-refresh-btn {
+    background-color: #333 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 4px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+  }
+
+  .conversation-history-refresh-btn:hover {
+    background-color: #555 !important;
+    transform: translateY(-1px) !important;
+  }
+
+  .conversation-history-refresh-btn:disabled {
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+  }
+
+  .conversation-history .fa-spinner,
+  .fa-spinner {
+    color: #333 !important;
+  }
+
+  .conversation-history .fa-spinner {
+    color: #333 !important;
+  }
+
+  /* Add these new styles for the goal details section */
+  .selected-goal {
+    background-color: #3498db !important;
+    border: 2px solid #3498db !important;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4) !important;
+    transform: translateY(-2px) !important;
+    color: white !important;
+    font-weight: 600 !important;
+  }
+
+  .selected-goal i {
+    color: white !important;
+    transform: scale(1.1);
+  }
+
+  /* Specific colors for each goal type when selected */
+  .selected-goal[data-goal="Lose Weight"] {
+    background-color: #e74c3c !important; /* Orange/Red */
+    border-color: #e74c3c !important;
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4) !important;
+  }
+
+  .selected-goal[data-goal="Build Muscle"] {
+    background-color: #3498db !important; /* Blue */
+    border-color: #3498db !important;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4) !important;
+  }
+
+  .selected-goal[data-goal="Get Fit"] {
+    background-color: #2ecc71 !important; /* Green */
+    border-color: #2ecc71 !important;
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.4) !important;
+  }
+
+  .selected-goal[data-goal="Get Stronger"] {
+    background-color: #f1c40f !important; /* Yellow */
+    border-color: #f1c40f !important;
+    box-shadow: 0 4px 12px rgba(241, 196, 15, 0.4) !important;
+  }
+
+  .selected-goal[data-goal="Stay Flexible"] {
+    background-color: #9b59b6 !important; /* Purple */
+    border-color: #9b59b6 !important;
+    box-shadow: 0 4px 12px rgba(155, 89, 182, 0.4) !important;
+  }
+
+  .selected-goal[data-goal="Be Athletic"] {
+    background-color: #1abc9c !important; /* Teal */
+    border-color: #1abc9c !important;
+    box-shadow: 0 4px 12px rgba(26, 188, 156, 0.4) !important;
+  }
+
+  .goal-details-container {
+    margin-top: 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    background-color: #fff;
+    padding: 25px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    animation: fadeIn 0.4s ease-in-out;
+    border-top: 4px solid #3498db;
+  }
+
+  .goal-details-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .goal-details-icon {
+    font-size: 45px;
+    margin-bottom: 15px;
+    animation: popupIcon 0.5s ease forwards;
+  }
+
+  .goal-details-title {
+    font-size: 26px;
+    margin-bottom: 10px;
+    text-align: center;
+    font-weight: 700;
+    color: #2c3e50;
+  }
+
+  .goal-details-description {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #5a6a7e;
+    max-width: 85%;
+    line-height: 1.5;
+    font-size: 16px;
+  }
+
+  .goal-details-form {
+    width: 100%;
+    max-width: 700px;
+    margin-top: 10px;
+    padding-top: 15px;
+    border-top: 1px solid #eaeaea;
+  }
+
+  .goal-details-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    gap: 15px;
+  }
+
+  .goal-details-button {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    min-width: 120px;
+  }
+
+  .goal-details-button.cancel {
+    background-color: #f5f5f5;
+    color: #34495e;
+    border: 1px solid #ddd;
+  }
+
+  .goal-details-button.submit {
+    background-color: #3498db;
+    color: white;
+    border: none;
+  }
+
+  .goal-details-button.cancel:hover {
+    background-color: #e0e0e0;
+    transform: translateY(-2px);
+  }
+
+  .goal-details-button.submit:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(41, 128, 185, 0.3);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Style form elements inside goal-details-form to match existing form styles */
+  .goal-details-form .form-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    animation: formRowAppear 0.5s ease forwards;
+  }
+
+  .goal-details-form .form-group {
+    flex: 1;
+    position: relative;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    padding: 10px;
+  }
+
+  .goal-details-form .form-group:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    background-color: rgba(52, 152, 219, 0.03);
+  }
+
+  .goal-details-form .form-group:focus-within {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    background-color: rgba(52, 152, 219, 0.05);
+  }
+
+  .goal-details-form .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #34495e;
+    font-size: 15px;
+    transition: all 0.3s ease;
+  }
+
+  .goal-details-form .form-group .required-asterisk {
+    color: #e74c3c;
+    margin-left: 4px;
+  }
+
+  .goal-details-form .form-group .optional-label {
+    color: #7f8c8d;
+    font-size: 13px;
+    font-weight: normal;
+  }
+
+  .goal-details-form .form-group:focus-within label {
+    color: #3498db;
+  }
+
+  .goal-details-form .form-group input,
+  .goal-details-form .form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    color: #2c3e50;
+    background-color: #f8f9fa;
+  }
+
+  .goal-details-form .form-group input:focus,
+  .goal-details-form .form-group select:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    outline: none;
+    background-color: #fff;
+    animation: focusField 0.3s ease forwards;
+  }
+
+  .goal-details-form .form-group input:hover,
+  .goal-details-form .form-group select:hover {
+    border-color: #3498db;
+  }
+
+  /* Style range input specifically */
+  .goal-details-form .form-group input[type="range"] {
+    -webkit-appearance: none;
+    height: 8px;
+    background: #dfe6e9;
+    border-radius: 4px;
+    outline: none;
+    padding: 0;
+    margin: 12px 0;
+  }
+
+  .goal-details-form .form-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #3498db;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+  }
+
+  .goal-details-form .form-group input[type="range"]::-webkit-slider-thumb:hover {
+    background: #2980b9;
+    transform: scale(1.1);
+  }
+
+  .goal-details-form .range-value {
+    text-align: center;
+    margin-top: 10px;
+    font-weight: 500;
+    color: #3498db;
+  }
+
+  /* Style multiple select */
+  .goal-details-form .form-group select[multiple] {
+    height: auto;
+    min-height: 120px;
+    padding: 8px;
+  }
+
+  .goal-details-form .form-group select[multiple] option {
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+
+  .goal-details-form .form-group select[multiple] option:checked {
+    background-color: #3498db !important;
+    color: white;
+  }
+
+  .goal-details-form .form-group select[multiple] option:hover {
+    background-color: #f1f9ff;
+  }
+
+  /* Media queries for responsive design */
+  @media (max-width: 768px) {
+    .goal-details-form .form-row {
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .goal-details-buttons {
+      flex-direction: column-reverse;
+    }
+
+    .goal-details-button {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+  }
+
+  /* Add animation timings for form rows */
+  .goal-details-form .form-row:nth-child(1) { animation-delay: 0.1s; }
+  .goal-details-form .form-row:nth-child(2) { animation-delay: 0.2s; }
+  .goal-details-form .form-row:nth-child(3) { animation-delay: 0.3s; }
+  .goal-details-form .form-row:nth-child(4) { animation-delay: 0.4s; }
+
+  /* Update goal-details-icon to match selected goal color */
+  .goal-details-icon {
+    font-size: 45px;
+    margin-bottom: 15px;
+    animation: popupIcon 0.5s ease forwards;
+  }
+
+  /* Goal icon colors - default blue */
+  .goal-details-icon[data-goal="Lose Weight"] {
+    color: #e74c3c;
+  }
+
+  .goal-details-icon[data-goal="Build Muscle"] {
+    color: #3498db;
+  }
+
+  .goal-details-icon[data-goal="Get Fit"] {
+    color: #2ecc71;
+  }
+
+  .goal-details-icon[data-goal="Get Stronger"] {
+    color: #f1c40f;
+  }
+
+  .goal-details-icon[data-goal="Stay Flexible"] {
+    color: #9b59b6;
+  }
+
+  .goal-details-icon[data-goal="Be Athletic"] {
+    color: #1abc9c;
+  }
+
+  /* Custom submit button colors based on goal */
+  .goal-details-container[data-goal="Lose Weight"] .goal-details-button.submit {
+    background-color: #e74c3c;
+  }
+
+  .goal-details-container[data-goal="Build Muscle"] .goal-details-button.submit {
+    background-color: #3498db;
+  }
+
+  .goal-details-container[data-goal="Get Fit"] .goal-details-button.submit {
+    background-color: #2ecc71;
+  }
+
+  .goal-details-container[data-goal="Get Stronger"] .goal-details-button.submit {
+    background-color: #f1c40f;
+  }
+
+  .goal-details-container[data-goal="Stay Flexible"] .goal-details-button.submit {
+    background-color: #9b59b6;
+  }
+
+  .goal-details-container[data-goal="Be Athletic"] .goal-details-button.submit {
+    background-color: #1abc9c;
+  }
+
+  /* Hover states for submit buttons */
+  .goal-details-container[data-goal="Lose Weight"] .goal-details-button.submit:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+  }
+
+  .goal-details-container[data-goal="Build Muscle"] .goal-details-button.submit:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+  }
+
+  .goal-details-container[data-goal="Get Fit"] .goal-details-button.submit:hover {
+    background-color: #27ae60;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+  }
+
+  .goal-details-container[data-goal="Get Stronger"] .goal-details-button.submit:hover {
+    background-color: #f39c12;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(241, 196, 15, 0.3);
+  }
+
+  .goal-details-container[data-goal="Stay Flexible"] .goal-details-button.submit:hover {
+    background-color: #8e44ad;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(155, 89, 182, 0.3);
+  }
+
+  .goal-details-container[data-goal="Be Athletic"] .goal-details-button.submit:hover {
+    background-color: #16a085;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(26, 188, 156, 0.3);
+  }
+
+  /* Development testing panel */
+  .dev-panel {
+    margin-top: 40px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    max-width: 600px;
+    margin: 40px auto;
+    border: 2px dashed #4E3580;
+  }
+
+  .dev-panel h3 {
+    color: #0f172a;
+    margin-top: 0;
+    text-align: center;
+    margin-bottom: 15px;
+  }
+
+  .dev-controls {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 15px;
+  }
+
+  .dev-button {
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .dev-button.login {
+    background: #4E3580;
+    color: white;
+  }
+
+  .dev-button.logout {
+    background: #ec4899;
+    color: white;
+  }
+
+  .dev-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .dev-note {
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    font-style: italic;
+  }
+
+  /* Mobile styles - for screens 480px and below */
+  @media (max-width: 480px) {
+    .suggestion-chips {
+      display: grid !important;
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 16px !important;
+      justify-content: space-around !important;
+      width: 100% !important;
+      padding: 8px !important;
+    }
+
+    .suggestion-chip {
+      width: 100% !important;
+      justify-content: center !important;
+      font-size: 13px !important;
+    }
+  }
+
+  /* Specific styles for very small screens */
+  @media (max-width: 470px) {
+    .suggestion-chips {
+      display: grid !important;
+      margin-right: 18px !important;
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 30px !important;
+      justify-content: center !important;
+
+
+
+    }
+
+    .suggestions-title {
+      margin-bottom: 10px !important;
+    }
+
+    .suggestion-chip {
+      width: 100% !important;
+      padding: 8px 10px !important;
+      justify-content: center !important;
+      font-size: 12px !important;
+    }
+
+    .suggestion-chip i {
+      font-size: 16px !important;
+      margin-right: 4px !important;
+    }
+  }
+
+  /* Specific styles for Surface Duo and similar devices (540 x 720) */
+  @media (min-width: 530px) and (max-width: 550px) {
+    .suggestion-chips {
+      display: grid !important;
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 10px !important;
+      justify-content: center !important;
+      width: 100% !important;
+    }
+
+    .suggestion-chip {
+      width: 100% !important;
+      padding: 8px 14px !important;
+      justify-content: center !important;
+      font-size: 13px !important;
+    }
+
+    .suggestion-chip i {
+      font-size: 17px !important;
+      margin-right: 6px !important;
+    }
+
+    .ai-coach-container {
+      padding: 15px !important;
+    }
+
+    .input-container {
+      width: 100% !important;
+    }
+  }
+
+  /* Generic styles for devices between Surface Duo and tablets */
+  @media (min-width: 550px) and (max-width: 768px) {
+    .suggestion-chips {
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 16px !important;
+      justify-content: center !important;
+      width: 100% !important;
+      max-width: 700px !important;
+      margin: 0 auto !important;
+    }
+
+    .suggestion-chip {
+      width: 100% !important;
+      padding: 8px 16px !important;
+      justify-content: center !important;
+      font-size: 14px !important;
+    }
+
+    .suggestion-chip i {
+      font-size: 18px !important;
+      margin-right: 8px !important;
+    }
+
+    .ai-coach-container {
+      padding: 20px !important;
+    }
+
+    .input-container {
+      width: 100% !important;
+    }
+  }
+
+  /* For iPad and tablets */
+  @media (min-width: 768px) and (max-width: 900px) {
+    .suggestion-chips {
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 20px !important;
+      justify-content: center !important;
+      max-width: 750px !important;
+      margin: 0 auto !important;
+    }
+  }
+
+  /* Additional mobile fixes for meal and workout plans */
+  @media (max-width: 480px) {
+    /* Fix accordion headers for better mobile display */
+    .accordion-header, .nested-accordion-header {
+      position: relative;
+      padding: 16px 12px;
+      height: auto;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Fix icons positioning */
+    .accordion-icon, .nested-accordion-icon {
+        position: static !important;
+        margin-right: 8px;
+        flex-shrink: 0;
+        order: -1; /* Force icons to the left */
+        transform: none !important;
+        font-size: 18px;
+    }
+
+    /* Fix content alignment */
+    .day-header-content, .meal-header-content {
+        flex: 1;
+        min-width: 0;
+        max-width: 65%;
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 8px;
+    }
+
+    .day-header-right, .meal-header-right {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        flex-shrink: 0;
+        min-width: 30%;
+    }
+
+    /* Fix arrow positioning */
+    .accordion-arrow, .nested-accordion-arrow {
+        position: static !important;
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        transform: none !important;
+    }
+
+    /* Ensure text doesn't overflow */
+    .day-header-content span, .meal-header-content span {
+        white-space: normal;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.3;
+        font-size: 15px;
+    }
+
+    /* Fix calories display */
+    .total-calories, .calories-info {
+        font-size: 12px;
+        padding: 3px 8px;
+        white-space: nowrap;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 350px) {
+    .accordion-header, .nested-accordion-header {
+        padding: 12px 10px;
+        min-height: 50px;
+    }
+
+    .accordion-icon, .nested-accordion-icon {
+        margin-right: 6px;
+        font-size: 14px;
+    }
+
+    .day-header-content, .meal-header-content {
+        max-width: 60%;
+    }
+
+    .day-header-right, .meal-header-right {
+        min-width: 35%;
+        gap: 4px;
+    }
+
+    .day-header-content span, .meal-header-content span {
+        font-size: 14px;
+    }
+
+    .total-calories, .calories-info {
+        font-size: 11px;
+        padding: 2px 5px;
+    }
+
+    .accordion-arrow, .nested-accordion-arrow {
+        width: 16px;
+        height: 16px;
+        min-width: 16px;
+        font-size: 14px;
+    }
+}
+
+
+
+/* Generating Status Styling */
+.generating-status {
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.generating-indicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  color: white;
+  padding: 16px 32px;
+  border-radius: 30px;
+  box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4);
+  animation: slideIn 0.3s ease-out;
+  margin: 20px auto;
+  max-width: 300px;
+  justify-content: center;
+}
+
+.generating-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.generating-text {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Progress Indicator Styling */
+.progress-indicator {
+  margin-top: 12px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  border-radius: 3px;
+  transition: width 0.3s ease-out;
+  animation: progressGlow 2s ease-in-out infinite;
+}
+
+.progress-text {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  display: block;
+  font-weight: 400;
+}
+
+@keyframes progressGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(16, 185, 129, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.8);
+  }
+}
+
+/* Streaming accordion states */
+.accordion-item.generating {
+  opacity: 0.8;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, rgba(109, 40, 217, 0.05) 100%);
+  border-left: 3px solid #7c3aed;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.accordion-item.pending {
+  opacity: 0.6;
+  background: rgba(0, 0, 0, 0.02);
+  border-left: 3px solid #e5e7eb;
+}
+
+.accordion-item.generated {
+  opacity: 1;
+  background: white;
+  border-left: 3px solid #10b981;
+  animation: slideIn 0.3s ease-out;
+}
+
+/* Smooth accordion addition animation */
+.accordion-item {
+  animation: accordionSlideIn 0.5s ease-out;
+  transform: translateY(0);
+  transition: all 0.3s ease;
+}
+
+@keyframes accordionSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+    max-height: 0;
+    margin-bottom: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    max-height: 200px;
+    margin-bottom: 16px;
+  }
+}
+
+/* Staggered animation for multiple accordions */
+.accordion-item:nth-child(1) { animation-delay: 0ms; }
+.accordion-item:nth-child(2) { animation-delay: 100ms; }
+.accordion-item:nth-child(3) { animation-delay: 200ms; }
+.accordion-item:nth-child(4) { animation-delay: 300ms; }
+.accordion-item:nth-child(5) { animation-delay: 400ms; }
+.accordion-item:nth-child(6) { animation-delay: 500ms; }
+.accordion-item:nth-child(7) { animation-delay: 600ms; }
+
+.pending-text {
+  font-size: 12px;
+  color: #9ca3af;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Lime green generating indicator for workout plans */
+.workout-section .generating-indicator {
+  background: linear-gradient(135deg, #BCCE32 0%, #9CAF1F 100%);
+  box-shadow: 0 4px 12px rgba(188, 206, 50, 0.3);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Locked Container Styling - Enhanced */
+.locked-section {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.locked-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  padding: 40px 20px;
+}
+
+.locked-card {
+
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 50px 40px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  max-width: 280px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  background: none;
+}
+
+.locked-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: none;
+}
+
+.locked-icon-container {
+  position: relative;
+  margin: 0 auto 30px;
+  width: 100px;
+  height: 100px;
+}
+
+.locked-icon-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.15);
+}
+
+.locked-background-icon {
+  font-size: 40px;
+  color: #9ca3af;
+  opacity: 0.2;
+}
+
+.locked-icon-foreground {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+}
+
+.lock-icon {
+  font-size: 22px;
+  color: white;
+  font-weight: 600;
+}
+
+.locked-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+  letter-spacing: -0.025em;
+}
+
+.locked-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Profile Form Popup - Enhanced Styling */
+.profile-form-popup .popup-content {
+  /* Very thin scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 #f7fafc;
+}
+
+.profile-form-popup .popup-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.profile-form-popup .popup-content::-webkit-scrollbar-track {
+  background: #f7fafc;
+  border-radius: 2px;
+}
+
+.profile-form-popup .popup-content::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 2px;
+}
+
+.profile-form-popup .popup-content::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+/* Enhanced form styling for profile popup */
+.profile-form-popup .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.profile-form-popup .form-group {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.profile-form-popup .form-group:hover {
+  border-color: #cbd5e0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+.profile-form-popup .form-group:focus-within {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.profile-form-popup .form-group label {
+  display: block;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.profile-form-popup .form-group input,
+.profile-form-popup .form-group select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #374151;
+  background: #ffffff;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.profile-form-popup .form-group input:focus,
+.profile-form-popup .form-group select:focus {
+  outline: none;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.profile-form-popup .required-asterisk {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+/* Missing Profile Fields Popup Styles */
+.missing-profile-fields-popup .popup-content {
+  /* Very thin scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 #f7fafc;
+  overflow-y: auto;
+  max-height: 90vh;
+}
+
+.missing-profile-fields-popup .popup-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.missing-profile-fields-popup .popup-content::-webkit-scrollbar-track {
+  background: #f7fafc;
+  border-radius: 3px;
+}
+
+.missing-profile-fields-popup .popup-content::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 3px;
+}
+
+.missing-profile-fields-popup .popup-content::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+/* Enhanced form styling for missing profile fields popup */
+.missing-profile-fields-popup .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.missing-profile-fields-popup .form-group {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.missing-profile-fields-popup .form-group:hover {
+  border-color: #cbd5e0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+.missing-profile-fields-popup .form-group:focus-within {
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.missing-profile-fields-popup .form-group label {
+  display: block;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.missing-profile-fields-popup .form-group input,
+.missing-profile-fields-popup .form-group select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #374151;
+  background: #ffffff;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.missing-profile-fields-popup .form-group input:focus,
+.missing-profile-fields-popup .form-group select:focus {
+  outline: none;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+/* Error state for missing profile fields */
+.missing-profile-fields-popup .form-group.error {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.missing-profile-fields-popup .form-group.error input,
+.missing-profile-fields-popup .form-group.error select {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.missing-profile-fields-popup .form-group.error label {
+  color: #ef4444;
+}
+
+.missing-profile-fields-popup .required-asterisk {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+/* Responsive design for profile popup */
+@media (max-width: 768px) {
+  .profile-form-popup .popup-content {
+    max-width: 95%;
+    width: 95%;
+    padding: 24px;
+    margin: 20px;
+  }
+
+  .profile-form-popup .form-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .profile-form-popup .form-group {
+    padding: 12px;
+  }
+
+  .missing-profile-fields-popup .popup-content {
+    max-width: 95%;
+    width: 95%;
+    padding: 24px;
+    margin: 20px;
+  }
+
+  .missing-profile-fields-popup .form-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .missing-profile-fields-popup .form-group {
+    padding: 12px;
+  }
+
+  .profile-form-popup .form-group input,
+  .profile-form-popup .form-group select {
+    padding: 10px 12px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-form-popup .popup-content {
+    max-width: 98%;
+    width: 98%;
+    padding: 20px;
+    margin: 10px;
+    max-height: 90vh;
+  }
+
+  .profile-form-popup .form-group {
+    padding: 10px;
+  }
+}
+
+/* Profile Save Popup */
+.profile-save-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.profile-save-popup .popup-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.profile-save-popup h3 {
+  margin-top: 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.profile-save-popup p {
+  margin-bottom: 1.5rem;
+  color: #555;
+}
+
+.profile-save-popup ul {
+  margin-bottom: 2rem;
+  padding-left: 1.5rem;
+}
+
+.profile-save-popup li {
+  margin-bottom: 0.5rem;
+  color: #444;
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.popup-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.popup-button.cancel {
+  background-color: #f0f0f0;
+  color: #555;
+}
+
+.popup-button.cancel:hover {
+  background-color: #e0e0e0;
+}
+
+.popup-button.save {
+  background-color: #BCCE32 !important;
+  color: black !important;
+}
+
+.popup-button.save:hover {
+  background-color: black !important;
+  color: white !important;
+}
+
+/* Specific styles for profile update popup button */
+.profile-update-popup .popup-button.save {
+  background-color: #BCCE32;
+  color: black;
+}
+
+.profile-update-popup .popup-button.save:hover {
+  background-color: black;
+  color: white;
+}
+
+/* Profile Choice Popup */
+.profile-choice-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.profile-choice-popup .popup-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.profile-choice-popup h3 {
+  margin-top: 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.profile-choice-popup p {
+  margin-bottom: 1.5rem;
+  color: #555;
+}
+
+/* Add margin-top to position popups below navbar for both large and small devices */
+.missing-profile-fields-popup .popup-content,
+.profile-form-popup .popup-content,
+.profile-update-popup .popup-content,
+.profile-choice-popup .popup-content {
+  margin-top: 90px !important;
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .missing-profile-fields-popup .popup-content,
+  .profile-form-popup .popup-content,
+  .profile-update-popup .popup-content,
+  .profile-choice-popup .popup-content {
+    margin-top: 80px !important;
+  }
+}
+
+/* Media query for very small screens */
+@media (max-width: 480px) {
+  .missing-profile-fields-popup .popup-content,
+  .profile-form-popup .popup-content,
+  .profile-update-popup .popup-content,
+  .profile-choice-popup .popup-content {
+    margin-top: 70px !important;
+  }
+}
+
+/* Cursor blink animation for streaming */
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* Spinner animation for streaming status */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Copy Prompt Button Styles */
+.copy-prompt-container {
+  display: flex;
+  justify-content: center;
+  margin: 15px 0;
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Repositioned copy prompt button to be inline with input */
+.input-section .copy-prompt-container {
+  display: flex;
+  justify-content: center;
+  margin: 15px 0 0 0;
+  order: 3;
+  width: 100%;
+}
+
+.copy-prompt-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: gray !important;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Make copy prompt button smaller and more compact when inline */
+.input-section .copy-prompt-button {
+  padding: 8px 12px;
+  font-size: 12px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.copy-prompt-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.copy-prompt-button:hover::before {
+  left: 100%;
+}
+
+.copy-prompt-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+}
+
+.copy-prompt-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+}
+
+.copy-prompt-button.clicked {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  transform: scale(1.05);
+  animation: successPulse 0.6s ease-out;
+}
+
+.copy-prompt-button i {
+  font-size: 16px;
+  transition: transform 0.3s ease;
+}
+
+.copy-prompt-button:hover i {
+  transform: scale(1.1);
+}
+
+.copy-prompt-button.clicked i {
+  animation: checkmark 0.6s ease-out;
+}
+
+@keyframes successPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1.05); }
+}
+
+@keyframes checkmark {
+  0% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.2) rotate(180deg); }
+  100% { transform: scale(1) rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .copy-prompt-button {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .copy-prompt-button i {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .copy-prompt-container {
+    margin: 10px 0;
+  }
+
+  .copy-prompt-button {
+    padding: 8px 12px;
+    font-size: 12px;
+    gap: 6px;
+  }
+}
+
+/* Suggestions Section Styling */
+/* .suggestions-section {
+  background: #5F4D72;
+  border: 1px solid #C8DA2B;
+  border-radius: 12px;
+  padding: 0;
+  margin-top: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+} */
+
+/* Suggestions Section Styling - Updated to light gray */
+.suggestions-section {
+  background: #bdc3c7; /* Changed from #5F4D72 to light gray */
+  border: 1px solid #95a5a6; /* Changed from #C8DA2B to darker gray */
+  border-radius: 12px;
+  padding: 0;
+  margin-top: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.suggestions-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(189, 195, 199, 0.05); /* Updated to match new background */
+  pointer-events: none;
+}
+
+.suggestions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+   /* background: #A2B522 !important;  */
+    background: linear-gradient(145deg, #1B1F15 0%, #3C4420 25%, #C8DA2B 80%, #E5F35A 100%);
+  margin-bottom: 0;
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border-radius: 12px 12px 0 0;
+}
+
+.suggestions-header:hover {
+  border-radius: 12px 12px 0 0;
+  padding: 20px;
+}
+
+.suggestions-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.suggestions-header .accordion-arrow {
+  color: #000000;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.suggestions-header:hover .accordion-arrow {
+  color: white;
+}
+
+.suggestions-icon {
+  font-size: 20px;
+  color:black;
+
+}
+
+.suggestions-header h2 {
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 0.2px;
+}
+
+.suggestions-header:hover h2 {
+  color: #000000;
+}
+
+.suggestions-content {
+  position: relative;
+  z-index: 1;
+  margin-top: 0;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  background: black !important;
+  border-radius: 0 0 12px 12px;
+  padding: 20px;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+    transform: translateY(0);
+  }
+}
+
+.suggestions-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  background: #FFFFFF;
+  border-radius: 8px;
+  border: 1px solid #C8DA2B;
+}
+
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(200, 218, 43, 0.3);
+  border-top: 2px solid #C8DA2B;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  color: #CDD954;
+  font-size: 16px;
+  font-weight: 500;
+  text-shadow: 0 0 8px rgba(200, 218, 43, 0.5);
+  margin-top: 15px;
+  margin-bottom: 5px;
+}
+
+.suggestions-text {
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  border: none;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 12px;
+  background: #FFFFFF !important;
+  border-radius: 6px;
+  border: 1px solid #C8DA2B;
+  transition: all 0.2s ease;
+}
+
+.suggestion-item:hover {
+  background: #FFFFFF;
+  border-color: #C8DA2B;
+  transform: translateX(2px);
+  box-shadow: 0 2px 8px rgba(200, 218, 43, 0.3);
+}
+
+.suggestion-item:last-child {
+  margin-bottom: 0;
+}
+
+.suggestion-bullet {
+  color: #C8DA2B;
+  font-size: 12px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.suggestion-content {
+  color: #000000;
+}
+
+/* Add responsive styles for the calorie results popup */
+.calorie-results-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.calorie-results-popup .popup-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 20px;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.calorie-results-popup h2 {
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.calorie-target-container {
+  margin-bottom: 30px;
+  padding: 25px;
+  background-color: #f8f9fa;
+  border-radius: 15px;
+  border: 2px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+.calorie-target-value {
+  font-size: 56px;
+  font-weight: bold;
+  color: #BCCE32;
+  margin-bottom: 8px;
+  line-height: 1;
+}
+
+.calorie-target-label {
+  font-size: 20px;
+  color: #666;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.calorie-tdee-info {
+  font-size: 16px;
+  color: #888;
+  font-weight: 400;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.calorie-links-container {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+
+.calorie-link-button {
+  background: none;
+  border: none;
+  color: #4E3580;
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 2px 4px;
+  margin: 0;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.calorie-link-separator {
+  color: #ccc;
+  font-size: 12px;
+}
+
+.calorie-info-text {
+  margin-bottom: 30px;
+  color: #666;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.calorie-popup-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.calorie-popup-button {
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 100px;
+  border: none;
+}
+
+.calorie-popup-button.cancel {
+  background-color: #e8e8e8;
+  color: #666;
+}
+
+.calorie-popup-button.generate {
+  background-color: #BCCE32;
+  color: black;
+}
+
+/* Responsive styles for calorie results popup */
+@media (max-width: 768px) {
+  .calorie-results-popup {
+    padding: 15px;
+  }
+
+  .calorie-results-popup .popup-content {
+    padding: 25px 20px;
+    max-width: 95%;
+    border-radius: 16px;
+  }
+
+  .calorie-target-container {
+    padding: 20px 15px;
+  }
+
+  .calorie-target-value {
+    font-size: 48px;
+  }
+
+  .calorie-target-label {
+    font-size: 18px;
+  }
+
+  .calorie-tdee-info {
+    font-size: 14px;
+  }
+
+  .calorie-info-text {
+    font-size: 15px;
+    margin-bottom: 25px;
+  }
+
+  .calorie-popup-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .calorie-popup-button {
+    width: 100%;
+    min-width: unset;
+    padding: 12px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .calorie-results-popup {
+    padding: 10px;
+  }
+
+  .calorie-results-popup .popup-content {
+    padding: 20px 15px;
+    border-radius: 12px;
+  }
+
+  .calorie-results-popup h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+
+  .calorie-target-container {
+    padding: 15px 12px;
+    margin-bottom: 20px;
+  }
+
+  .calorie-target-value {
+    font-size: 36px;
+    margin-bottom: 6px;
+  }
+
+  .calorie-target-label {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+
+  .calorie-tdee-info {
+    font-size: 13px;
+  }
+
+  .calorie-links-container {
+    gap: 4px;
+    font-size: 11px;
+  }
+
+  .calorie-link-button {
+    font-size: 11px;
+    padding: 1px 2px;
+  }
+
+  .calorie-link-separator {
+    font-size: 11px;
+  }
+
+  .calorie-info-text {
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.4;
+  }
+
+  .calorie-popup-buttons {
+    gap: 8px;
+  }
+
+  .calorie-popup-button {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 350px) {
+  .calorie-results-popup {
+    padding: 5px;
+  }
+
+  .calorie-results-popup .popup-content {
+    padding: 15px 10px;
+  }
+
+  .calorie-results-popup h2 {
+    font-size: 18px;
+  }
+
+  .calorie-target-value {
+    font-size: 32px;
+  }
+
+  .calorie-target-label {
+    font-size: 14px;
+  }
+
+  .calorie-tdee-info {
+    font-size: 12px;
+  }
+
+  .calorie-link-button {
+    font-size: 10px;
+  }
+
+  .calorie-link-separator {
+    font-size: 10px;
+  }
+
+  .calorie-info-text {
+    font-size: 13px;
+  }
+
+  .calorie-popup-button {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+
+/* Explanation Sections */
+.explanation-section {
+  margin-bottom: 15px;
+  padding: 15px;
+  background: #FFFFFF;
+  border-radius: 8px;
+  border: 1px solid #C8DA2B;
+  position: relative;
+  overflow: hidden;
+}
+
+.explanation-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  border-radius: 0 2px 2px 0;
+}
+
+.meal-explanation::before {
+  background: #C8DA2B;
+}
+
+.workout-explanation::before {
+  background: #C8DA2B;
+}
+
+.recommendation-explanation::before {
+  background: #C8DA2B;
+}
+
+.explanation-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.explanation-icon {
+  font-size: 16px;
+}
+
+.meal-explanation .explanation-icon {
+  color: #C8DA2B;
+}
+
+.workout-explanation .explanation-icon {
+  color: #C8DA2B;
+}
+
+.recommendation-explanation .explanation-icon {
+  color: #C8DA2B;
+}
+
+.explanation-header h3 {
+  color: #000000;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.explanation-text {
+  color: #000000;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 400;
+  margin: 0;
+}
+
+.suggestions-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 15px 0 10px 0;
+  padding: 10px 15px;
+  background: #FFFFFF !important;
+  border-radius: 6px;
+  border: 1px solid #C8DA2B;
+}
+
+.section-icon {
+  color: #C8DA2B;
+  font-size: 14px;
+}
+
+.suggestions-section-header h3 {
+  color: #000000;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Mobile Responsiveness for Suggestions */
+@media (max-width: 768px) {
+  .suggestions-section {
+    padding: 20px;
+    margin-top: 20px;
+  }
+
+  .suggestions-header {
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .suggestions-icon {
+    font-size: 24px;
+    color:black;
+
+  }
+
+  .suggestions-header h2 {
+    font-size: 20px;
+  }
+
+  .suggestions-text {
+    padding: 20px;
+  }
+
+  .suggestion-item {
+    padding: 12px;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .suggestion-content {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .suggestions-section {
+    padding: 15px;
+    margin-top: 15px;
+  }
+
+  .suggestions-header {
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+
+  .suggestions-icon {
+    font-size: 20px;
+  }
+
+  .suggestions-header h2 {
+    font-size: 18px;
+  }
+
+  .suggestions-text {
+    padding: 15px;
+  }
+
+  .suggestion-item {
+    padding: 10px;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .suggestion-content {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+}
+
+/* ============================================
+   NEW REDESIGNED INPUT SECTION STYLES
+   ============================================ */
+
+/* Input Wrapper - Contains input and inline button */
+.input-wrapper-with-button {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 20px auto;
+  display: flex;
+  align-items: stretch;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  background: transparent;
+  transition: all 0.3s ease;
+  min-height: 50px;
+}
+
+.input-wrapper-with-button:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.input-wrapper-with-button:focus-within {
+  border-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+/* Updated Goal Input - Now part of the wrapper */
+.input-wrapper-with-button .goal-input {
+  flex: 1;
+  padding: 16px 20px;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 16px 0 0 16px;
+  font-size: 16px;
+  color: #C8DA2B !important;
+  font-weight: 400;
+  resize: none;
+  overflow: hidden;
+  height: 50px;
+  min-height: 50px;
+  max-height: 200px;
+  line-height: 1.4;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: none !important;
+  outline: none !important;
+  width: auto !important;
+  max-width: none !important;
+  transition: none !important;
+  transform: none !important;
+}
+
+.input-wrapper-with-button .goal-input::placeholder {
+  color: rgba(200, 218, 43, 0.5) !important;
+  font-size: 16px;
+}
+
+.input-wrapper-with-button .goal-input:focus {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.input-wrapper-with-button .goal-input:focus::placeholder {
+  opacity: 1;
+  color: rgba(200, 218, 43, 0.6) !important;
+}
+
+.input-wrapper-with-button .goal-input:disabled {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(200, 218, 43, 0.4) !important;
+  cursor: not-allowed;
+}
+
+/* Generate Prompt Button - Inline within input (Icon Only) */
+.generate-prompt-inline-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 100%;
+  min-height: 48px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0 14px 14px 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  margin-right: 2px;
+}
+
+.generate-prompt-inline-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.02);
+}
+
+.generate-prompt-inline-button:active {
+  transform: scale(0.98);
+}
+
+.generate-prompt-inline-button.clicked {
+  background: rgba(72, 187, 120, 0.3);
+  color: #48bb78;
+}
+
+.generate-prompt-inline-button i {
+  font-size: 20px;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.generate-prompt-inline-button:hover i {
+  transform: scale(1.15);
+  filter: brightness(1.3);
+}
+
+.generate-prompt-inline-button.clicked i {
+  animation: lightbulbGlow 0.6s ease-out;
+}
+
+@keyframes lightbulbGlow {
+  0% { transform: scale(1); filter: brightness(1); }
+  25% { transform: scale(1.2); filter: brightness(1.5); }
+  50% { transform: scale(1.3); filter: brightness(2); }
+  75% { transform: scale(1.2); filter: brightness(1.5); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+
+.generate-prompt-inline-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Main Recommendations Button - Below input */
+.recommend-button-main {
+  width: auto;
+  max-width: 320px;
+  margin: 0 auto;
+  padding: 16px 32px;
+  background: #CCD853 !important;
+  color: #1A1F14 !important;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 4px 20px rgba(204, 216, 83, 0.4);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  animation: subtlePulse 3s ease-in-out infinite;
+}
+
+/* Subtle pulse animation to draw attention */
+@keyframes subtlePulse {
+  0%, 100% {
+    box-shadow: 0 4px 20px rgba(204, 216, 83, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 25px rgba(204, 216, 83, 0.6);
+  }
+}
+
+/* Button text */
+.recommend-button-main .button-text {
+  position: relative;
+  z-index: 2;
+}
+
+/* Button icon */
+.recommend-button-main .button-icon {
+  font-size: 18px;
+  transition: transform 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+/* Shimmer effect on button */
+.recommend-button-main::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.recommend-button-main:hover {
+  background: #B8D843 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 30px rgba(204, 216, 83, 0.5);
+  animation: none; /* Stop pulse on hover */
+}
+
+.recommend-button-main:hover::before {
+  left: 100%;
+}
+
+.recommend-button-main:hover .button-icon {
+  transform: translateX(5px);
+  animation: arrowBounce 0.6s ease infinite;
+}
+
+@keyframes arrowBounce {
+  0%, 100% {
+    transform: translateX(5px);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+}
+
+.recommend-button-main:active {
+  transform: translateY(0);
+}
+
+.recommend-button-main.disabled,
+.recommend-button-main:disabled {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+  animation: none;
+}
+
+.recommend-button-main.disabled .button-icon,
+.recommend-button-main:disabled .button-icon {
+  opacity: 0.4;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .input-wrapper-with-button {
+    max-width: 100%;
+    flex-direction: column;
+    border-radius: 12px;
+  }
+
+  .input-wrapper-with-button .goal-input {
+    border-radius: 12px 12px 0 0;
+    padding: 14px 16px;
+    font-size: 15px;
+  }
+
+  .generate-prompt-inline-button {
+    width: 100%;
+    height: auto;
+    min-height: 44px;
+    justify-content: center;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 0 0 10px 10px;
+    margin-right: 0;
+    margin-bottom: 2px;
+  }
+
+  .recommend-button-main {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 480px) {
+  .input-wrapper-with-button .goal-input {
+    font-size: 14px;
+    padding: 12px 14px;
+  }
+
+  .generate-prompt-inline-button {
+    height: auto;
+    min-height: 40px;
+  }
+
+  .generate-prompt-inline-button i {
+    font-size: 18px;
+  }
+
+  .recommend-button-main {
+    max-width: 95%;
+  }
+}
+
+/* PDF Download Button */
+.pdf-download-button {
+  width: auto;
+  max-width: 320px;
+  margin: 0 auto;
+  padding: 16px 32px;
+  background: #CCD853 !important;
+  color: #1A1F14 !important;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 4px 20px rgba(204, 216, 83, 0.4);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  animation: subtlePulse 3s ease-in-out infinite;
+}
+
+/* Shimmer effect on button */
+.pdf-download-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.pdf-download-button:hover::before {
+  left: 100%;
+}
+
+.pdf-download-button:hover {
+  background: #B8D843 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 30px rgba(204, 216, 83, 0.5);
+  animation: none;
+}
+
+.pdf-download-button i {
+  font-size: 18px;
+  color: #1A1F14;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.pdf-download-button span {
+  position: relative;
+  z-index: 2;
+}
+
+.pdf-download-button:hover i.fa-download {
+  animation: pdfDownloadBounce 0.6s ease infinite;
+}
+
+.pdf-download-button:active {
+  transform: translateY(0);
+}
+
+@keyframes pdfDownloadBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+/* Responsive adjustments for PDF button */
+@media (max-width: 768px) {
+  .pdf-download-button {
+    padding: 14px 28px;
+    font-size: 15px;
+    max-width: 90%;
+  }
+
+  .pdf-download-button i {
+    font-size: 17px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pdf-download-button {
+    padding: 13px 24px;
+    font-size: 14px;
+    gap: 10px;
+    width: 100%;
+    max-width: 95%;
+  }
+
+  .pdf-download-button i {
+    font-size: 16px;
+  }
+}

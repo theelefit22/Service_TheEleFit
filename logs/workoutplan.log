@@ -1,0 +1,21 @@
+2026-01-12 15:31:27 [WORKOUTPLAN] INFO: === /workoutplan endpoint called ===
+2026-01-12 15:31:27 [WORKOUTPLAN] INFO: Received data: {
+  "goal": "weight_loss",
+  "workout_focus": "Mixed Cardio and Strength",
+  "workout_days": 5,
+  "targetWeight": 63,
+  "timelineWeeks": 12,
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is light. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months."
+}
+2026-01-12 15:31:27 [WORKOUTPLAN] INFO: === PARSED INPUTS ===
+2026-01-12 15:31:27 [WORKOUTPLAN] INFO: Goal: weight_loss
+2026-01-12 15:31:27 [WORKOUTPLAN] INFO: Workout Focus: Mixed Cardio and Strength
+2026-01-12 15:31:27 [WORKOUTPLAN] INFO: Workout Days: 5
+2026-01-12 15:31:27 [WORKOUTPLAN] INFO: Target Weight: 63 kg
+2026-01-12 15:31:27 [WORKOUTPLAN] INFO: Timeline: 12 weeks
+2026-01-12 15:31:27 [WORKOUTPLAN] INFO: User Prompt: I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is light. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months.
+2026-01-12 15:31:27 [WORKOUTPLAN] INFO: ===================
+
+2026-01-12 15:31:27 [WORKOUTPLAN] INFO: === GROQ WORKOUT OUTPUT START ===
+2026-01-12 15:31:28 [WORKOUTPLAN] INFO: === GROQ WORKOUT OUTPUT END ===
+2026-01-12 15:31:28 [WORKOUTPLAN] INFO: Total characters streamed: 1467
