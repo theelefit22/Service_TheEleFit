@@ -32,4 +32,8 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/aicoach-backend:latest
             docker stop aicoach-backend || true
             docker rm aicoach-backend || true
-            docker run -d -p 5000:5000 --name aicoach-backend ${{ secrets.DOCKER_USERNAME }}/aicoach-backend:latest
+            docker run -d -p 5002:5002 \
+            --name aicoach-backend \
+            --env-file /home/ec2-user/.env \
+            ${{ secrets.DOCKER_USERNAME }}/aicoach-backend:latest
+
