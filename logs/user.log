@@ -631,3 +631,32 @@
 2026-01-12 15:31:09 [USER] INFO: [PREGEN] Scheduled background generation for session a97f9fccd5f2-1768212069
 2026-01-12 15:31:09 [USER] INFO: [PREGEN] Starting pre-generation for session a97f9fccd5f2-1768212069
 2026-01-12 15:31:14 [USER] INFO: [PREGEN] Completed for session a97f9fccd5f2-1768212069, 7 chunks
+2026-01-19 20:30:52 [USER] INFO: === /user endpoint called ===
+2026-01-19 20:30:52 [USER] INFO: Received data: {
+  "prompt": "I am a 24-year-old male, my height is 165 cm, weight is 73 kg. My activity level is lightly active. I want to workout 5 days per week. My target weight is 63 kg, and I want to achieve this goal in 3 months.",
+  "userDetails": {
+    "age": 24,
+    "weight": 73,
+    "height": 165,
+    "gender": "male",
+    "activityLevel": "lightly active",
+    "targetWeight": 63,
+    "timelineWeeks": 12,
+    "healthGoals": "weight_loss"
+  }
+}
+2026-01-19 20:30:52 [USER] INFO: Goal classification for 'weight_loss': get_fit
+2026-01-19 20:30:52 [USER] INFO: === CALCULATION RESULTS ===
+2026-01-19 20:30:52 [USER] INFO: Current weight: 73 kg
+2026-01-19 20:30:52 [USER] INFO: Target weight: 63 kg
+2026-01-19 20:30:52 [USER] INFO: TDEE: 2551
+2026-01-19 20:30:52 [USER] INFO: Weight change: -10 kg
+2026-01-19 20:30:52 [USER] INFO: Daily offset: -916
+2026-01-19 20:30:52 [USER] INFO: Target calories: 1634
+2026-01-19 20:30:52 [USER] INFO: Goal category: get_fit
+2026-01-19 20:30:52 [USER] INFO: Workout focus: Mixed Cardio and Strength
+2026-01-19 20:30:52 [USER] INFO: Macros: {"protein_g": 143, "fat_g": 64, "carbs_g": 123, "fiber_g": 23}
+2026-01-19 20:30:52 [USER] INFO: Capped: False
+2026-01-19 20:30:52 [USER] INFO: [PREGEN] Scheduled background generation for session c38d99825e11-1768834852
+2026-01-19 20:30:52 [USER] INFO: [PREGEN] Starting pre-generation for session c38d99825e11-1768834852
+2026-01-19 20:30:57 [USER] INFO: [PREGEN] Completed for session c38d99825e11-1768834852, 7 chunks
