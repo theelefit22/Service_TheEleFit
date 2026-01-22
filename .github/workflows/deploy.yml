@@ -19,8 +19,12 @@ jobs:
 
       - name: Build and push image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/aicoach-backend:latest ./backend
-          docker push ${{ secrets.DOCKER_USERNAME }}/aicoach-backend:latest
+          IMAGE=${{ secrets.DOCKER_USERNAME }}/aicoach-backend
+          TAG=${GITHUB_SHA}
+
+          docker build -t $IMAGE:$TAG -t $IMAGE:latest ./backend
+          docker push $IMAGE:$TAG
+          docker push $IMAGE:latest
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.0
@@ -29,11 +33,42 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker pull ${{ secrets.DOCKER_USERNAME }}/aicoach-backend:latest
-            docker stop aicoach-backend || true
-            docker rm aicoach-backend || true
-            docker run -d -p 5000:5000 \
-            --name aicoach-backend \
-            --env-file /home/ec2-user/.env \
-            ${{ secrets.DOCKER_USERNAME }}/aicoach-backend:latest
+            IMAGE=${{ secrets.DOCKER_USERNAME }}/aicoach-backend
+            TAG=${GITHUB_SHA}
 
+            echo "Pulling new image..."
+            docker pull $IMAGE:$TAG
+
+            echo "Starting test container..."
+            docker run -d \
+              --name aicoach-test \
+              -p 5001:5000 \
+              --env-file /home/ec2-user/.env \
+              $IMAGE:$TAG
+
+            sleep 10
+
+            echo "Running health check..."
+            if curl -f http://localhost:5001/health; then
+              echo "Healthy. Promoting new container."
+
+              docker stop aicoach-backend || true
+              docker rm aicoach-backend || true
+
+              docker stop aicoach-test
+              docker rm aicoach-test
+
+              docker run -d \
+                --name aicoach-backend \
+                -p 5000:5000 \
+                --env-file /home/ec2-user/.env \
+                $IMAGE:$TAG
+
+              echo "Deployment successful."
+            else
+              echo "Health check failed. Keeping old container."
+              docker logs aicoach-test
+              docker stop aicoach-test
+              docker rm aicoach-test
+              exit 1
+            fi

@@ -1804,6 +1804,10 @@ At the end of the response, include a closing recommendation tailored to the use
 
     return StreamingResponse(event_stream(), media_type="application/octet-stream")
 
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
 
 if __name__ == "__main__":
     import uvicorn
