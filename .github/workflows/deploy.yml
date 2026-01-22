@@ -37,11 +37,14 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           envs: IMAGE,TAG
           script: |
-            echo "Deploying image: $IMAGE:$TAG"
+            set -e
 
+            echo "Deploying $IMAGE:$TAG"
+
+            # Pull new image
             docker pull $IMAGE:$TAG
 
-            echo "Starting test container..."
+            # Start test container
             docker run -d \
               --name aicoach-test \
               -p 5001:5000 \
@@ -50,9 +53,9 @@ jobs:
 
             sleep 10
 
-            echo "Running health check..."
+            # Health check
             if curl -f http://localhost:5001/health; then
-              echo "Healthy. Promoting to production."
+              echo "Healthy. Promoting."
 
               docker stop aicoach-backend || true
               docker rm aicoach-backend || true
@@ -66,9 +69,14 @@ jobs:
                 --env-file /home/ec2-user/.env \
                 $IMAGE:$TAG
 
-              echo "Deployment successful."
+              echo "Cleaning old images (keeping only 2 latest)..."
+
+              docker images $IMAGE --format "{{.ID}}" | tail -n +3 | xargs -r docker rmi
+
+              echo "Deploy complete."
+
             else
-              echo "Health check failed. Keeping old version."
+              echo "Health check failed. Rolling back."
               docker logs aicoach-test || true
               docker stop aicoach-test || true
               docker rm aicoach-test || true
