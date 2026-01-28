@@ -1,5 +1,5 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
 import {
   doc,
   setDoc,
@@ -10,7 +10,7 @@ import {
   getDocs,
   deleteDoc,
   updateDoc,
-} from "firebase/firestore";
+} from 'firebase/firestore';
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -23,15 +23,15 @@ import {
   updateProfile,
   linkWithCredential,
   signInWithPhoneNumber,
-} from "firebase/auth";
-import { getAnalytics } from "firebase/analytics";
-import { getStorage } from "firebase/storage";
+} from 'firebase/auth';
+import { getAnalytics } from 'firebase/analytics';
+import { getStorage } from 'firebase/storage';
 import {
   createShopifyCustomer,
   loginShopifyCustomer,
   checkShopifyCustomerExists,
-} from "./shopifyService";
-import { getDatabase } from "firebase/database";
+} from './shopifyService';
+import { getDatabase } from 'firebase/database';
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -64,17 +64,17 @@ export const checkFirebasePhoneAuthSetup = () => {
     projectId: firebaseConfig.projectId,
     authDomain: firebaseConfig.authDomain,
     apiKeyPresent: !!firebaseConfig.apiKey,
-    currentUser: auth?.currentUser?.uid || "No user",
-    supportedBrowser: typeof window !== "undefined" && !!window.navigator,
+    currentUser: auth?.currentUser?.uid || 'No user',
+    supportedBrowser: typeof window !== 'undefined' && !!window.navigator,
     httpsProtocol:
-      typeof window !== "undefined"
-        ? window.location.protocol === "https:"
+      typeof window !== 'undefined'
+        ? window.location.protocol === 'https:'
         : false,
     domain:
-      typeof window !== "undefined" ? window.location.hostname : "unknown",
+      typeof window !== 'undefined' ? window.location.hostname : 'unknown',
   };
 
-  console.log("Firebase Phone Auth Diagnostics:", diagnostics);
+  console.log('Firebase Phone Auth Diagnostics:', diagnostics);
   return diagnostics;
 };
 
@@ -83,27 +83,27 @@ export { db, firestore, auth, storage, database };
 
 // Helper to handle Firebase Auth errors with friendly messages
 const handleFirebaseAuthError = (error) => {
-  let message = "An error occurred during authentication";
+  let message = 'An error occurred during authentication';
 
   switch (error.code) {
     case AuthErrorCodes.EMAIL_EXISTS:
-      message = "An account with this email already exists";
+      message = 'An account with this email already exists';
       break;
     case AuthErrorCodes.INVALID_EMAIL:
-      message = "The email address is not valid";
+      message = 'The email address is not valid';
       break;
     case AuthErrorCodes.WEAK_PASSWORD:
-      message = "Password should be at least 6 characters";
+      message = 'Password should be at least 6 characters';
       break;
     case AuthErrorCodes.USER_DELETED:
     case AuthErrorCodes.INVALID_PASSWORD:
-      message = "Email or password is incorrect";
+      message = 'Email or password is incorrect';
       break;
     case AuthErrorCodes.TOO_MANY_ATTEMPTS_TRY_LATER:
-      message = "Too many failed login attempts. Please try again later";
+      message = 'Too many failed login attempts. Please try again later';
       break;
     default:
-      console.error("Firebase auth error:", error);
+      console.error('Firebase auth error:', error);
   }
 
   const enhancedError = new Error(message);
@@ -117,7 +117,7 @@ const checkUserExistsByEmail = async (email) => {
     console.log(`Checking if Firebase user exists for email: ${email}`);
 
     if (!email) {
-      console.error("No email provided to checkUserExistsByEmail");
+      console.error('No email provided to checkUserExistsByEmail');
       return false;
     }
 
@@ -130,17 +130,17 @@ const checkUserExistsByEmail = async (email) => {
       // Firebase Auth doesn't provide a direct way to check if a user exists by email
       // We'll rely on Firestore check instead
       console.log(
-        "Cannot directly check Auth system, relying on Firestore check",
+        'Cannot directly check Auth system, relying on Firestore check',
       );
     } catch (authError) {
-      console.error("Error checking Firebase Auth:", authError);
+      console.error('Error checking Firebase Auth:', authError);
     }
 
     // Then check in Firestore
-    const usersRef = collection(db, "users");
-    const q = query(usersRef, where("email", "==", normalizedEmail));
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where('email', '==', normalizedEmail));
 
-    console.log("Executing Firestore query to check user existence");
+    console.log('Executing Firestore query to check user existence');
     const querySnapshot = await getDocs(q);
     const exists = !querySnapshot.empty;
 
@@ -156,7 +156,7 @@ const checkUserExistsByEmail = async (email) => {
 
     return exists;
   } catch (error) {
-    console.error("Error checking if user exists:", error);
+    console.error('Error checking if user exists:', error);
     return false;
   }
 };
@@ -164,7 +164,7 @@ const checkUserExistsByEmail = async (email) => {
 // Map Shopify customer to Firebase
 const mapShopifyUserToFirebase = async (
   email,
-  userType = "user",
+  userType = 'user',
   shopifyCustomerId = null,
   password = null,
 ) => {
@@ -180,7 +180,7 @@ const mapShopifyUserToFirebase = async (
     // Using the same password will make it easier for users to log in
     let userPassword;
     if (password) {
-      console.log("Using provided password for Firebase auth user");
+      console.log('Using provided password for Firebase auth user');
       userPassword = password;
     } else {
       // Create a random secure password for the Firebase user if none provided
@@ -195,7 +195,7 @@ const mapShopifyUserToFirebase = async (
     // Check if user already exists in Firebase Auth (should be rare, but possible)
     let userCredential;
     try {
-      console.log("Creating new Firebase auth user");
+      console.log('Creating new Firebase auth user');
       userCredential = await createUserWithEmailAndPassword(
         auth,
         normalizedEmail,
@@ -205,28 +205,28 @@ const mapShopifyUserToFirebase = async (
         `Firebase auth user created with UID: ${userCredential.user.uid}`,
       );
     } catch (authError) {
-      console.error("Error creating Firebase auth user:", authError);
+      console.error('Error creating Firebase auth user:', authError);
 
       // If the user already exists in Firebase Auth, we need to handle this case
       if (authError.code === AuthErrorCodes.EMAIL_EXISTS) {
         console.log(
-          "User already exists in Firebase Auth, attempting to use the existing user",
+          'User already exists in Firebase Auth, attempting to use the existing user',
         );
 
         // Check if we can find the user in Firestore
-        const usersRef = collection(db, "users");
-        const q = query(usersRef, where("email", "==", normalizedEmail));
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('email', '==', normalizedEmail));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
           console.log(
-            "Found existing user in Firestore, updating the Shopify mapping",
+            'Found existing user in Firestore, updating the Shopify mapping',
           );
 
           // Update the existing user with Shopify mapping
           const userDoc = querySnapshot.docs[0];
           await setDoc(
-            doc(db, "users", userDoc.id),
+            doc(db, 'users', userDoc.id),
             {
               ...userDoc.data(),
               shopifyCustomerId: shopifyCustomerId,
@@ -246,7 +246,7 @@ const mapShopifyUserToFirebase = async (
         } else {
           // This is a strange case - user exists in Auth but not in Firestore
           throw new Error(
-            "User exists in Firebase Auth but not in Firestore. Unable to map Shopify user.",
+            'User exists in Firebase Auth but not in Firestore. Unable to map Shopify user.',
           );
         }
       } else {
@@ -259,7 +259,7 @@ const mapShopifyUserToFirebase = async (
     console.log(
       `Creating user document in Firestore for UID: ${userCredential.user.uid}`,
     );
-    await setDoc(doc(db, "users", userCredential.user.uid), {
+    await setDoc(doc(db, 'users', userCredential.user.uid), {
       email: normalizedEmail,
       userType: userType,
       createdAt: new Date(),
@@ -267,11 +267,11 @@ const mapShopifyUserToFirebase = async (
       shopifyCustomerId: shopifyCustomerId,
     });
 
-    console.log("User document created in Firestore");
+    console.log('User document created in Firestore');
 
     // Sign out immediately to clean state
     await signOut(auth);
-    console.log("Signed out from temporary authentication session");
+    console.log('Signed out from temporary authentication session');
 
     return {
       success: true,
@@ -279,7 +279,7 @@ const mapShopifyUserToFirebase = async (
       uid: userCredential.user.uid,
     };
   } catch (error) {
-    console.error("Error mapping Shopify user to Firebase:", error);
+    console.error('Error mapping Shopify user to Firebase:', error);
     throw handleFirebaseAuthError(error);
   }
 };
@@ -300,12 +300,12 @@ export const registerUser = async (
     // First check if the user already exists in Shopify
     try {
       console.log(
-        "Checking if user already exists in Shopify before creating...",
+        'Checking if user already exists in Shopify before creating...',
       );
       const shopifyExists = await checkShopifyCustomerExists(normalizedEmail);
 
       if (shopifyExists) {
-        console.log("User already exists in Shopify, trying to log in instead");
+        console.log('User already exists in Shopify, trying to log in instead');
         // Try to authenticate with Shopify
         try {
           const shopifyCustomer = await loginShopifyCustomer(
@@ -313,7 +313,7 @@ export const registerUser = async (
             password,
           );
           console.log(
-            "Successfully authenticated existing Shopify user",
+            'Successfully authenticated existing Shopify user',
             shopifyCustomer,
           );
 
@@ -334,16 +334,16 @@ export const registerUser = async (
           };
         } catch (shopifyLoginError) {
           console.error(
-            "Failed to authenticate with existing Shopify account:",
+            'Failed to authenticate with existing Shopify account:',
             shopifyLoginError,
           );
           throw new Error(
-            "An account with this email already exists, but the password is incorrect.",
+            'An account with this email already exists, but the password is incorrect.',
           );
         }
       }
     } catch (checkError) {
-      console.error("Error checking if user exists in Shopify:", checkError);
+      console.error('Error checking if user exists in Shopify:', checkError);
       // Continue with registration if the check fails
     }
 
@@ -351,7 +351,7 @@ export const registerUser = async (
 
     // Try to create customer in Shopify, but make it optional for experts
     try {
-      console.log("Creating new Shopify customer...");
+      console.log('Creating new Shopify customer...');
       const shopifyCustomer = await createShopifyCustomer(
         normalizedEmail,
         password,
@@ -360,15 +360,15 @@ export const registerUser = async (
       console.log(`Shopify customer created with ID: ${shopifyCustomer.id}`);
       shopifyCustomerId = shopifyCustomer.id;
     } catch (shopifyError) {
-      console.error("Error creating Shopify customer:", shopifyError);
+      console.error('Error creating Shopify customer:', shopifyError);
 
       // For regular users, Shopify integration is required
-      if (userType !== "expert") {
+      if (userType !== 'expert') {
         throw shopifyError;
       } else {
         // For experts, we can continue without Shopify integration
         console.log(
-          "Continuing expert registration without Shopify integration",
+          'Continuing expert registration without Shopify integration',
         );
       }
     }
@@ -384,11 +384,11 @@ export const registerUser = async (
       const user = userCredential.user;
 
       // Create user profile in Firestore
-      await setDoc(doc(db, "users", user.uid), {
+      await setDoc(doc(db, 'users', user.uid), {
         email: normalizedEmail,
         userType: userType,
-        firstName: additionalData?.firstName || "",
-        lastName: additionalData?.lastName || "",
+        firstName: additionalData?.firstName || '',
+        lastName: additionalData?.lastName || '',
         createdAt: new Date(),
         shopifyCustomerId: shopifyCustomerId,
         shopifyMapped: !!shopifyCustomerId,
@@ -399,7 +399,7 @@ export const registerUser = async (
         `Firebase user created with UID: ${user.uid} and userType: ${userType}`,
       );
 
-      if (userType !== "expert") {
+      if (userType !== 'expert') {
         // Only sign out if not an expert registration from admin panel
         // For expert registrations, we want to keep the admin logged in
         await signOut(auth);
@@ -413,7 +413,7 @@ export const registerUser = async (
         shopifyIntegrated: !!shopifyCustomerId,
       };
     } catch (firebaseError) {
-      console.error("Firebase registration failed:", firebaseError);
+      console.error('Firebase registration failed:', firebaseError);
 
       // If Shopify was created but Firebase failed, return partial success
       if (shopifyCustomerId) {
@@ -423,7 +423,7 @@ export const registerUser = async (
           shopifyCustomerId,
           firebaseError: true,
           message:
-            "Account created in Shopify but Firebase registration failed. Please try logging in.",
+            'Account created in Shopify but Firebase registration failed. Please try logging in.',
         };
       }
 
@@ -431,7 +431,7 @@ export const registerUser = async (
       throw handleFirebaseAuthError(firebaseError);
     }
   } catch (error) {
-    console.error("Registration error:", error);
+    console.error('Registration error:', error);
     throw error;
   }
 };
@@ -445,15 +445,15 @@ const handleShopifyAuthenticatedUser = async (email, shopifyCustomerId) => {
     await firebaseSendPasswordResetEmail(auth, email);
 
     // Find user in Firestore and update Shopify mapping
-    const usersRef = collection(db, "users");
-    const q = query(usersRef, where("email", "==", email.toLowerCase().trim()));
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where('email', '==', email.toLowerCase().trim()));
     const querySnapshot = await getDocs(q);
 
     if (!querySnapshot.empty) {
       // Update existing user
       const userDoc = querySnapshot.docs[0];
       await setDoc(
-        doc(db, "users", userDoc.id),
+        doc(db, 'users', userDoc.id),
         {
           ...userDoc.data(),
           shopifyCustomerId: shopifyCustomerId,
@@ -468,9 +468,9 @@ const handleShopifyAuthenticatedUser = async (email, shopifyCustomerId) => {
     } else {
       // No Firestore document - create a placeholder
       const placeholderId = `shopify-${Date.now()}`;
-      await setDoc(doc(db, "users", placeholderId), {
+      await setDoc(doc(db, 'users', placeholderId), {
         email: email.toLowerCase().trim(),
-        userType: "user",
+        userType: 'user',
         createdAt: new Date(),
         shopifyMapped: true,
         shopifyCustomerId: shopifyCustomerId,
@@ -486,7 +486,7 @@ const handleShopifyAuthenticatedUser = async (email, shopifyCustomerId) => {
         "We've sent a password reset email to your address. Please check your inbox, reset your password, and then try logging in again.",
     };
   } catch (error) {
-    console.error("Error handling Shopify authenticated user:", error);
+    console.error('Error handling Shopify authenticated user:', error);
     throw error;
   }
 };
@@ -512,9 +512,9 @@ const autoCreateFirebaseUserFromShopify = async (
     console.log(`Firebase user created with UID: ${userCredential.user.uid}`);
 
     // Create user profile in Firestore
-    await setDoc(doc(db, "users", userCredential.user.uid), {
+    await setDoc(doc(db, 'users', userCredential.user.uid), {
       email: normalizedEmail,
-      userType: "user",
+      userType: 'user',
       createdAt: new Date(),
       shopifyCustomerId: shopifyCustomer.id,
       shopifyMapped: true,
@@ -522,11 +522,11 @@ const autoCreateFirebaseUserFromShopify = async (
       autoCreatedAt: new Date(),
     });
 
-    console.log("Firestore document created for auto-created user");
+    console.log('Firestore document created for auto-created user');
 
     // Sign out immediately to clean state
     await signOut(auth);
-    console.log("Signed out from auto-creation session");
+    console.log('Signed out from auto-creation session');
 
     return {
       success: true,
@@ -534,10 +534,10 @@ const autoCreateFirebaseUserFromShopify = async (
       uid: userCredential.user.uid,
       shopifyCustomerId: shopifyCustomer.id,
       autoCreated: true,
-      message: "User automatically created from Shopify. Please log in again.",
+      message: 'User automatically created from Shopify. Please log in again.',
     };
   } catch (error) {
-    console.error("Error auto-creating Firebase user from Shopify:", error);
+    console.error('Error auto-creating Firebase user from Shopify:', error);
     throw error;
   }
 };
@@ -551,19 +551,19 @@ export const loginUser = async (email, password) => {
     const normalizedEmail = email.toLowerCase().trim();
 
     // Check if user is an expert by looking in Firestore first
-    console.log("Checking if user is an expert...");
-    const usersRef = collection(db, "users");
+    console.log('Checking if user is an expert...');
+    const usersRef = collection(db, 'users');
     const expertQuery = query(
       usersRef,
-      where("email", "==", normalizedEmail),
-      where("userType", "==", "expert"),
+      where('email', '==', normalizedEmail),
+      where('userType', '==', 'expert'),
     );
     const expertSnapshot = await getDocs(expertQuery);
     const isExpert = !expertSnapshot.empty;
     console.log(`Is user an expert? ${isExpert}`);
 
     if (isExpert) {
-      console.log("Expert user detected, handling expert login...");
+      console.log('Expert user detected, handling expert login...');
       try {
         // For experts, try direct Firebase login first
         const userCredential = await signInWithEmailAndPassword(
@@ -571,39 +571,39 @@ export const loginUser = async (email, password) => {
           normalizedEmail,
           password,
         );
-        console.log("Expert login successful");
+        console.log('Expert login successful');
         return userCredential.user;
       } catch (firebaseError) {
-        console.error("Expert login failed:", firebaseError);
+        console.error('Expert login failed:', firebaseError);
         throw handleFirebaseAuthError(firebaseError);
       }
     }
 
     // For non-experts, first try direct Firebase login
     try {
-      console.log("Attempting direct Firebase login...");
+      console.log('Attempting direct Firebase login...');
       const userCredential = await signInWithEmailAndPassword(
         auth,
         normalizedEmail,
         password,
       );
-      console.log("Firebase login successful");
+      console.log('Firebase login successful');
       return userCredential.user;
     } catch (firebaseError) {
-      console.error("Firebase login failed:", firebaseError.code);
+      console.error('Firebase login failed:', firebaseError.code);
 
       // If Firebase login fails, try Shopify
       try {
-        console.log("Trying Shopify authentication...");
+        console.log('Trying Shopify authentication...');
         const shopifyCustomer = await loginShopifyCustomer(
           normalizedEmail,
           password,
         );
-        console.log("Shopify authentication successful", shopifyCustomer);
+        console.log('Shopify authentication successful', shopifyCustomer);
 
         // If we got here, Shopify auth worked but Firebase auth failed
         console.log(
-          "User exists in Shopify but Firebase auth failed - attempting auto-creation",
+          'User exists in Shopify but Firebase auth failed - attempting auto-creation',
         );
 
         // At this point, we know:
@@ -616,7 +616,7 @@ export const loginUser = async (email, password) => {
         console.log(`User exists in Firestore: ${userExistsInFirestore}`);
 
         if (userExistsInFirestore) {
-          console.log("User exists in Firestore, sending password reset email");
+          console.log('User exists in Firestore, sending password reset email');
           // Send password reset email to allow user to set Firebase password
           await firebaseSendPasswordResetEmail(auth, normalizedEmail);
           throw new Error(
@@ -625,7 +625,7 @@ export const loginUser = async (email, password) => {
         } else {
           // User doesn't exist in our Firestore, automatically create Firebase user from Shopify
           console.log(
-            "User not found in Firebase - auto-creating from Shopify",
+            'User not found in Firebase - auto-creating from Shopify',
           );
           try {
             const autoCreateResult = await autoCreateFirebaseUserFromShopify(
@@ -633,7 +633,7 @@ export const loginUser = async (email, password) => {
               password,
               shopifyCustomer,
             );
-            console.log("Auto-creation successful:", autoCreateResult);
+            console.log('Auto-creation successful:', autoCreateResult);
 
             // Return success immediately - user has been created
             return {
@@ -643,15 +643,15 @@ export const loginUser = async (email, password) => {
               shopifyCustomerId: shopifyCustomer.id,
               autoCreated: true,
               message:
-                "User automatically created from Shopify. Please log in again with the same credentials.",
+                'User automatically created from Shopify. Please log in again with the same credentials.',
             };
           } catch (createError) {
-            console.error("Error auto-creating Firebase account:", createError);
+            console.error('Error auto-creating Firebase account:', createError);
 
             // If we can't create a Firebase account, just send a password reset
-            if (createError.code === "auth/email-already-in-use") {
+            if (createError.code === 'auth/email-already-in-use') {
               console.log(
-                "Email already in use in Firebase Auth, sending password reset",
+                'Email already in use in Firebase Auth, sending password reset',
               );
               await firebaseSendPasswordResetEmail(auth, normalizedEmail);
               throw new Error(
@@ -663,24 +663,24 @@ export const loginUser = async (email, password) => {
           }
         }
       } catch (shopifyError) {
-        console.error("Shopify authentication failed:", shopifyError);
+        console.error('Shopify authentication failed:', shopifyError);
 
         // If both Firebase and Shopify auth failed, user provided wrong credentials
         if (
-          firebaseError.code === "auth/invalid-login-credentials" ||
-          firebaseError.code === "auth/wrong-password" ||
-          firebaseError.code === "auth/user-not-found"
+          firebaseError.code === 'auth/invalid-login-credentials' ||
+          firebaseError.code === 'auth/wrong-password' ||
+          firebaseError.code === 'auth/user-not-found'
         ) {
           // Check if the error suggests the user might have a Shopify account
           if (
             shopifyError.message &&
-            shopifyError.message.includes("UNIDENTIFIED_CUSTOMER")
+            shopifyError.message.includes('UNIDENTIFIED_CUSTOMER')
           ) {
             throw new Error(
-              "Email or password is incorrect. If you have a Shopify account, please use your Shopify password.",
+              'Email or password is incorrect. If you have a Shopify account, please use your Shopify password.',
             );
           } else {
-            throw new Error("Email or password is incorrect.");
+            throw new Error('Email or password is incorrect.');
           }
         }
 
@@ -689,7 +689,7 @@ export const loginUser = async (email, password) => {
       }
     }
   } catch (error) {
-    console.error("Login error:", error);
+    console.error('Login error:', error);
     throw error;
   }
 };
@@ -704,8 +704,8 @@ const deleteAndRecreateFirebaseAccount = async (
     console.log(`Attempting to fix Firebase account for: ${email}`);
 
     // Find the user in Firestore
-    const usersRef = collection(db, "users");
-    const q = query(usersRef, where("email", "==", email.toLowerCase().trim()));
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where('email', '==', email.toLowerCase().trim()));
     const querySnapshot = await getDocs(q);
 
     let userData = null;
@@ -727,7 +727,7 @@ const deleteAndRecreateFirebaseAccount = async (
     // and update references
 
     try {
-      console.log("Creating new Firebase auth user with correct password");
+      console.log('Creating new Firebase auth user with correct password');
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -739,8 +739,8 @@ const deleteAndRecreateFirebaseAccount = async (
 
       // If we had existing user data, transfer it to the new user
       if (userData) {
-        console.log("Transferring existing user data to new account");
-        await setDoc(doc(db, "users", userCredential.user.uid), {
+        console.log('Transferring existing user data to new account');
+        await setDoc(doc(db, 'users', userCredential.user.uid), {
           ...userData,
           email: email.toLowerCase().trim(),
           shopifyCustomerId: shopifyCustomerId,
@@ -751,15 +751,15 @@ const deleteAndRecreateFirebaseAccount = async (
 
         // Delete the old document
         if (userId !== userCredential.user.uid) {
-          await deleteDoc(doc(db, "users", userId));
+          await deleteDoc(doc(db, 'users', userId));
           console.log(`Deleted old user document: ${userId}`);
         }
       } else {
         // Create new user document
-        console.log("Creating new user document");
-        await setDoc(doc(db, "users", userCredential.user.uid), {
+        console.log('Creating new user document');
+        await setDoc(doc(db, 'users', userCredential.user.uid), {
           email: email.toLowerCase().trim(),
-          userType: "user",
+          userType: 'user',
           createdAt: new Date(),
           shopifyMapped: true,
           shopifyCustomerId: shopifyCustomerId,
@@ -768,28 +768,28 @@ const deleteAndRecreateFirebaseAccount = async (
 
       // Sign out to clean state
       await signOut(auth);
-      console.log("Signed out from temporary authentication session");
+      console.log('Signed out from temporary authentication session');
 
       return { success: true, uid: userCredential.user.uid };
     } catch (error) {
-      console.error("Error recreating Firebase account:", error);
+      console.error('Error recreating Firebase account:', error);
       throw error;
     }
   } catch (error) {
-    console.error("Error in deleteAndRecreateFirebaseAccount:", error);
+    console.error('Error in deleteAndRecreateFirebaseAccount:', error);
     throw error;
   }
 };
 
 export const getUserType = async (uid) => {
   try {
-    const userDoc = await getDoc(doc(db, "users", uid));
+    const userDoc = await getDoc(doc(db, 'users', uid));
     if (userDoc.exists()) {
       return userDoc.data().userType;
     }
     return null;
   } catch (error) {
-    console.error("Error getting user type:", error);
+    console.error('Error getting user type:', error);
     return null;
   }
 };
@@ -800,14 +800,14 @@ export const sendPasswordResetEmail = async (email) => {
     const existsInShopify = await checkShopifyCustomerExists(email);
 
     if (!existsInShopify) {
-      throw new Error("No account found with that email address");
+      throw new Error('No account found with that email address');
     }
 
     // Send reset email through Firebase
     await firebaseSendPasswordResetEmail(auth, email);
     return { success: true };
   } catch (error) {
-    console.error("Password reset error:", error);
+    console.error('Password reset error:', error);
     if (error.code) {
       throw handleFirebaseAuthError(error);
     }
@@ -820,14 +820,14 @@ const resetUserPasswordAndProvideInstructions = async (email) => {
   try {
     console.log(`Sending password reset email to ${email}`);
     await firebaseSendPasswordResetEmail(auth, email);
-    console.log("Password reset email sent successfully");
+    console.log('Password reset email sent successfully');
     return {
       success: true,
       message:
-        "A password reset email has been sent to your address. Please check your inbox and follow the instructions to reset your password, then try logging in again.",
+        'A password reset email has been sent to your address. Please check your inbox and follow the instructions to reset your password, then try logging in again.',
     };
   } catch (error) {
-    console.error("Error sending password reset email:", error);
+    console.error('Error sending password reset email:', error);
     return {
       success: false,
       message:
@@ -842,7 +842,7 @@ export const setupRecaptcha = (containerId) => {
   try {
     // Ensure Firebase Auth is initialized
     if (!auth) {
-      throw new Error("Firebase Auth is not initialized");
+      throw new Error('Firebase Auth is not initialized');
     }
 
     // Clear any existing reCAPTCHA
@@ -850,7 +850,7 @@ export const setupRecaptcha = (containerId) => {
       try {
         window.recaptchaVerifier.clear();
       } catch (clearError) {
-        console.warn("Error clearing existing reCAPTCHA:", clearError);
+        console.warn('Error clearing existing reCAPTCHA:', clearError);
       }
       window.recaptchaVerifier = null;
     }
@@ -863,17 +863,17 @@ export const setupRecaptcha = (containerId) => {
 
     // Create new reCAPTCHA verifier with minimal configuration for better compatibility
     const verifier = new RecaptchaVerifier(auth, containerId, {
-      size: "invisible",
+      size: 'invisible',
       callback: (response) => {
-        console.log("reCAPTCHA verified successfully");
+        console.log('reCAPTCHA verified successfully');
       },
-      "expired-callback": () => {
-        console.log("reCAPTCHA expired, please verify again");
+      'expired-callback': () => {
+        console.log('reCAPTCHA expired, please verify again');
         if (window.recaptchaVerifier) {
           try {
             window.recaptchaVerifier.clear();
           } catch (clearError) {
-            console.warn("Error clearing expired reCAPTCHA:", clearError);
+            console.warn('Error clearing expired reCAPTCHA:', clearError);
           }
           window.recaptchaVerifier = null;
         }
@@ -885,7 +885,7 @@ export const setupRecaptcha = (containerId) => {
 
     return verifier;
   } catch (error) {
-    console.error("Error setting up reCAPTCHA:", error);
+    console.error('Error setting up reCAPTCHA:', error);
     throw error;
   }
 };
@@ -894,24 +894,24 @@ export const sendPhoneVerificationCode = async (phoneNumber, containerId) => {
   try {
     // Ensure Firebase Auth is initialized
     if (!auth) {
-      throw new Error("Firebase Auth is not initialized");
+      throw new Error('Firebase Auth is not initialized');
     }
 
     // Check if we're in a supported environment
-    if (typeof window === "undefined") {
+    if (typeof window === 'undefined') {
       throw new Error(
-        "Phone authentication is only supported in browser environments",
+        'Phone authentication is only supported in browser environments',
       );
     }
 
     // Format phone number to E.164 format
-    if (!phoneNumber.startsWith("+")) {
-      phoneNumber = "+" + phoneNumber;
+    if (!phoneNumber.startsWith('+')) {
+      phoneNumber = '+' + phoneNumber;
     }
 
-    console.log("Sending verification code to:", phoneNumber);
-    console.log("Firebase config:", {
-      apiKey: firebaseConfig.apiKey.substring(0, 10) + "...",
+    console.log('Sending verification code to:', phoneNumber);
+    console.log('Firebase config:', {
+      apiKey: firebaseConfig.apiKey.substring(0, 10) + '...',
       authDomain: firebaseConfig.authDomain,
       projectId: firebaseConfig.projectId,
     });
@@ -920,7 +920,7 @@ export const sendPhoneVerificationCode = async (phoneNumber, containerId) => {
     const phoneRegex = /^\+[1-9]\d{1,14}$/;
     if (!phoneRegex.test(phoneNumber)) {
       throw new Error(
-        "Invalid phone number format. Please use international format.",
+        'Invalid phone number format. Please use international format.',
       );
     }
 
@@ -933,26 +933,26 @@ export const sendPhoneVerificationCode = async (phoneNumber, containerId) => {
     // Render the reCAPTCHA widget with error handling
     try {
       await verifier.render();
-      console.log("reCAPTCHA rendered successfully");
+      console.log('reCAPTCHA rendered successfully');
     } catch (renderError) {
-      console.error("Error rendering reCAPTCHA:", renderError);
+      console.error('Error rendering reCAPTCHA:', renderError);
 
       // Try to clear and recreate with different configuration
       try {
         verifier.clear();
         const fallbackVerifier = new RecaptchaVerifier(auth, containerId, {
-          size: "normal",
+          size: 'normal',
           callback: (response) => {
-            console.log("Fallback reCAPTCHA verified successfully");
+            console.log('Fallback reCAPTCHA verified successfully');
           },
         });
         window.recaptchaVerifier = fallbackVerifier;
         await fallbackVerifier.render();
-        console.log("Fallback reCAPTCHA rendered successfully");
+        console.log('Fallback reCAPTCHA rendered successfully');
       } catch (fallbackError) {
-        console.error("Fallback reCAPTCHA also failed:", fallbackError);
+        console.error('Fallback reCAPTCHA also failed:', fallbackError);
         throw new Error(
-          "reCAPTCHA setup failed. Please refresh the page and try again.",
+          'reCAPTCHA setup failed. Please refresh the page and try again.',
         );
       }
     }
@@ -961,7 +961,7 @@ export const sendPhoneVerificationCode = async (phoneNumber, containerId) => {
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(
         () =>
-          reject(new Error("Phone verification timeout. Please try again.")),
+          reject(new Error('Phone verification timeout. Please try again.')),
         60000,
       );
     });
@@ -980,10 +980,10 @@ export const sendPhoneVerificationCode = async (phoneNumber, containerId) => {
     // Store confirmation result globally
     window.confirmationResult = confirmationResult;
 
-    console.log("Verification code sent successfully");
+    console.log('Verification code sent successfully');
     return confirmationResult.verificationId;
   } catch (error) {
-    console.error("Error sending verification code:", error);
+    console.error('Error sending verification code:', error);
 
     // Clean up on error with proper error handling
     try {
@@ -995,48 +995,48 @@ export const sendPhoneVerificationCode = async (phoneNumber, containerId) => {
         window.confirmationResult = null;
       }
     } catch (cleanupError) {
-      console.warn("Error during cleanup:", cleanupError);
+      console.warn('Error during cleanup:', cleanupError);
     }
 
     // Provide user-friendly error messages
-    if (error.code === "auth/invalid-app-credential") {
+    if (error.code === 'auth/invalid-app-credential') {
       throw new Error(
-        "Firebase phone authentication is not properly configured. Please check the setup guide or contact support.",
+        'Firebase phone authentication is not properly configured. Please check the setup guide or contact support.',
       );
-    } else if (error.code === "auth/invalid-phone-number") {
+    } else if (error.code === 'auth/invalid-phone-number') {
       throw new Error(
-        "Invalid phone number format. Please use international format (+1234567890).",
+        'Invalid phone number format. Please use international format (+1234567890).',
       );
-    } else if (error.code === "auth/too-many-requests") {
+    } else if (error.code === 'auth/too-many-requests') {
       throw new Error(
-        "Too many SMS requests. Please wait 1 hour before trying again, or use a test phone number for development.",
+        'Too many SMS requests. Please wait 1 hour before trying again, or use a test phone number for development.',
       );
-    } else if (error.code === "auth/quota-exceeded") {
+    } else if (error.code === 'auth/quota-exceeded') {
       throw new Error(
-        "SMS quota exceeded for today. Please try again tomorrow or upgrade your Firebase plan.",
+        'SMS quota exceeded for today. Please try again tomorrow or upgrade your Firebase plan.',
       );
-    } else if (error.code === "auth/captcha-check-failed") {
+    } else if (error.code === 'auth/captcha-check-failed') {
       throw new Error(
-        "reCAPTCHA verification failed. Please complete the reCAPTCHA challenge and try again.",
+        'reCAPTCHA verification failed. Please complete the reCAPTCHA challenge and try again.',
       );
-    } else if (error.code === "auth/missing-app-credential") {
+    } else if (error.code === 'auth/missing-app-credential') {
       throw new Error(
-        "Firebase app credentials are missing. Please check your Firebase configuration.",
+        'Firebase app credentials are missing. Please check your Firebase configuration.',
       );
-    } else if (error.code === "auth/app-not-authorized") {
+    } else if (error.code === 'auth/app-not-authorized') {
       throw new Error(
-        "This domain is not authorized for Firebase phone authentication. Please add your domain to authorized domains in Firebase Console.",
+        'This domain is not authorized for Firebase phone authentication. Please add your domain to authorized domains in Firebase Console.',
       );
-    } else if (error.message && error.message.includes("400")) {
+    } else if (error.message && error.message.includes('400')) {
       throw new Error(
-        "Phone authentication configuration error. Please ensure Phone provider is enabled in Firebase Console and your domain is authorized.",
+        'Phone authentication configuration error. Please ensure Phone provider is enabled in Firebase Console and your domain is authorized.',
       );
     } else {
-      console.error("Full error details:", error);
-      console.error("Error code:", error.code);
-      console.error("Error message:", error.message);
+      console.error('Full error details:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
       throw new Error(
-        error.message || "Failed to send verification code. Please try again.",
+        error.message || 'Failed to send verification code. Please try again.',
       );
     }
   }
@@ -1051,14 +1051,14 @@ export const verifyPhoneNumberForExistingUser = async (
 ) => {
   try {
     console.log(
-      "Verifying phone number for existing user without disrupting session",
+      'Verifying phone number for existing user without disrupting session',
     );
-    console.log("Current user:", {
+    console.log('Current user:', {
       uid: currentUser.uid,
       email: currentUser.email,
     });
-    console.log("Phone number to verify:", phoneNumber);
-    console.log("Verification ID:", verificationId);
+    console.log('Phone number to verify:', phoneNumber);
+    console.log('Verification ID:', verificationId);
 
     // Validate verification code format
     if (
@@ -1066,7 +1066,7 @@ export const verifyPhoneNumberForExistingUser = async (
       verificationCode.length !== 6 ||
       !/^\d{6}$/.test(verificationCode)
     ) {
-      throw new Error("Please enter a valid 6-digit verification code.");
+      throw new Error('Please enter a valid 6-digit verification code.');
     }
 
     // For existing users, we'll use a completely different approach:
@@ -1075,14 +1075,14 @@ export const verifyPhoneNumberForExistingUser = async (
 
     if (!window.confirmationResult) {
       throw new Error(
-        "No verification in progress. Please request a new code.",
+        'No verification in progress. Please request a new code.',
       );
     }
 
     // Confirm the verification code with timeout
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(
-        () => reject(new Error("Verification timeout. Please try again.")),
+        () => reject(new Error('Verification timeout. Please try again.')),
         30000,
       );
     });
@@ -1092,7 +1092,7 @@ export const verifyPhoneNumberForExistingUser = async (
 
     const result = await Promise.race([verificationPromise, timeoutPromise]);
 
-    console.log("Phone verification successful:", {
+    console.log('Phone verification successful:', {
       verifiedPhoneNumber: result.user.phoneNumber,
       requestedPhoneNumber: phoneNumber,
     });
@@ -1100,7 +1100,7 @@ export const verifyPhoneNumberForExistingUser = async (
     // Verify that the phone number matches what was requested
     if (result.user.phoneNumber !== phoneNumber) {
       throw new Error(
-        "Verified phone number does not match the requested number.",
+        'Verified phone number does not match the requested number.',
       );
     }
 
@@ -1112,7 +1112,7 @@ export const verifyPhoneNumberForExistingUser = async (
         window.recaptchaVerifier = null;
       } catch (clearError) {
         console.warn(
-          "Error clearing reCAPTCHA after verification:",
+          'Error clearing reCAPTCHA after verification:',
           clearError,
         );
       }
@@ -1120,7 +1120,7 @@ export const verifyPhoneNumberForExistingUser = async (
 
     // Update the user's Firestore document to mark phone as verified
     // WITHOUT disrupting the current user session
-    const userRef = doc(db, "users", currentUser.uid);
+    const userRef = doc(db, 'users', currentUser.uid);
     await updateDoc(userRef, {
       phone: phoneNumber,
       phoneVerified: true,
@@ -1128,11 +1128,11 @@ export const verifyPhoneNumberForExistingUser = async (
       updatedAt: new Date(),
     });
 
-    console.log("Updated Firestore document with phone verification status");
+    console.log('Updated Firestore document with phone verification status');
 
     // IMPORTANT: Instead of signing out, we'll just mark the verification as complete
     // The current user session remains intact
-    console.log("Phone verification completed - user session preserved");
+    console.log('Phone verification completed - user session preserved');
 
     return {
       success: true,
@@ -1143,7 +1143,7 @@ export const verifyPhoneNumberForExistingUser = async (
       sessionPreserved: true,
     };
   } catch (error) {
-    console.error("Error verifying phone number for existing user:", error);
+    console.error('Error verifying phone number for existing user:', error);
 
     // Clean up on error
     try {
@@ -1153,19 +1153,19 @@ export const verifyPhoneNumberForExistingUser = async (
         window.recaptchaVerifier = null;
       }
     } catch (cleanupError) {
-      console.warn("Error during verification cleanup:", cleanupError);
+      console.warn('Error during verification cleanup:', cleanupError);
     }
 
     // Provide user-friendly error messages
-    if (error.code === "auth/invalid-verification-code") {
-      throw new Error("Invalid verification code. Please check and try again.");
-    } else if (error.code === "auth/code-expired") {
-      throw new Error("Verification code expired. Please request a new code.");
-    } else if (error.code === "auth/too-many-requests") {
-      throw new Error("Too many attempts. Please wait and try again.");
+    if (error.code === 'auth/invalid-verification-code') {
+      throw new Error('Invalid verification code. Please check and try again.');
+    } else if (error.code === 'auth/code-expired') {
+      throw new Error('Verification code expired. Please request a new code.');
+    } else if (error.code === 'auth/too-many-requests') {
+      throw new Error('Too many attempts. Please wait and try again.');
     } else {
       throw new Error(
-        error.message || "Failed to verify code. Please try again.",
+        error.message || 'Failed to verify code. Please try again.',
       );
     }
   }
@@ -1179,12 +1179,12 @@ export const verifyPhoneNumber = async (
   try {
     // Ensure Firebase Auth is initialized
     if (!auth) {
-      throw new Error("Firebase Auth is not initialized");
+      throw new Error('Firebase Auth is not initialized');
     }
 
     if (!window.confirmationResult) {
       throw new Error(
-        "No verification in progress. Please request a new code.",
+        'No verification in progress. Please request a new code.',
       );
     }
 
@@ -1194,15 +1194,15 @@ export const verifyPhoneNumber = async (
       verificationCode.length !== 6 ||
       !/^\d{6}$/.test(verificationCode)
     ) {
-      throw new Error("Please enter a valid 6-digit verification code.");
+      throw new Error('Please enter a valid 6-digit verification code.');
     }
 
-    console.log("Verifying phone number with code:", verificationCode);
+    console.log('Verifying phone number with code:', verificationCode);
     console.log(
-      "Current user context:",
+      'Current user context:',
       currentUser
         ? { uid: currentUser.uid, email: currentUser.email }
-        : "No current user",
+        : 'No current user',
     );
 
     // If we have a current user, use the new function that doesn't disrupt the session
@@ -1220,7 +1220,7 @@ export const verifyPhoneNumber = async (
         );
       } else {
         throw new Error(
-          "Phone number context missing for existing user verification",
+          'Phone number context missing for existing user verification',
         );
       }
     }
@@ -1228,7 +1228,7 @@ export const verifyPhoneNumber = async (
     // For new users (no current user), proceed with normal verification
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(
-        () => reject(new Error("Verification timeout. Please try again.")),
+        () => reject(new Error('Verification timeout. Please try again.')),
         30000,
       );
     });
@@ -1246,13 +1246,13 @@ export const verifyPhoneNumber = async (
         window.recaptchaVerifier = null;
       } catch (clearError) {
         console.warn(
-          "Error clearing reCAPTCHA after verification:",
+          'Error clearing reCAPTCHA after verification:',
           clearError,
         );
       }
     }
 
-    console.log("Phone number verified successfully for new user");
+    console.log('Phone number verified successfully for new user');
 
     return {
       success: true,
@@ -1262,7 +1262,7 @@ export const verifyPhoneNumber = async (
       verifiedForExistingUser: false,
     };
   } catch (error) {
-    console.error("Error verifying phone number:", error);
+    console.error('Error verifying phone number:', error);
 
     // Clean up on error
     try {
@@ -1272,25 +1272,25 @@ export const verifyPhoneNumber = async (
         window.recaptchaVerifier = null;
       }
     } catch (cleanupError) {
-      console.warn("Error during verification cleanup:", cleanupError);
+      console.warn('Error during verification cleanup:', cleanupError);
     }
 
     // Provide user-friendly error messages
-    if (error.code === "auth/invalid-verification-code") {
-      throw new Error("Invalid verification code. Please check and try again.");
-    } else if (error.code === "auth/code-expired") {
-      throw new Error("Verification code expired. Please request a new code.");
-    } else if (error.code === "auth/too-many-requests") {
-      throw new Error("Too many attempts. Please wait and try again.");
-    } else if (error.code === "auth/credential-already-in-use") {
+    if (error.code === 'auth/invalid-verification-code') {
+      throw new Error('Invalid verification code. Please check and try again.');
+    } else if (error.code === 'auth/code-expired') {
+      throw new Error('Verification code expired. Please request a new code.');
+    } else if (error.code === 'auth/too-many-requests') {
+      throw new Error('Too many attempts. Please wait and try again.');
+    } else if (error.code === 'auth/credential-already-in-use') {
       throw new Error(
-        "This phone number is already associated with another account.",
+        'This phone number is already associated with another account.',
       );
-    } else if (error.code === "auth/provider-already-linked") {
-      throw new Error("This phone number is already linked to your account.");
+    } else if (error.code === 'auth/provider-already-linked') {
+      throw new Error('This phone number is already linked to your account.');
     } else {
       throw new Error(
-        error.message || "Failed to verify code. Please try again.",
+        error.message || 'Failed to verify code. Please try again.',
       );
     }
   }
@@ -1304,13 +1304,13 @@ export const verifyOTPForExistingUser = async (
 ) => {
   try {
     console.log(
-      "Verifying OTP for existing user without Firebase Auth disruption",
+      'Verifying OTP for existing user without Firebase Auth disruption',
     );
-    console.log("Current user:", {
+    console.log('Current user:', {
       uid: currentUser.uid,
       email: currentUser.email,
     });
-    console.log("Phone number to verify:", phoneNumber);
+    console.log('Phone number to verify:', phoneNumber);
 
     // Validate verification code format
     if (
@@ -1318,7 +1318,7 @@ export const verifyOTPForExistingUser = async (
       verificationCode.length !== 6 ||
       !/^\d{6}$/.test(verificationCode)
     ) {
-      throw new Error("Please enter a valid 6-digit verification code.");
+      throw new Error('Please enter a valid 6-digit verification code.');
     }
 
     // For now, we'll use a simple validation approach
@@ -1330,12 +1330,12 @@ export const verifyOTPForExistingUser = async (
       verificationCode.length === 6 && /^\d{6}$/.test(verificationCode);
 
     if (!isValidOTP) {
-      throw new Error("Invalid verification code. Please check and try again.");
+      throw new Error('Invalid verification code. Please check and try again.');
     }
 
     // Update the user's Firestore document to mark phone as verified
     // WITHOUT disrupting the current user session
-    const userRef = doc(db, "users", currentUser.uid);
+    const userRef = doc(db, 'users', currentUser.uid);
     await updateDoc(userRef, {
       phone: phoneNumber,
       phoneVerified: true,
@@ -1343,8 +1343,8 @@ export const verifyOTPForExistingUser = async (
       updatedAt: new Date(),
     });
 
-    console.log("Updated Firestore document with phone verification status");
-    console.log("Phone verification completed - user session preserved");
+    console.log('Updated Firestore document with phone verification status');
+    console.log('Phone verification completed - user session preserved');
 
     return {
       success: true,
@@ -1354,9 +1354,9 @@ export const verifyOTPForExistingUser = async (
       sessionPreserved: true,
     };
   } catch (error) {
-    console.error("Error verifying OTP for existing user:", error);
+    console.error('Error verifying OTP for existing user:', error);
     throw new Error(
-      error.message || "Failed to verify code. Please try again.",
+      error.message || 'Failed to verify code. Please try again.',
     );
   }
 };
@@ -1364,7 +1364,7 @@ export const verifyOTPForExistingUser = async (
 // Function to restore user session after phone verification
 export const restoreUserSessionAfterPhoneVerification = async () => {
   try {
-    const sessionData = localStorage.getItem("phoneVerificationSession");
+    const sessionData = localStorage.getItem('phoneVerificationSession');
     if (!sessionData) {
       return null;
     }
@@ -1376,11 +1376,11 @@ export const restoreUserSessionAfterPhoneVerification = async () => {
     const sessionAge = Date.now() - timestamp;
     if (sessionAge > 3600000) {
       // 1 hour
-      localStorage.removeItem("phoneVerificationSession");
+      localStorage.removeItem('phoneVerificationSession');
       return null;
     }
 
-    console.log("Restoring user session after phone verification:", {
+    console.log('Restoring user session after phone verification:', {
       email,
       uid,
       phoneVerified,
@@ -1391,7 +1391,7 @@ export const restoreUserSessionAfterPhoneVerification = async () => {
     // The user will need to sign in again, but we've preserved their phone verification status
 
     // Clear the session restoration data
-    localStorage.removeItem("phoneVerificationSession");
+    localStorage.removeItem('phoneVerificationSession');
 
     return {
       email,
@@ -1402,10 +1402,10 @@ export const restoreUserSessionAfterPhoneVerification = async () => {
     };
   } catch (error) {
     console.error(
-      "Error restoring user session after phone verification:",
+      'Error restoring user session after phone verification:',
       error,
     );
-    localStorage.removeItem("phoneVerificationSession");
+    localStorage.removeItem('phoneVerificationSession');
     return null;
   }
 };
@@ -1427,7 +1427,7 @@ export const handleTokenFailureWithShopify = async (email, password) => {
         password,
       );
       console.log(
-        "Shopify authentication successful, auto-creating Firebase user",
+        'Shopify authentication successful, auto-creating Firebase user',
       );
 
       // Auto-create Firebase user from Shopify
@@ -1444,14 +1444,14 @@ export const handleTokenFailureWithShopify = async (email, password) => {
         shopifyCustomerId: shopifyCustomer.id,
         autoCreated: true,
         message:
-          "User automatically created from Shopify. Please log in again with the same credentials.",
+          'User automatically created from Shopify. Please log in again with the same credentials.',
       };
     } catch (shopifyError) {
-      console.error("Shopify authentication failed:", shopifyError);
-      throw new Error("Authentication failed. Please check your credentials.");
+      console.error('Shopify authentication failed:', shopifyError);
+      throw new Error('Authentication failed. Please check your credentials.');
     }
   } catch (error) {
-    console.error("Error handling token failure with Shopify:", error);
+    console.error('Error handling token failure with Shopify:', error);
     throw error;
   }
 };
@@ -1460,7 +1460,7 @@ export const handleTokenFailureWithShopify = async (email, password) => {
 // Verify customer exists in Shopify using Storefront API
 const verifyCustomerInShopify = async (email, customerId) => {
   try {
-    console.log("Verifying customer in Shopify:", { email, customerId });
+    console.log('Verifying customer in Shopify:', { email, customerId });
 
     // For now, we'll use a simple verification approach
     // In production, you would call the actual Shopify Storefront API
@@ -1484,11 +1484,11 @@ const verifyCustomerInShopify = async (email, customerId) => {
       verified: true,
       email: email,
       customerId: customerId,
-      firstName: "Customer",
-      lastName: "User",
+      firstName: 'Customer',
+      lastName: 'User',
     };
   } catch (error) {
-    console.error("Error verifying customer in Shopify:", error);
+    console.error('Error verifying customer in Shopify:', error);
     return {
       verified: false,
       error: error.message,
@@ -1498,43 +1498,43 @@ const verifyCustomerInShopify = async (email, customerId) => {
 
 export const authenticateCustomer = async (customerObject) => {
   try {
-    console.log("Authenticating customer with object:", customerObject);
+    console.log('Authenticating customer with object:', customerObject);
 
     const { email, customerId } = customerObject;
 
     if (!email || !customerId) {
-      throw new Error("Customer object must contain email and customerId");
+      throw new Error('Customer object must contain email and customerId');
     }
 
     // Normalize email
     const normalizedEmail = email.toLowerCase().trim();
 
     // First, verify customer exists in Shopify using Storefront API
-    console.log("Verifying customer exists in Shopify...");
+    console.log('Verifying customer exists in Shopify...');
     const shopifyVerification = await verifyCustomerInShopify(
       normalizedEmail,
       customerId,
     );
 
     if (!shopifyVerification.verified) {
-      throw new Error("Customer not found in Shopify or verification failed");
+      throw new Error('Customer not found in Shopify or verification failed');
     }
 
-    console.log("Customer verified in Shopify:", shopifyVerification);
+    console.log('Customer verified in Shopify:', shopifyVerification);
 
     // Check if user exists in Firebase
     try {
-      console.log("Checking if user exists in Firebase...");
+      console.log('Checking if user exists in Firebase...');
       const userExists = await checkUserExistsByEmail(normalizedEmail);
 
       if (userExists) {
         console.log(
-          "User exists in Firebase, updating customer ID and signing in...",
+          'User exists in Firebase, updating customer ID and signing in...',
         );
 
         // Try to get user from Firestore to get their UID
-        const usersRef = collection(db, "users");
-        const q = query(usersRef, where("email", "==", normalizedEmail));
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where('email', '==', normalizedEmail));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
@@ -1543,9 +1543,9 @@ export const authenticateCustomer = async (customerObject) => {
 
           // Update the customer ID if it's different
           if (userData.shopifyCustomerId !== customerId) {
-            console.log("Updating customer ID in Firestore...");
+            console.log('Updating customer ID in Firestore...');
             await setDoc(
-              doc(db, "users", userDoc.id),
+              doc(db, 'users', userDoc.id),
               {
                 ...userData,
                 shopifyCustomerId: customerId,
@@ -1556,7 +1556,7 @@ export const authenticateCustomer = async (customerObject) => {
           }
 
           // For verified customers, we'll create a session that bypasses normal authentication
-          console.log("Creating verified customer session...");
+          console.log('Creating verified customer session...');
 
           // Store the verified customer session in localStorage
           const sessionData = {
@@ -1565,14 +1565,14 @@ export const authenticateCustomer = async (customerObject) => {
             customerId: customerId,
             verified: true,
             timestamp: Date.now(),
-            userType: "user", // Use 'user' for dashboard access
+            userType: 'user', // Use 'user' for dashboard access
           };
 
           localStorage.setItem(
-            "verifiedCustomerSession",
+            'verifiedCustomerSession',
             JSON.stringify(sessionData),
           );
-          console.log("Stored verified customer session:", sessionData);
+          console.log('Stored verified customer session:', sessionData);
 
           // The session will be picked up by the useAuth hook
 
@@ -1583,22 +1583,22 @@ export const authenticateCustomer = async (customerObject) => {
             shopifyCustomerId: customerId,
             authenticated: true,
             sessionData: sessionData,
-            message: "Customer verified successfully! Redirecting...",
+            message: 'Customer verified successfully! Redirecting...',
           };
         }
       }
 
       // If user doesn't exist in Firebase, create them automatically
       console.log(
-        "User not found in Firebase, auto-creating from customer object...",
+        'User not found in Firebase, auto-creating from customer object...',
       );
 
       // Create a mock Shopify customer object for the auto-creation function
       const mockShopifyCustomer = {
         id: customerId,
         email: normalizedEmail,
-        firstName: shopifyVerification.firstName || "Customer",
-        lastName: shopifyVerification.lastName || "User",
+        firstName: shopifyVerification.firstName || 'Customer',
+        lastName: shopifyVerification.lastName || 'User',
       };
 
       // Generate a random password for the new Firebase user
@@ -1615,7 +1615,7 @@ export const authenticateCustomer = async (customerObject) => {
         );
 
         console.log(
-          "Successfully created Firebase user from Shopify customer:",
+          'Successfully created Firebase user from Shopify customer:',
           newUser,
         );
 
@@ -1626,15 +1626,15 @@ export const authenticateCustomer = async (customerObject) => {
           customerId: customerId,
           verified: true,
           timestamp: Date.now(),
-          userType: "user", // Use 'user' for dashboard access
+          userType: 'user', // Use 'user' for dashboard access
         };
 
         localStorage.setItem(
-          "verifiedCustomerSession",
+          'verifiedCustomerSession',
           JSON.stringify(sessionData),
         );
         console.log(
-          "Stored verified customer session for new user:",
+          'Stored verified customer session for new user:',
           sessionData,
         );
 
@@ -1646,11 +1646,11 @@ export const authenticateCustomer = async (customerObject) => {
           authenticated: true,
           autoCreated: true,
           sessionData: sessionData,
-          message: "Account created and verified successfully! Redirecting...",
+          message: 'Account created and verified successfully! Redirecting...',
         };
       } catch (createError) {
         console.error(
-          "Error creating Firebase user from Shopify customer:",
+          'Error creating Firebase user from Shopify customer:',
           createError,
         );
 
@@ -1662,15 +1662,15 @@ export const authenticateCustomer = async (customerObject) => {
           authenticated: false,
           autoCreated: false,
           message:
-            "Customer verified with Shopify! Please create an account to continue.",
+            'Customer verified with Shopify! Please create an account to continue.',
         };
       }
     } catch (error) {
-      console.error("Error in customer authentication:", error);
+      console.error('Error in customer authentication:', error);
       throw error;
     }
   } catch (error) {
-    console.error("Error authenticating customer:", error);
+    console.error('Error authenticating customer:', error);
     throw error;
   }
 };

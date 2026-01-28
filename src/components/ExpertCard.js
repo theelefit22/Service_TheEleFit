@@ -25,7 +25,7 @@ const ExpertCard = ({ expert }) => {
           <img 
             src={imageUrl} 
             alt={name}
-            className={isDefault ? "default-image" : ""}
+            className={isDefault ? 'default-image' : ''}
           />
         )}
       </div>

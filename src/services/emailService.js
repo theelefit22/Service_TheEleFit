@@ -5,7 +5,7 @@ import { doc, setDoc, collection, addDoc } from 'firebase/firestore';
 
 // Initialize EmailJS with your User ID (public key)
 // You can find this in your EmailJS dashboard under Account > API Keys
-emailjs.init("V8y4JdJdlObvV0JTX");
+emailjs.init('V8y4JdJdlObvV0JTX');
 
 // Function to send booking notification to expert when a user books a slot
 const sendBookingNotificationToExpert = async (bookingData) => {
@@ -101,8 +101,8 @@ const sendRealEmail = async ({ to, subject, content, expertData, userData }) => 
     // 3. PUBLIC_KEY: Your EmailJS account's public key
     
     // IMPORTANT: You must create these in your EmailJS account!
-    const SERVICE_ID = "service_6xenpqn";
-    const TEMPLATE_ID = "template_yjlbx4n";  // Using your template ID
+    const SERVICE_ID = 'service_6xenpqn';
+    const TEMPLATE_ID = 'template_yjlbx4n';  // Using your template ID
     
     // Prepare the template parameters
     // These must exactly match your EmailJS template variables
@@ -111,9 +111,9 @@ const sendRealEmail = async ({ to, subject, content, expertData, userData }) => 
       to_name: userData ? userData.userName : (expertData ? expertData.expertName : ''),
       subject: subject,
       message_html: content,
-      reply_to: "theelifit25@gmail.com",
-      bcc_email: "",          // Optional BCC
-      cc_email: "",           // Optional CC
+      reply_to: 'theelifit25@gmail.com',
+      bcc_email: '',          // Optional BCC
+      cc_email: '',           // Optional CC
       // Additional booking data
       meeting_time: userData ? userData.slotTime : (expertData ? expertData.slotTime : ''),
       meeting_link: userData ? userData.meetingLink : (expertData ? expertData.meetingLink : ''),
@@ -133,7 +133,7 @@ const sendRealEmail = async ({ to, subject, content, expertData, userData }) => 
         SERVICE_ID,
         TEMPLATE_ID,
         templateParams,
-        "V8y4JdJdlObvV0JTX" // Your public key
+        'V8y4JdJdlObvV0JTX' // Your public key
       );
       
       if (response.status === 200) {
@@ -509,22 +509,22 @@ The Nutrition Experts Platform Team
     
     // Also send the email directly using EmailJS
     try {
-      const SERVICE_ID = "service_6xenpqn";
-      const TEMPLATE_ID = "template_yjlbx4n";
+      const SERVICE_ID = 'service_6xenpqn';
+      const TEMPLATE_ID = 'template_yjlbx4n';
       
       const templateParams = {
         email: email,
         to_name: name,
         subject: 'Congratulations! Your Expert Application Has Been Approved',
         message_html: emailContent,
-        reply_to: "theelifit25@gmail.com",
+        reply_to: 'theelifit25@gmail.com',
       };
       
       const response = await emailjs.send(
         SERVICE_ID,
         TEMPLATE_ID,
         templateParams,
-        "V8y4JdJdlObvV0JTX"
+        'V8y4JdJdlObvV0JTX'
       );
       
       if (response.status === 200) {
@@ -540,7 +540,7 @@ The Nutrition Experts Platform Team
     console.log(`Approval email sent to ${email}`);
     return true;
   } catch (error) {
-    console.error("Error sending approval email:", error);
+    console.error('Error sending approval email:', error);
     throw error;
   }
 };
@@ -576,7 +576,7 @@ The Nutrition Experts Platform Team
     console.log(`Rejection email sent to ${email}`);
     return true;
   } catch (error) {
-    console.error("Error sending rejection email:", error);
+    console.error('Error sending rejection email:', error);
     throw error;
   }
 };
@@ -650,22 +650,22 @@ The Nutrition Experts Platform Team
     
     // Also send the email directly using EmailJS
     try {
-      const SERVICE_ID = "service_6xenpqn";
-      const TEMPLATE_ID = "template_yjlbx4n";
+      const SERVICE_ID = 'service_6xenpqn';
+      const TEMPLATE_ID = 'template_yjlbx4n';
       
       const templateParams = {
         email: email,
         to_name: name,
         subject: 'Congratulations! Your Expert Application Has Been Approved',
         message_html: emailContent,
-        reply_to: "theelifit25@gmail.com",
+        reply_to: 'theelifit25@gmail.com',
       };
       
       const response = await emailjs.send(
         SERVICE_ID,
         TEMPLATE_ID,
         templateParams,
-        "V8y4JdJdlObvV0JTX"
+        'V8y4JdJdlObvV0JTX'
       );
       
       if (response.status === 200) {
@@ -681,7 +681,7 @@ The Nutrition Experts Platform Team
     console.log(`Approval email with password reset sent to ${email}`);
     return true;
   } catch (error) {
-    console.error("Error sending approval email with password reset:", error);
+    console.error('Error sending approval email with password reset:', error);
     throw error;
   }
 };

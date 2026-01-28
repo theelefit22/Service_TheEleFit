@@ -646,7 +646,7 @@ const ExpertDashboard = () => {
                     <h3 className="no-dot">About</h3>
                     <div className="readonly-field">
                       <textarea 
-                        value={expertData.bio || "No bio information provided."} 
+                        value={expertData.bio || 'No bio information provided.'} 
                         readOnly 
                       />
                     </div>
@@ -658,7 +658,7 @@ const ExpertDashboard = () => {
                       <div className="readonly-field">
                         <input 
                           type="text" 
-                          value={expertData.qualifications || "No qualifications provided."} 
+                          value={expertData.qualifications || 'No qualifications provided.'} 
                           readOnly 
                         />
                       </div>
@@ -669,7 +669,7 @@ const ExpertDashboard = () => {
                       <div className="readonly-field">
                         <input 
                           type="text" 
-                          value={expertData.experience || "No experience provided."} 
+                          value={expertData.experience || 'No experience provided.'} 
                           readOnly 
                         />
                       </div>
@@ -680,7 +680,7 @@ const ExpertDashboard = () => {
                       <div className="readonly-field">
                         <input 
                           type="text" 
-                          value={expertData.phone || "No phone number provided."} 
+                          value={expertData.phone || 'No phone number provided.'} 
                           readOnly 
                         />
                       </div>
@@ -691,7 +691,7 @@ const ExpertDashboard = () => {
                       <div className="readonly-field">
                         <input 
                           type="email" 
-                          value={expertData.email || "No email provided."} 
+                          value={expertData.email || 'No email provided.'} 
                           readOnly 
                         />
                       </div>
@@ -812,7 +812,7 @@ const ExpertDashboard = () => {
                           type="email"
                           id="email"
                           name="email"
-                          value={currentUser?.email || ""}
+                          value={currentUser?.email || ''}
                           disabled
                           className="disabled-input"
                         />

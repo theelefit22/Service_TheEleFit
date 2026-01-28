@@ -12,7 +12,7 @@ const bookingService = {
       const expertSnapshot = await getDoc(expertDoc);
       
       if (!expertSnapshot.exists()) {
-        return Promise.reject("Expert not found");
+        return Promise.reject('Expert not found');
       }
       
       const expertData = expertSnapshot.data();
@@ -21,11 +21,11 @@ const bookingService = {
       );
       
       if (slotIndex === -1) {
-        return Promise.reject("Slot not found");
+        return Promise.reject('Slot not found');
       }
       
       if (expertData.availableSlots[slotIndex].booked || expertData.availableSlots[slotIndex].pending) {
-        return Promise.reject("Slot is not available");
+        return Promise.reject('Slot is not available');
       }
       
       // Mark slot as pending
@@ -60,7 +60,7 @@ const bookingService = {
       const bookingRef = await addDoc(bookingsCollection, bookingData);
       
       // Send notification email to expert about the new booking request
-      console.log("Sending booking notification to expert");
+      console.log('Sending booking notification to expert');
       await emailService.sendBookingNotificationToExpert({
         ...bookingData,
         id: bookingRef.id
@@ -77,8 +77,8 @@ const bookingService = {
         message: `Booking request sent. Waiting for ${expertData.name} to confirm.`
       };
     } catch (error) {
-      console.error("Error requesting booking:", error);
-      return Promise.reject("Failed to request booking");
+      console.error('Error requesting booking:', error);
+      return Promise.reject('Failed to request booking');
     }
   },
   
@@ -94,8 +94,8 @@ const bookingService = {
         ...doc.data(),
       }));
     } catch (error) {
-      console.error("Error getting user bookings:", error);
-      return Promise.reject("Failed to retrieve your bookings");
+      console.error('Error getting user bookings:', error);
+      return Promise.reject('Failed to retrieve your bookings');
     }
   },
   
@@ -111,8 +111,8 @@ const bookingService = {
         ...doc.data(),
       }));
     } catch (error) {
-      console.error("Error getting expert bookings:", error);
-      return Promise.reject("Failed to retrieve bookings");
+      console.error('Error getting expert bookings:', error);
+      return Promise.reject('Failed to retrieve bookings');
     }
   },
   
@@ -124,7 +124,7 @@ const bookingService = {
       const bookingSnapshot = await getDoc(bookingDoc);
       
       if (!bookingSnapshot.exists()) {
-        return Promise.reject("Booking not found");
+        return Promise.reject('Booking not found');
       }
       
       const bookingData = bookingSnapshot.data();
@@ -138,7 +138,7 @@ const bookingService = {
       const expertSnapshot = await getDoc(expertDoc);
       
       if (!expertSnapshot.exists()) {
-        return Promise.reject("Expert not found");
+        return Promise.reject('Expert not found');
       }
       
       const expertData = expertSnapshot.data();
@@ -147,7 +147,7 @@ const bookingService = {
       );
       
       if (slotIndex === -1) {
-        return Promise.reject("Slot not found");
+        return Promise.reject('Slot not found');
       }
       
       // Mark the slot as booked
@@ -202,8 +202,8 @@ const bookingService = {
         message: 'Booking confirmed successfully. Meeting details sent via email.'
       };
     } catch (error) {
-      console.error("Error confirming booking:", error);
-      return Promise.reject("Failed to confirm booking");
+      console.error('Error confirming booking:', error);
+      return Promise.reject('Failed to confirm booking');
     }
   },
   
@@ -215,7 +215,7 @@ const bookingService = {
       const bookingSnapshot = await getDoc(bookingDoc);
       
       if (!bookingSnapshot.exists()) {
-        return Promise.reject("Booking not found");
+        return Promise.reject('Booking not found');
       }
       
       const bookingData = bookingSnapshot.data();
@@ -229,7 +229,7 @@ const bookingService = {
       const expertSnapshot = await getDoc(expertDoc);
       
       if (!expertSnapshot.exists()) {
-        return Promise.reject("Expert not found");
+        return Promise.reject('Expert not found');
       }
       
       const expertData = expertSnapshot.data();
@@ -238,7 +238,7 @@ const bookingService = {
       );
       
       if (slotIndex === -1) {
-        return Promise.reject("Slot not found");
+        return Promise.reject('Slot not found');
       }
       
       // Mark the slot as available again
@@ -267,8 +267,8 @@ const bookingService = {
         message: 'Booking rejected'
       };
     } catch (error) {
-      console.error("Error rejecting booking:", error);
-      return Promise.reject("Failed to reject booking");
+      console.error('Error rejecting booking:', error);
+      return Promise.reject('Failed to reject booking');
     }
   },
   
@@ -280,7 +280,7 @@ const bookingService = {
       const bookingSnapshot = await getDoc(bookingDoc);
       
       if (!bookingSnapshot.exists()) {
-        return Promise.reject("Booking not found");
+        return Promise.reject('Booking not found');
       }
       
       const bookingData = bookingSnapshot.data();
@@ -294,7 +294,7 @@ const bookingService = {
       const expertSnapshot = await getDoc(expertDoc);
       
       if (!expertSnapshot.exists()) {
-        return Promise.reject("Expert not found");
+        return Promise.reject('Expert not found');
       }
       
       const expertData = expertSnapshot.data();
@@ -303,7 +303,7 @@ const bookingService = {
       );
       
       if (slotIndex === -1) {
-        return Promise.reject("Slot not found");
+        return Promise.reject('Slot not found');
       }
       
       // Mark the slot as available again
@@ -331,8 +331,8 @@ const bookingService = {
         message: 'Booking cancelled successfully'
       };
     } catch (error) {
-      console.error("Error cancelling booking:", error);
-      return Promise.reject("Failed to cancel booking");
+      console.error('Error cancelling booking:', error);
+      return Promise.reject('Failed to cancel booking');
     }
   }
 };

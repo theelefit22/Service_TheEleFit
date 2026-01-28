@@ -99,7 +99,7 @@ const Navbar = () => {
             }
           }
         } catch (error) {
-          console.error("Error getting user data:", error);
+          console.error('Error getting user data:', error);
           setIsEvaCustomer(false);
         }
       } else {
@@ -191,7 +191,7 @@ const Navbar = () => {
             <li className="nav-item">
               <NavLink
                 to="/grocery-list"
-                className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+                className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
               >
                 Grocery List
               </NavLink>
@@ -281,7 +281,7 @@ const Navbar = () => {
           <li className="nav-item">
             <NavLink
               to="/contact"
-              className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
               onClick={closeMenu}
             >
               Get in Touch
@@ -291,7 +291,7 @@ const Navbar = () => {
           <li className="nav-item">
             <NavLink
               to="/aicoach"
-              className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+              className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
               onClick={closeMenu}
             >
               AI Coach
@@ -306,7 +306,7 @@ const Navbar = () => {
                     {userType === 'expert' ? (
                       <NavLink
                         to="/expert-dashboard"
-                        className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+                        className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
                         onClick={closeMenu}
                       >
                         Dashboard
@@ -314,7 +314,7 @@ const Navbar = () => {
                     ) : (
                       <NavLink
                         to="/user-dashboard"
-                        className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}
+                        className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
                         onClick={closeMenu}
                       >
                         My Dashboard

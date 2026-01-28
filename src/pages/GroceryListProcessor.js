@@ -9,7 +9,7 @@ import {
   getGroceryListById 
 } from '../services/groceryListService';
 import { initTableScrollHelpers, cleanupTableScrollHelpers } from '../utils/tableScrollHelper';
-import "./GroceryListProcessor.css"
+import './GroceryListProcessor.css';
 
 // Add CSV export utility function
 const exportToCSV = (data, filename) => {
@@ -569,10 +569,10 @@ function GroceryListProcessor() {
             )];
             
             // Ensure standard meal times are always included
-            const standardMealTimes = ["Breakfast", "Lunch", "Dinner", "Snack"];
+            const standardMealTimes = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
             const allMealTimes = [...new Set([...times, ...standardMealTimes])];
             
-            console.log("Extracted meal times:", allMealTimes); // Debug log
+            console.log('Extracted meal times:', allMealTimes); // Debug log
             
             // Set all states at once to minimize re-renders
             setCategories(cats);
@@ -854,7 +854,7 @@ function GroceryListProcessor() {
           uiRating: feedbackData.uiRating,
           processRating: feedbackData.processRating,
           comments: feedbackData.comments,
-          page: "GroceryListProcessor"
+          page: 'GroceryListProcessor'
         });
         console.log('Feedback saved to Firestore');
       } else {

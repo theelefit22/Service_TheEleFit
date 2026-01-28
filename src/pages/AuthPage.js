@@ -910,7 +910,7 @@ const AuthPage = () => {
               </label>
               <div className="password-input-container">
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -922,7 +922,7 @@ const AuthPage = () => {
                   type="button"
                   className="password-toggle-btn"
                   onClick={togglePasswordVisibility}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>

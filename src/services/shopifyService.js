@@ -446,7 +446,7 @@ export const checkShopifyCustomerExists = async (email) => {
     const variables2 = {
       input: {
         email,
-        password: "ThisIsADummyPasswordThatWillNeverWork123!@#"
+        password: 'ThisIsADummyPasswordThatWillNeverWork123!@#'
       }
     };
 

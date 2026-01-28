@@ -136,10 +136,10 @@ const AdminDashboard = ({ experts, users, timeRange, setTimeRange, theme, loadin
       // Sort by creation date, newest first
       applicationsList.sort((a, b) => b.createdAt - a.createdAt);
       
-      console.log("Pending applications found:", applicationsList.length);
+      console.log('Pending applications found:', applicationsList.length);
       setPendingApplications(applicationsList);
     } catch (error) {
-      console.error("Error loading pending applications:", error);
+      console.error('Error loading pending applications:', error);
     } finally {
       setLoadingApplications(false);
     }

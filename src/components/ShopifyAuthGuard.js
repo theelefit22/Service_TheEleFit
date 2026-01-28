@@ -60,7 +60,7 @@ const ShopifyAuthGuard = ({ children }) => {
         // Try to find existing user in Firestore with this email
         try {
           const usersRef = collection(db, 'users');
-          const q = query(usersRef, where("email", "==", tokenEmail.toLowerCase().trim()));
+          const q = query(usersRef, where('email', '==', tokenEmail.toLowerCase().trim()));
           const querySnapshot = await getDocs(q);
           
           if (!querySnapshot.empty) {

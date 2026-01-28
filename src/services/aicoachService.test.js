@@ -1,4 +1,12 @@
 // Mock the Firebase module
+import { 
+  saveAiCoachData, 
+  fetchAiCoachHistory, 
+  getAiCoachConversation, 
+  updateAiCoachConversation, 
+  deleteAiCoachConversation 
+} from './aicoachService';
+
 jest.mock('firebase/firestore', () => ({
   collection: jest.fn(),
   query: jest.fn(),
@@ -18,14 +26,6 @@ jest.mock('firebase/firestore', () => ({
 jest.mock('../services/firebase', () => ({
   db: {}
 }));
-
-import { 
-  saveAiCoachData, 
-  fetchAiCoachHistory, 
-  getAiCoachConversation, 
-  updateAiCoachConversation, 
-  deleteAiCoachConversation 
-} from './aicoachService';
 
 describe('aicoachService', () => {
   beforeEach(() => {

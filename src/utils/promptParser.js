@@ -930,24 +930,24 @@ export const parsePrompt = (prompt) => {
 export const testSpecificCases = () => {
   const testCases = [
     // The failing test cases
-    { input: "Woman 22, 5’3”, goal: gain weight.", expected: { age: 22, gender: "female", height: 160, goal: "weight_gain" } },
-    { input: "29F, 5’5”, goal: slim.", expected: { age: 29, gender: "female", height: 165, goal: "weight_loss" } },
-    { input: "Woman 22, 5'3\", goal: gain weight.", expected: { age: 22, gender: "female", height: 160, goal: "weight_gain" } },
-    { input: "29F, 5'5\", goal: slim.", expected: { age: 29, gender: "female", height: 165, goal: "weight_loss" } },
+    { input: 'Woman 22, 5’3”, goal: gain weight.', expected: { age: 22, gender: 'female', height: 160, goal: 'weight_gain' } },
+    { input: '29F, 5’5”, goal: slim.', expected: { age: 29, gender: 'female', height: 165, goal: 'weight_loss' } },
+    { input: "Woman 22, 5'3\", goal: gain weight.", expected: { age: 22, gender: 'female', height: 160, goal: 'weight_gain' } },
+    { input: "29F, 5'5\", goal: slim.", expected: { age: 29, gender: 'female', height: 165, goal: 'weight_loss' } },
     // New test cases for timeline parsing
-    { input: "i am 36m,haign 5.5ft and having 60kg want to loose 5kgs weight .i do sedentary activty for 7days a week .give me a plan fro 6months to achgive my goal bt in the use ran meal andworupadn enditn showinf 12weeks ehci is wrong fix that", expected: { age: 36, gender: "male", height: 168, weight: 60, goal: "weight_loss", activityLevel: "sedentary", frequency: 7, timelineWeeks: 24 } },
-    { input: "give me a plan for 6 months", expected: { timelineWeeks: 24 } },
-    { input: "plan for 12 weeks", expected: { timelineWeeks: 12 } },
-    { input: "want a plan for 3months", expected: { timelineWeeks: 12 } },
-    { input: "need a 8weeks plan", expected: { timelineWeeks: 8 } }
+    { input: 'i am 36m,haign 5.5ft and having 60kg want to loose 5kgs weight .i do sedentary activty for 7days a week .give me a plan fro 6months to achgive my goal bt in the use ran meal andworupadn enditn showinf 12weeks ehci is wrong fix that', expected: { age: 36, gender: 'male', height: 168, weight: 60, goal: 'weight_loss', activityLevel: 'sedentary', frequency: 7, timelineWeeks: 24 } },
+    { input: 'give me a plan for 6 months', expected: { timelineWeeks: 24 } },
+    { input: 'plan for 12 weeks', expected: { timelineWeeks: 12 } },
+    { input: 'want a plan for 3months', expected: { timelineWeeks: 12 } },
+    { input: 'need a 8weeks plan', expected: { timelineWeeks: 8 } }
   ];
 
-  console.log("Testing specific failing cases...");
+  console.log('Testing specific failing cases...');
   testCases.forEach((testCase, index) => {
     console.log(`\nTest case ${index + 1}: "${testCase.input}"`);
     try {
       const result = parsePrompt(testCase.input);
-      console.log("Parsed result:", result);
+      console.log('Parsed result:', result);
 
       // Check if it matches expected
       let passed = true;
@@ -959,12 +959,12 @@ export const testSpecificCases = () => {
       }
 
       if (passed) {
-        console.log("✅ Test passed!");
+        console.log('✅ Test passed!');
       } else {
-        console.log("❌ Test failed!");
+        console.log('❌ Test failed!');
       }
     } catch (error) {
-      console.error("Error parsing:", error);
+      console.error('Error parsing:', error);
     }
   });
 };

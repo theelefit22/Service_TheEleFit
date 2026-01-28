@@ -97,7 +97,7 @@ const AdminPanel = () => {
       setApplications(applicationsList);
       return applicationsList;
     } catch (error) {
-      console.error("Error loading applications:", error);
+      console.error('Error loading applications:', error);
       throw error;
     }
   };
@@ -106,7 +106,7 @@ const AdminPanel = () => {
     try {
       // Get all experts from Firestore (users with userType 'expert')
       const usersCollection = collection(db, 'users');
-      const expertsQuery = query(usersCollection, where("userType", "==", "expert"));
+      const expertsQuery = query(usersCollection, where('userType', '==', 'expert'));
       const expertsSnapshot = await getDocs(expertsQuery);
       
       const expertsList = await Promise.all(expertsSnapshot.docs.map(async (docSnapshot) => {
@@ -133,7 +133,7 @@ const AdminPanel = () => {
       
       setExperts(expertsList);
     } catch (error) {
-      console.error("Error loading experts:", error);
+      console.error('Error loading experts:', error);
       throw error;
     }
   };
@@ -142,7 +142,7 @@ const AdminPanel = () => {
     try {
       // Get all regular users from Firestore
       const usersCollection = collection(db, 'users');
-      const usersQuery = query(usersCollection, where("userType", "==", "user"));
+      const usersQuery = query(usersCollection, where('userType', '==', 'user'));
       const usersSnapshot = await getDocs(usersQuery);
       
       const usersList = await Promise.all(usersSnapshot.docs.map(async (docSnapshot) => {
@@ -151,7 +151,7 @@ const AdminPanel = () => {
         // Get user-related data
         // For example, get booking history
         const bookingsCollection = collection(db, 'bookings');
-        const userBookingsQuery = query(bookingsCollection, where("userId", "==", docSnapshot.id));
+        const userBookingsQuery = query(bookingsCollection, where('userId', '==', docSnapshot.id));
         const bookingsSnapshot = await getDocs(userBookingsQuery);
         
         const bookings = bookingsSnapshot.docs.map(bookingDoc => ({
@@ -162,7 +162,7 @@ const AdminPanel = () => {
         
         // Get reviews
         const reviewsCollection = collection(db, 'reviews');
-        const userReviewsQuery = query(reviewsCollection, where("userId", "==", docSnapshot.id));
+        const userReviewsQuery = query(reviewsCollection, where('userId', '==', docSnapshot.id));
         const reviewsSnapshot = await getDocs(userReviewsQuery);
         
         const reviews = reviewsSnapshot.docs.map(reviewDoc => ({
@@ -185,7 +185,7 @@ const AdminPanel = () => {
       
       setUsers(usersList);
     } catch (error) {
-      console.error("Error loading users:", error);
+      console.error('Error loading users:', error);
       throw error;
     }
   };
@@ -207,13 +207,13 @@ const AdminPanel = () => {
       
       // First check if user already exists in Firebase
       const usersRef = collection(db, 'users');
-      const userQuery = query(usersRef, where("email", "==", application.email));
+      const userQuery = query(usersRef, where('email', '==', application.email));
       const userSnapshot = await getDocs(userQuery);
       let existingUser = null;
       let uid = null;
       
       if (!userSnapshot.empty) {
-        console.log("User already exists in Firebase, will update instead of create");
+        console.log('User already exists in Firebase, will update instead of create');
         existingUser = userSnapshot.docs[0];
         uid = existingUser.id;
       }
@@ -237,7 +237,7 @@ const AdminPanel = () => {
           existingUser: true
         };
         
-        console.log("Existing user updated to expert type:", result);
+        console.log('Existing user updated to expert type:', result);
       } else {
         // Create new user
         try {
@@ -249,11 +249,11 @@ const AdminPanel = () => {
           
           console.log('Expert registration result:', result);
         } catch (registerError) {
-          console.error("Error registering expert:", registerError);
+          console.error('Error registering expert:', registerError);
           
           // Check if error is because user already exists
           if (registerError.message && registerError.message.includes('auth/email-already-in-use')) {
-            console.log("User exists in Firebase Auth but not in Firestore, creating Firestore document");
+            console.log('User exists in Firebase Auth but not in Firestore, creating Firestore document');
             
             // Try to sign in with the new password to get the UID
             try {
@@ -275,15 +275,15 @@ const AdminPanel = () => {
                 shopifyIntegrated: false
               };
               
-              console.log("Created Firestore document for existing auth user:", result);
+              console.log('Created Firestore document for existing auth user:', result);
             } catch (signInError) {
-              console.error("Could not sign in with new password, sending password reset email instead");
+              console.error('Could not sign in with new password, sending password reset email instead');
               
               // Send password reset email
               await sendPasswordResetEmail(application.email);
               
               // Try direct Firebase registration without Shopify
-              console.log("Attempting to create Firestore document without knowing UID");
+              console.log('Attempting to create Firestore document without knowing UID');
               
               // We don't know the UID, so we'll create a document with a generated ID
               const userDocRef = await addDoc(collection(db, 'pendingExperts'), {
@@ -310,7 +310,7 @@ const AdminPanel = () => {
             }
           } else {
             // Try direct Firebase registration without Shopify
-            console.log("Attempting direct Firebase registration without Shopify...");
+            console.log('Attempting direct Firebase registration without Shopify...');
             
             try {
               // Create user in Firebase Auth
@@ -332,9 +332,9 @@ const AdminPanel = () => {
                 shopifyIntegrated: false
               };
               
-              console.log("Direct Firebase registration successful:", result);
+              console.log('Direct Firebase registration successful:', result);
             } catch (directRegisterError) {
-              console.error("Direct Firebase registration also failed:", directRegisterError);
+              console.error('Direct Firebase registration also failed:', directRegisterError);
               throw directRegisterError;
             }
           }
@@ -399,7 +399,7 @@ const AdminPanel = () => {
       const updatedApp = {...application, status: 'approved', approvedAt: new Date()};
       setSelectedApp(updatedApp);
     } catch (error) {
-      console.error("Error approving expert:", error);
+      console.error('Error approving expert:', error);
       setError(`Failed to approve expert: ${error.message}`);
     } finally {
       setActionLoading(false);
@@ -412,7 +412,7 @@ const AdminPanel = () => {
     setSuccess('');
     
     try {
-      console.log("Rejecting application:", application.id);
+      console.log('Rejecting application:', application.id);
       
       // Update application status
       const applicationRef = doc(db, 'expertApplications', application.id);
@@ -433,7 +433,7 @@ const AdminPanel = () => {
       const updatedApp = {...application, status: 'rejected', rejectedAt: new Date()};
       setSelectedApp(updatedApp);
     } catch (error) {
-      console.error("Error rejecting expert:", error);
+      console.error('Error rejecting expert:', error);
       setError(`Failed to reject expert: ${error.message}`);
     } finally {
       setActionLoading(false);
@@ -473,7 +473,7 @@ const AdminPanel = () => {
     try {
       // Find the original application to get or generate a new password
       const applicationsCollection = collection(db, 'expertApplications');
-      const applicationsQuery = query(applicationsCollection, where("email", "==", expert.email));
+      const applicationsQuery = query(applicationsCollection, where('email', '==', expert.email));
       const applicationsSnapshot = await getDocs(applicationsQuery);
       
       let password;
@@ -499,7 +499,7 @@ const AdminPanel = () => {
       
       setSuccess(`Credentials successfully resent to ${expert.email}`);
     } catch (error) {
-      console.error("Error resending credentials:", error);
+      console.error('Error resending credentials:', error);
       setError(`Failed to resend credentials: ${error.message}`);
     } finally {
       setResendLoading(false);
@@ -519,7 +519,7 @@ const AdminPanel = () => {
       
       // 3. Delete bookings
       const bookingsCollection = collection(db, 'bookings');
-      const expertBookingsQuery = query(bookingsCollection, where("expertId", "==", expertId));
+      const expertBookingsQuery = query(bookingsCollection, where('expertId', '==', expertId));
       const bookingsSnapshot = await getDocs(expertBookingsQuery);
       
       const deleteBookingsPromises = bookingsSnapshot.docs.map(bookingDoc => 
@@ -529,7 +529,7 @@ const AdminPanel = () => {
       
       // 4. Delete reviews
       const reviewsCollection = collection(db, 'reviews');
-      const expertReviewsQuery = query(reviewsCollection, where("expertId", "==", expertId));
+      const expertReviewsQuery = query(reviewsCollection, where('expertId', '==', expertId));
       const reviewsSnapshot = await getDocs(expertReviewsQuery);
       
       const deleteReviewsPromises = reviewsSnapshot.docs.map(reviewDoc => 
@@ -564,7 +564,7 @@ const AdminPanel = () => {
       
       // 2. Delete bookings
       const bookingsCollection = collection(db, 'bookings');
-      const userBookingsQuery = query(bookingsCollection, where("userId", "==", userId));
+      const userBookingsQuery = query(bookingsCollection, where('userId', '==', userId));
       const bookingsSnapshot = await getDocs(userBookingsQuery);
       
       const deleteBookingsPromises = bookingsSnapshot.docs.map(bookingDoc => 
@@ -574,7 +574,7 @@ const AdminPanel = () => {
       
       // 3. Delete reviews
       const reviewsCollection = collection(db, 'reviews');
-      const userReviewsQuery = query(reviewsCollection, where("userId", "==", userId));
+      const userReviewsQuery = query(reviewsCollection, where('userId', '==', userId));
       const reviewsSnapshot = await getDocs(userReviewsQuery);
       
       const deleteReviewsPromises = reviewsSnapshot.docs.map(reviewDoc => 

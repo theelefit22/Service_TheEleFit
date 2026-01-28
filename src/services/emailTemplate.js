@@ -1,20 +1,20 @@
 // EmailJS configuration
 export const EMAIL_CONFIG = {
-  SERVICE_ID: "service_6xenpqn",
-  TEMPLATE_ID: "template_yjlbx4n",
-  PUBLIC_KEY: "V8y4JdJdlObvV0JTX",
-  DEFAULT_REPLY_TO: "theelifit25@gmail.com",
+  SERVICE_ID: 'service_6xenpqn',
+  TEMPLATE_ID: 'template_yjlbx4n',
+  PUBLIC_KEY: 'V8y4JdJdlObvV0JTX',
+  DEFAULT_REPLY_TO: 'theelifit25@gmail.com',
   TEMPLATE_PARAMS: {
-    email: "",              // Recipient's email (using {{email}} in template)
-    to_name: "",           // From Name in template
-    subject: "",           // Email subject
-    message_html: "",      // Main content
-    reply_to: "theelifit25@gmail.com",
-    bcc_email: "",        // BCC recipients
-    cc_email: "",         // CC recipients
-    meeting_time: "",      // Meeting time
-    meeting_link: "",      // Meeting link
-    expert_name: ""       // Expert's name
+    email: '',              // Recipient's email (using {{email}} in template)
+    to_name: '',           // From Name in template
+    subject: '',           // Email subject
+    message_html: '',      // Main content
+    reply_to: 'theelifit25@gmail.com',
+    bcc_email: '',        // BCC recipients
+    cc_email: '',         // CC recipients
+    meeting_time: '',      // Meeting time
+    meeting_link: '',      // Meeting link
+    expert_name: ''       // Expert's name
   }
 };
 

@@ -5,7 +5,7 @@ import { ref, deleteObject as deleteStorageObject, getMetadata } from 'firebase/
 import { db, storage } from '../services/firebase';
 import './ProfileImageUploader.css';
 
-const DEFAULT_PROFILE_IMAGE = "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png";
+const DEFAULT_PROFILE_IMAGE = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
 
 // Camera icon SVG as a component
 const CameraIcon = () => (
@@ -237,11 +237,11 @@ const ProfileImageUploader = ({
     <div className={`profile-image-uploader ${size}`}>
       <div 
         className={`image-container ${isUploading ? 'uploading' : ''} ${previewUrl ? 'preview-mode' : ''}`}
-        title={previewUrl ? "Preview" : "Profile photo"}
+        title={previewUrl ? 'Preview' : 'Profile photo'}
       >
         <img 
           src={previewUrl || imageUrl} 
-          alt={previewUrl ? "Preview" : "Profile"} 
+          alt={previewUrl ? 'Preview' : 'Profile'} 
         />
         
         {isUploading && (

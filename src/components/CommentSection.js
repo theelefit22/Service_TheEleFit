@@ -5,7 +5,7 @@ import './CommentSection.css';
 import { formatDistanceToNow, format, differenceInMinutes, differenceInHours, isYesterday } from 'date-fns';
 
 // Default avatar for users without profile pictures
-const DEFAULT_AVATAR = "https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg";
+const DEFAULT_AVATAR = 'https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg';
 
 const COMMENTS_TO_SHOW = 3; // Number of comments to show initially
 

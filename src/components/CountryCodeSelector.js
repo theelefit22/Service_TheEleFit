@@ -6,8 +6,8 @@ const CountryCodeSelector = ({
   value = '', 
   onChange, 
   onValidationChange,
-  placeholder = "Enter phone number",
-  className = "",
+  placeholder = 'Enter phone number',
+  className = '',
   disabled = false
 }) => {
   const [selectedCountry, setSelectedCountry] = useState(getDefaultCountry());

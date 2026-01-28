@@ -9,10 +9,10 @@ const PhoneNumberInput = ({
   onChange, 
   onValidationChange,
   onVerificationChange,
-  placeholder = "Enter phone number",
-  className = "",
+  placeholder = 'Enter phone number',
+  className = '',
   disabled = false,
-  label = "Phone",
+  label = 'Phone',
   showVerification = true,
   isAlreadyVerified = false,
   currentUser = null

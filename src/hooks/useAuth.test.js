@@ -1,4 +1,7 @@
 // Mock Firebase functions
+import { renderHook } from '@testing-library/react';
+import { useAuth } from './useAuth';
+
 jest.mock('firebase/auth', () => ({
   onAuthStateChanged: jest.fn(),
   signInWithEmailAndPassword: jest.fn(),
@@ -20,9 +23,6 @@ jest.mock('../services/firebase', () => ({
   handleTokenFailureWithShopify: jest.fn(),
   authenticateCustomer: jest.fn()
 }));
-
-import { renderHook } from '@testing-library/react';
-import { useAuth } from './useAuth';
 
 describe('useAuth', () => {
   const mockOnAuthStateChanged = require('firebase/auth').onAuthStateChanged;

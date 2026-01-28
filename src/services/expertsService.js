@@ -4,11 +4,11 @@ import { collection, getDocs, doc, getDoc, updateDoc, addDoc, query, where, arra
 
 // Array of professional headshot images from Unsplash
 const professionalImages = [
-  "https://images.unsplash.com/photo-1551836022-d5d88e9218df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-  "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-  "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
-  "https://images.unsplash.com/photo-1563701039037-5834af7e8d36?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+  'https://images.unsplash.com/photo-1551836022-d5d88e9218df?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1563701039037-5834af7e8d36?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
 ];
 
 export const expertsService = {
@@ -23,7 +23,7 @@ export const expertsService = {
       }));
       return expertsList;
     } catch (error) {
-      console.error("Error getting experts:", error);
+      console.error('Error getting experts:', error);
       // Fallback to local data if Firestore fails
       return experts;
     }
@@ -46,7 +46,7 @@ export const expertsService = {
         return localExpert;
       }
     } catch (error) {
-      console.error("Error getting expert:", error);
+      console.error('Error getting expert:', error);
       // Fallback to local data
       const expert = experts.find(expert => expert.id === parseInt(id));
       return expert;
@@ -61,7 +61,7 @@ export const expertsService = {
       const expertSnapshot = await getDoc(expertDoc);
       
       if (!expertSnapshot.exists()) {
-        return Promise.reject("Expert not found");
+        return Promise.reject('Expert not found');
       }
       
       const expertData = expertSnapshot.data();
@@ -70,11 +70,11 @@ export const expertsService = {
       );
       
       if (slotIndex === -1) {
-        return Promise.reject("Slot not found");
+        return Promise.reject('Slot not found');
       }
       
       if (expertData.availableSlots[slotIndex].booked) {
-        return Promise.reject("Slot already booked");
+        return Promise.reject('Slot already booked');
       }
       
       // Create updated slots array
@@ -100,12 +100,12 @@ export const expertsService = {
         message: `Successfully booked a slot with ${expertData.name}`
       };
     } catch (error) {
-      console.error("Error booking slot:", error);
+      console.error('Error booking slot:', error);
       // Fallback to local implementation if Firestore fails
       const expertIndex = experts.findIndex(expert => expert.id === parseInt(expertId));
       
       if (expertIndex === -1) {
-        return Promise.reject("Expert not found");
+        return Promise.reject('Expert not found');
       }
 
       const slotIndex = experts[expertIndex].availableSlots.findIndex(
@@ -113,11 +113,11 @@ export const expertsService = {
       );
 
       if (slotIndex === -1) {
-        return Promise.reject("Slot not found");
+        return Promise.reject('Slot not found');
       }
 
       if (experts[expertIndex].availableSlots[slotIndex].booked) {
-        return Promise.reject("Slot already booked");
+        return Promise.reject('Slot already booked');
       }
 
       // Create a copy of the experts array with the updated booking
@@ -178,10 +178,10 @@ export const expertsService = {
         image: randomImage,
         rating: 4.5, // Default rating for new experts
         availableSlots: [
-          { id: 1, time: "Monday 9:00 AM", booked: false },
-          { id: 2, time: "Tuesday 2:00 PM", booked: false },
-          { id: 3, time: "Wednesday 11:00 AM", booked: false },
-          { id: 4, time: "Friday 3:00 PM", booked: false }
+          { id: 1, time: 'Monday 9:00 AM', booked: false },
+          { id: 2, time: 'Tuesday 2:00 PM', booked: false },
+          { id: 3, time: 'Wednesday 11:00 AM', booked: false },
+          { id: 4, time: 'Friday 3:00 PM', booked: false }
         ],
         createdAt: new Date(),
         shopifyCustomerId: authResult.shopifyCustomerId // Store Shopify customer ID
@@ -191,14 +191,14 @@ export const expertsService = {
       const expertsCollection = collection(db, 'experts');
       const docRef = await addDoc(expertsCollection, newExpert);
       
-      console.log("Expert registered in Firestore:", docRef.id);
+      console.log('Expert registered in Firestore:', docRef.id);
       return { 
         success: true, 
         expertId: docRef.id,
         message: "Registration successful! You've been added to our experts list." 
       };
     } catch (error) {
-      console.error("Error registering expert:", error);
+      console.error('Error registering expert:', error);
       throw error;
     }
   },
@@ -211,7 +211,7 @@ export const expertsService = {
       const expertSnapshot = await getDoc(expertDoc);
       
       if (!expertSnapshot.exists()) {
-        return Promise.reject("Expert not found");
+        return Promise.reject('Expert not found');
       }
       
       const expertData = expertSnapshot.data();
@@ -265,8 +265,8 @@ export const expertsService = {
         message: `Successfully rated ${expertData.name}`
       };
     } catch (error) {
-      console.error("Error rating expert:", error);
-      return Promise.reject("Failed to submit rating");
+      console.error('Error rating expert:', error);
+      return Promise.reject('Failed to submit rating');
     }
   },
   
@@ -278,7 +278,7 @@ export const expertsService = {
       const expertSnapshot = await getDoc(expertDoc);
       
       if (!expertSnapshot.exists()) {
-        return Promise.reject("Expert not found");
+        return Promise.reject('Expert not found');
       }
       
       const expertData = expertSnapshot.data();
@@ -318,8 +318,8 @@ export const expertsService = {
         message: `Comment added successfully`
       };
     } catch (error) {
-      console.error("Error adding comment:", error);
-      return Promise.reject("Failed to add comment");
+      console.error('Error adding comment:', error);
+      return Promise.reject('Failed to add comment');
     }
   },
   
@@ -330,14 +330,14 @@ export const expertsService = {
       const expertSnapshot = await getDoc(expertDoc);
       
       if (!expertSnapshot.exists()) {
-        return Promise.reject("Expert not found");
+        return Promise.reject('Expert not found');
       }
       
       const expertData = expertSnapshot.data();
       return expertData.comments || [];
     } catch (error) {
-      console.error("Error getting expert comments:", error);
-      return Promise.reject("Failed to retrieve comments");
+      console.error('Error getting expert comments:', error);
+      return Promise.reject('Failed to retrieve comments');
     }
   },
 
@@ -348,7 +348,7 @@ export const expertsService = {
       const expertSnapshot = await getDoc(expertDoc);
       
       if (!expertSnapshot.exists()) {
-        return Promise.reject("Expert not found");
+        return Promise.reject('Expert not found');
       }
       
       const expertData = expertSnapshot.data();
@@ -357,7 +357,7 @@ export const expertsService = {
       // Find the comment and update its likes
       const commentIndex = comments.findIndex(c => c.id === commentId);
       if (commentIndex === -1) {
-        return Promise.reject("Comment not found");
+        return Promise.reject('Comment not found');
       }
       
       const comment = comments[commentIndex];
@@ -386,8 +386,8 @@ export const expertsService = {
         message: `Comment ${userLiked ? 'unliked' : 'liked'} successfully`
       };
     } catch (error) {
-      console.error("Error liking comment:", error);
-      return Promise.reject("Failed to like comment");
+      console.error('Error liking comment:', error);
+      return Promise.reject('Failed to like comment');
     }
   }
 };
