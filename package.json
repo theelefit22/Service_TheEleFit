@@ -65,7 +65,9 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "node netlify-deploy.js",
-    "serve": "node serve.js"
+    "serve": "node serve.js",
+    "lint": "eslint src/**/*.{js,jsx}",
+    "lint:fix": "eslint src/**/*.{js,jsx} --fix"
   },
   "eslintConfig": {
     "extends": [
@@ -90,6 +92,10 @@
     "autoprefixer": "^10.4.21",
     "buffer": "^6.0.3",
     "cross-env": "^7.0.3",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
     "express": "^5.1.0",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
@@ -110,7 +116,12 @@
       "!src/setupTests.js"
     ],
     "coverageDirectory": "coverage",
-    "coverageReporters": ["json", "lcov", "text", "clover"],
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "clover"
+    ],
     "testResultsProcessor": "jest-junit"
   }
 }
